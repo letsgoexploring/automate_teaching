@@ -1,0 +1,11 @@
+LICENSE
+README.md
+setup.py
+automate_teaching/__init__.py
+automate_teaching/exam.py
+automate_teaching/google.py
+automate_teaching/latex.py
+automate_teaching.egg-info/PKG-INFO
+automate_teaching.egg-info/SOURCES.txt
+automate_teaching.egg-info/dependency_links.txt
+automate_teaching.egg-info/top_level.txt

@@ -1,0 +1,16 @@
+Metadata-Version: 2.2
+Name: automate_teaching
+Version: 0.0.1
+Summary: Functions to assist in course management, particularly economics.
+Home-page: https://github.com/letsgoexploring/automate_teaching
+Download-URL: https://github.com/letsgoexploring/automate_teaching/blob/gh-pages/dist/automate_teaching-0.0.1.tar.gz
+Author: Brian C. Jenkins
+Author-email: bcjenkin@uci.edu
+Keywords: python,google,gmail,calendar,latex,beamer,exam,multiple choice,gradescope,higher education,teaching
+License-File: LICENSE
+Dynamic: author
+Dynamic: author-email
+Dynamic: download-url
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: summary
