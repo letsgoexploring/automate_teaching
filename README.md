@@ -28,7 +28,7 @@
 ## Documentation
 Documentation for fredpy: https://www.briancjenkins.com/automate_teaching/docs/build/html/
 
-_Updated: January 26, 2025_
+_Updated: April 7, 2025_
 
 
 <!-- ## Quickstart -->
