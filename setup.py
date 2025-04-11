@@ -5,7 +5,7 @@ import os
 # Set version number
 release = '0.0.2'
 
-# Save proversion to version.txt
+# Save version to version.txt
 with open('version.txt','w') as newfile:
     newfile.write(release)
 
