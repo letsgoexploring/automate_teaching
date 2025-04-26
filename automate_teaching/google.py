@@ -766,52 +766,40 @@ class calendar:
         if calendar_id == None:
             calendar_id = self.primary_calendar_id
         
-        now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
-        
-        events_result = self.service.events().list(calendarId=calendar_id, timeMin=now,
-                                                      maxResults=maxResults, singleEvents=True,
-                                                      orderBy='startTime').execute()
+        now = datetime.datetime.utcnow().isoformat() + 'Z'
+        events_result = (
+            self.service
+                .events()
+                .list(calendarId=calendar_id,
+                      timeMin=now,
+                      maxResults=maxResults,
+                      singleEvents=True,
+                      orderBy='startTime')
+                .execute()
+        )
         all_events = events_result.get('items', [])
-        
+
+        # if no filters specified, return everything
+        if title_contains is None and description_contains is None:
+            return all_events
+
         events = []
-        
         for event in all_events:
-            
-            if title_contains is not None and description_contains is not None:
+            summary = event.get('summary', '')
+            description = event.get('description', '')
 
-                try:
-                    if title_contains in event['summary'] and description_contains in event['description']:
-
-                        start = event['start'].get('dateTime', event['start'].get('date'))
-                    
-                        events.append(event)
-
-                except:
-
-                    pass
-                    
-            elif title_contains is not None and description_contains is None:
-                
-                if title_contains in event['summary']:
-
-                    start = event['start'].get('dateTime', event['start'].get('date'))
-                
+            if title_contains and description_contains:
+                if title_contains in summary and description_contains in description:
                     events.append(event)
-                    
-            elif description_contains is not None and title_contains is None:
-                
 
+            elif title_contains:
+                if title_contains in summary:
+                    events.append(event)
 
-                try:
-                    if description_contains in event['description']:
+            elif description_contains:
+                if description_contains in description:
+                    events.append(event)
 
-                        start = event['start'].get('dateTime', event['start'].get('date'))
-                    
-                        events.append(event)
-
-                except:
-                    pass
-        
         return events
 
     

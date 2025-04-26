@@ -3,7 +3,7 @@ from setuptools import setup
 import os
 
 # Set version number
-release = '0.0.2'
+release = '0.0.1'
 
 # Save version to version.txt
 with open('version.txt','w') as newfile:
@@ -22,5 +22,5 @@ setup(
   classifiers = [],
   package_data={},
   include_package_data=True,
-  license-file="LICENSE",
+  license_file="LICENSE",
 )
