@@ -217,7 +217,7 @@ class mc_group():
     """Defines a class for storing and managing a group of multiple-choice questions."""
     
     def __init__(self,group_lines,correct_string):
-        """Initializes an mc_group instance.
+        r"""Initializes an mc_group instance.
 
         Parses a group of multiple-choice questions, extracting headers, counts, and individual questions.
 
@@ -464,7 +464,7 @@ class mc_exam():
         
         def get_question_length(mc_lines,starting_line_number):
         
-            """Finds the number of lines that a single multiple choice question occupies in a LaTeX file.
+            r"""Finds the number of lines that a single multiple choice question occupies in a LaTeX file.
 
             Args:
                 mc_lines (list): List of lines read from a LaTeX file, between \begin{mcquestions} and \end{mcquestions}.

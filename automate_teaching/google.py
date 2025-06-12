@@ -545,7 +545,7 @@ class calendar:
         self.primary_calendar_id = self.calendar_ids[self.primary_calendar]
 
 
-    def add_event(self,start,end=None,duration=0,duration_units='H',title='Event',description=None,calendar_name=None,calendar_id=None,time_zone=None):
+    def add_event(self,start,end=None,duration=0,duration_units='H',title='Event',description=None,calendar_name=None,calendar_id=None,time_zone=None,all_day=False):
 
         """Adds a single event to a Google Calendar.
 
@@ -559,6 +559,7 @@ class calendar:
             calendar_name (str, optional): Name of the calendar to add the event to. Default is None.
             calendar_id (str, optional): ID of the calendar to add the event to. Default is None.
             time_zone (str, optional): Time zone for the event in TZ identifier format (https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) Default is None.
+            all_day (bool, optional): If True, creates an all-day event. Default is False.
 
         Raises:
             ValueError: If `calendar_name` and `calendar_id` do not reference the same calendar.
@@ -569,74 +570,65 @@ class calendar:
 
         if description is None:
             description = 'Added by automate_teaching.'
-            
         else:
             description += '\n\nAdded by automate_teaching.'
 
-        # Working with Timedelta: https://pandas.pydata.org/docs/reference/api/pandas.Timedelta.html
-        start = pd.to_datetime(start)
-        
+        start = pd.to_datetime(start).date() if all_day else pd.to_datetime(start)
+
         if end is not None:
-            end = pd.to_datetime(end)
+            end = pd.to_datetime(end).date() if all_day else pd.to_datetime(end)
         else:
             if duration_units is None:
                 duration_units = 'H'
-            end = start + pd.Timedelta(duration, duration_units)
+            if all_day:
+                end = start + pd.Timedelta(days=1)
+            else:
+                end = start + pd.Timedelta(duration, duration_units)
 
-    
         if calendar_id is not None and calendar_name is not None:
             if calendar_id != self.calendar_ids[calendar_name]:
                 raise ValueError('calendar_id and calendar_name do not reference the same calendar.')
         elif calendar_name is not None:
             calendar_id = self.calendar_ids[calendar_name]
 
-        # Set calendar_id to primary if calendar_id or calendar_name are supplied
-        if calendar_id == None:
+        if calendar_id is None:
             calendar_id = self.primary_calendar_id
 
-        if time_zone is None:
-
-            time_zone = self.service.calendars().get(calendarId=calendar_id).execute()['timeZone']
-            
-        tz = pytz.timezone(time_zone)
-
-        utc_offset = tz.utcoffset(start)
-
-
-        seconds = utc_offset.seconds + utc_offset.days*24*60*60
-
-        if seconds<0:
-            utc_sign = '-'
+        if all_day:
+            event = {
+                'summary': title,
+                'description': description,
+                'start': {'date': start.isoformat()},
+                'end': {'date': end.isoformat()}
+            }
         else:
-            utc_sign = '+'
+            if time_zone is None:
+                time_zone = self.service.calendars().get(calendarId=calendar_id).execute()['timeZone']
 
-        seconds = abs(seconds)
+            tz = pytz.timezone(time_zone)
+            utc_offset = tz.utcoffset(start)
+            seconds = utc_offset.seconds + utc_offset.days * 86400
+            utc_sign = '-' if seconds < 0 else '+'
+            seconds = abs(seconds)
+            hours = int(seconds / 3600)
+            minutes = round((seconds % 3600) / 60)
+            UTC_HH = utc_sign + f'{abs(hours):02d}'
+            UTC_MM = f'{seconds % 3600 // 60:02d}'
 
-        hours = int(seconds/(60*60))
-        minutes = round(np.mod(seconds,60*60)/60)
+            event = {
+                'summary': title,
+                'description': description,
+                'start': {
+                    'dateTime': start.strftime('%Y-%m-%dT%H:%M:%S' + UTC_HH + ':' + UTC_MM),
+                    'timeZone': time_zone,
+                },
+                'end': {
+                    'dateTime': end.strftime('%Y-%m-%dT%H:%M:%S' + UTC_HH + ':' + UTC_MM),
+                    'timeZone': time_zone,
+                },
+            }
 
-        UTC_HH = utc_sign+f'{abs(hours):02d}'
-        UTC_MM = f'{np.remainder(seconds,60*60)//60:02d}'
-
-
-
-        # Event information
-
-        event = {
-            'summary': title,
-            'description': description,
-            'start': {
-                'dateTime': start.strftime('%Y-%m-%dT%H:%M:%S'+UTC_HH+':'+UTC_MM),
-                'timeZone': time_zone,
-            },
-            'end': {
-                'dateTime': end.strftime('%Y-%m-%dT%H:%M:%S'+UTC_HH+':'+UTC_MM),
-                'timeZone': time_zone,
-            },
-        }
-
-        # Add event to calendar
-        event = self.service.events().insert(calendarId=calendar_id, body=event).execute()
+        self.service.events().insert(calendarId=calendar_id, body=event).execute()
 
     def delete_events(self,events=None,calendar_name=None,calendar_id=None):
 

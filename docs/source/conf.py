@@ -21,7 +21,7 @@ rst_prolog = f"""
 .. |release_url| replace:: https://github.com/letsgoexploring/automate_teaching/blob/gh-pages/dist/automate_teaching-{release}.tar.gz
 """
 
-
+print(release,version)
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information

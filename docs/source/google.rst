@@ -190,7 +190,8 @@ Classes
          description=None, 
          calendar_name=None, 
          calendar_id=None, 
-         time_zone=None)
+         time_zone=None,
+         all_day=False)
 
       Adds a single event to a Google Calendar.
 
@@ -212,6 +213,8 @@ Classes
          ID of the calendar to add the event to. Default is None.
       :param str time_zone: 
          Time zone of the event (e.g., "America/New_York"). Default is None.
+      :param bool all_day: 
+         If True, creates an all-day event. Default is False.
       :raises ValueError: 
          If `calendar_name` and `calendar_id` do not reference the same calendar.
       :return: None
