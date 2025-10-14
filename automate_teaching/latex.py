@@ -35,7 +35,7 @@ def make_figure(image_filename,position='h',caption=None,label='',hspace='0cm',h
     figure = '\\begin{figure}[h]\n'
     
     if caption is not None and caption_top:
-        figure+='\\caption{\label{'+label+'} '+caption+'}\n'
+        figure+='\\caption{\\label{'+label+'} '+caption+'}\n'
         
     if center_image:
         figure+='\\begin{center}\n'
@@ -204,7 +204,7 @@ def make_table(data,table_spec='',row_format={},column_format={},hlines=[],cline
     table = '\\begin{table}['+position+']\n'
     
     if caption is not None and caption_top:
-        table+='\\caption{\label{'+label+'} '+caption+'}\n'
+        table+='\\caption{\\label{'+label+'} '+caption+'}\n'
         
     if center_table:
         table+='\\begin{center}\n'

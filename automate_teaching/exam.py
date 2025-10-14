@@ -3,6 +3,7 @@ import numpy as np
 from copy import deepcopy
 import os
 import string
+import re
 
 
 def make_answer_key(exam):
@@ -526,21 +527,43 @@ class mc_exam():
                 exam_lines = text.readlines()
                 self.exam_lines = exam_lines
 
+                # ADDED BY CHATGPT SUGGESTION
+                with open(exam_file, 'r') as text:
+                    raw_lines = text.readlines()
+                    self.exam_lines = raw_lines  # keep the original intact (with comments)
+
+                # find MC block bounds on the original lines
+                for n, line in enumerate(self.exam_lines):
+                    if line.lstrip().startswith('\\begin{mcquestions}'):
+                        self.mc_block_start = n
+                    elif line.lstrip().startswith('\\end{mcquestions}'):
+                        self.mc_block_end = n
+
+                # header & footer come from the original (comments preserved)
+                self.exam_header = ''.join(self.exam_lines[:self.mc_block_start])
+                self.exam_footer = ''.join(self.exam_lines[self.mc_block_end+1:])
+
+                # build a comment-stripped copy ONLY for parsing MC content
+                mc_slice = self.exam_lines[self.mc_block_start:self.mc_block_end]
+                self.mc_lines = [ln for ln in mc_slice if not ln.lstrip().startswith('%')]
+                # ADDED BY CHATGPT SUGGESTION
+
         
 
         if self.exam_lines is not None:
 
-            # Remove lines beginning wiath a comment
-            comment_lines = []
-            for n,line in enumerate(self.exam_lines):
+            # COMMENTED BY CHATGPT SUGGESTION
+            # # Remove lines beginning wiath a comment
+            # comment_lines = []
+            # for n,line in enumerate(self.exam_lines):
             
-                if line.lstrip().startswith('%'):
-                    comment_lines.append(n)
+            #     if line.lstrip().startswith('%'):
+            #         comment_lines.append(n)
                     
             
-            for index in sorted(comment_lines, reverse=True):
-                del self.exam_lines[index]
-
+            # for index in sorted(comment_lines, reverse=True):
+            #     del self.exam_lines[index]
+            # COMMENTED BY CHATGPT SUGGESTION
             
             for n,line in enumerate(self.exam_lines):
                 if line.lstrip().startswith('\\begin{mcquestions}'):
@@ -814,11 +837,74 @@ class mc_exam():
         
         output +='\\end{mcquestions}\n\n'
         
-        output +=''.join(self.exam_footer)
-        
-        with open(key_filename,'w') as newfile:
-            newfile.write(output)
+        # output +=''.join(self.exam_footer)
 
+        # --- Safely append the exam footer ---
+        # (make sure it's a string even if it was stored as a list of lines)
+        if isinstance(self.exam_footer, list):
+            output += ''.join(self.exam_footer)
+        else:
+            output += str(self.exam_footer)
+
+        # # --- Reveal commented answers ---
+        # answer_pattern = re.compile(
+        #     r'%\s*BEGIN ANSWER(.*?)%\s*END ANSWER',
+        #     re.DOTALL
+        # )
+
+        # def reveal_answers(match):
+        #     content = match.group(1)
+        #     # remove leading '%' and whitespace
+        #     lines = [
+        #         re.sub(r'^\s*%\s?', '', line)
+        #         for line in content.splitlines()
+        #         if line.strip() != ''
+        #     ]
+        #     revealed = '\n'.join(lines)
+        #     return '\n\\begin{quote}\\emph{Answer:}\\ ' + revealed + '\\end{quote}\n'
+
+        # output = re.sub(answer_pattern, reveal_answers, output)
+
+        # --- Remove backmatter sections from the answer key ---
+        # Remove everything from \backmatter{ to the *matching* closing brace, including trailing newlines
+        output = re.sub(
+            r'\\backmatter\s*\{(?:[^{}]|\{[^{}]*\})*?\}',  # handles nested braces, stops at correct closing brace
+            '',
+            output,
+            flags=re.DOTALL
+        )
+
+        # --- Clean up free-response block (after answers revealed) ---
+        def clean_fr_block(match):
+            """Replaces long vspaces/newpages inside the free-response block only."""
+            block = match.group(0)
+            block = re.sub(r'\\vspace\*?\{[^}]*\}', r'\\', block)
+            block = re.sub(r'\\newpage', r'\\', block)
+            return block
+
+        output = re.sub(
+            r'\\begin\{frquestions\}.*?\\end\{frquestions\}',
+            clean_fr_block,
+            output,
+            flags=re.DOTALL
+        )
+
+        # --- Reveal answers written as \answer{...} ---
+        def reveal_answers(match):
+            content = match.group(1).strip()
+            return f"\n\\emph{{Answer:}}\\ {content}\n"
+
+        output = re.sub(
+            r'\\answer\{(.*?)\}',
+            reveal_answers,
+            output,
+            flags=re.DOTALL
+        )
+
+        # --- Write to file ---
+        with open(key_filename, 'w') as newfile:
+            newfile.write(output)
+            
     def shuffle_questions(self,filename=None,seed=None,shuffle_within_groups=True):
         """Shuffles the questions in the exam.
 
