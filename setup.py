@@ -3,7 +3,7 @@ from setuptools import setup
 import os
 
 # Set version number
-release = '0.0.4'
+release = '0.0.5'
 
 # Save version to version.txt
 with open('version.txt','w') as newfile:

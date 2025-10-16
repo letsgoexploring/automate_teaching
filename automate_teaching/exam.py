@@ -846,25 +846,6 @@ class mc_exam():
         else:
             output += str(self.exam_footer)
 
-        # # --- Reveal commented answers ---
-        # answer_pattern = re.compile(
-        #     r'%\s*BEGIN ANSWER(.*?)%\s*END ANSWER',
-        #     re.DOTALL
-        # )
-
-        # def reveal_answers(match):
-        #     content = match.group(1)
-        #     # remove leading '%' and whitespace
-        #     lines = [
-        #         re.sub(r'^\s*%\s?', '', line)
-        #         for line in content.splitlines()
-        #         if line.strip() != ''
-        #     ]
-        #     revealed = '\n'.join(lines)
-        #     return '\n\\begin{quote}\\emph{Answer:}\\ ' + revealed + '\\end{quote}\n'
-
-        # output = re.sub(answer_pattern, reveal_answers, output)
-
         # --- Remove backmatter sections from the answer key ---
         # Remove everything from \backmatter{ to the *matching* closing brace, including trailing newlines
         output = re.sub(
@@ -876,10 +857,18 @@ class mc_exam():
 
         # --- Clean up free-response block (after answers revealed) ---
         def clean_fr_block(match):
-            """Replaces long vspaces/newpages inside the free-response block only."""
+            """Removes long vspace/newpage commands safely (no stray backslashes)."""
             block = match.group(0)
-            block = re.sub(r'\\vspace\*?\{[^}]*\}', r'\\', block)
-            block = re.sub(r'\\newpage', r'\\', block)
+
+            # Remove \vspace and \vspace* entirely
+            block = re.sub(r'\\vspace\*?\{[^}]*\}', '', block)
+
+            # Remove standalone \newpage commands
+            block = re.sub(r'\\newpage\s*', '', block)
+
+            # Remove any empty lines left behind
+            block = re.sub(r'\n\s*\n+', '\n\n', block)
+
             return block
 
         output = re.sub(
@@ -889,17 +878,50 @@ class mc_exam():
             flags=re.DOTALL
         )
 
-        # --- Reveal answers written as \answer{...} ---
-        def reveal_answers(match):
-            content = match.group(1).strip()
-            return f"\n\\emph{{Answer:}}\\ {content}\n"
+                # --- Reveal answers written as \answer{...} ---
+        def reveal_answers_balanced(text):
+            """Safely expand all \answer{...} blocks (handles nested braces)."""
+            result = ""
+            i = 0
+            while i < len(text):
+                start = text.find(r"\answer{", i)
+                if start == -1:
+                    result += text[i:]
+                    break
 
-        output = re.sub(
-            r'\\answer\{(.*?)\}',
-            reveal_answers,
-            output,
-            flags=re.DOTALL
-        )
+                # copy everything before the match
+                result += text[i:start]
+
+                # find the matching closing brace
+                depth = 0
+                j = start + len(r"\answer{")
+                while j < len(text):
+                    if text[j] == "{":
+                        depth += 1
+                    elif text[j] == "}":
+                        if depth == 0:
+                            break
+                        depth -= 1
+                    j += 1
+
+                # extract the inside content
+                content = text[start + len(r"\answer{"):j].strip()
+
+                # Clean up extra slashes but preserve \begin, \end, etc.
+                content = re.sub(r'(?m)^\s*\\\\\s*$', '', content)
+                # Remove only single backslashes at end of line, NOT double ones
+                content = re.sub(r'(?<!\\)\\(\s|$)', r'\1', content)
+
+                result += f"\n\\emph{{Answer:}} {content}\n"
+                i = j + 1
+
+            return result
+
+        output = reveal_answers_balanced(output)
+
+        # --- Final cleanup for stray backslashes or blank lines ---
+        output = re.sub(r'(?m)^\s*\\\\\s*$', '', output)
+        output = re.sub(r'%\s*\\\\', '', output)
 
         # --- Write to file ---
         with open(key_filename, 'w') as newfile:
