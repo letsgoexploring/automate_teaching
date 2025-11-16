@@ -168,31 +168,41 @@ class mc_question:
     
         return new_question
         
-    def add_periods(self,include_equations=True,correct_string=None):
+    def add_periods(self, include_equations=True, correct_string=None):
         """Adds periods to the end of each option if not already present.
-
-        Args:
-            include_equations (bool, optional): Whether to include periods for options ending with equations. Defaults to True.
-            correct_string (str, optional): The marker for the correct answer. Defaults to None.
+        If an equation already ends with a period inside $, no new period is added.
         """
-    
-        for n,option in enumerate(self.options):
-        
-            option_text = option.replace('\\item','').lstrip().replace(correct_string,'').replace('\\%','PERCENTSIGNHERE').replace('%','').replace('PERCENTSIGNHERE','\\%').rstrip()
-            
-            if not option_text.endswith('.'):
-            
-                if option_text.endswith('$') and  include_equations:
-                    option_text +='.'
-            
-                elif not option_text.endswith('$'):
-                    option_text +='.'
-            
-            if correct_string in option:
-            
-                option_text+=' %'+self.correct_string
-            
-            self.options[n] = '\\item '+option_text
+        for n, option in enumerate(self.options):
+            option_text = (
+                option.replace('\\item', '')
+                .lstrip()
+                .replace(correct_string or '', '')
+                .replace('\\%', 'PERCENTSIGNHERE')
+                .replace('%', '')
+                .replace('PERCENTSIGNHERE', '\\%')
+                .rstrip()
+            )
+
+            # 🧠 Detect if the text already ends with a period (outside or inside math)
+            already_has_period = option_text.endswith('.')
+
+            if not already_has_period:
+                # Check for math at the end, e.g., $y=x$ or $y=x.$
+                m = re.search(r'\$(.*?)\$', option_text)
+                if m:
+                    inner_math = m.group(1).strip()
+                    # ✅ If math ends with a period, do NOT add another
+                    if not inner_math.endswith('.'):
+                        if include_equations:
+                            option_text += '.'
+                else:
+                    # No math environment — add a period normally
+                    option_text += '.'
+
+            if correct_string and correct_string in option:
+                option_text += ' %' + self.correct_string
+
+            self.options[n] = '\\item ' + option_text
     
     
     def capitalize_first(self,correct_string=None):
@@ -341,7 +351,10 @@ class mc_exam:
 
     def __init__(self, exam_file=None, exam_lines=None, correct_string='CORRECT', seed=None):
         self.correct_string = correct_string
-        self.filename = exam_file
+        # Keep filename short if exam_file is a path
+        self.filepath = Path(exam_file).resolve() if exam_file else None
+        self.filename = self.filepath.name if exam_file else None
+        
         self.rng = np.random.default_rng(seed=seed)
 
         if exam_file is not None:
@@ -729,6 +742,9 @@ class mc_exam:
         with open(filename, 'w', encoding='utf-8') as newfile:
             newfile.write(output)
 
+        self.filepath = Path(filename).resolve()
+        self.filename = str(self.filepath)
+
         print(f"✅ Exported MC exam: {filename}")
         return output
             
@@ -823,7 +839,7 @@ class mc_exam:
 
         self.rng = np.random.default_rng(seed=seed)
 
-    def shuffle_options(self,filename=None,seed=None):
+    def shuffle_options(self, filename=None, seed=None):
         """Shuffles the options within each question.
 
         Args:
@@ -831,31 +847,34 @@ class mc_exam:
             seed (int, optional): Random seed for reproducibility.
 
         Returns:
-            mc_exam: A new instance with shuffled options.
+            mc_exam: A new mc_exam instance with shuffled options.
         """
 
+        # Create a full deep copy so we don't mutate the original
         new_exam = deepcopy(self)
-        
+
+        # ✅ Set the filename
         if filename is not None:
             new_exam.filename = filename
-
         else:
-            new_exam.filename = self.filename.replace('.tex','')+'_options_shuffled'+'.tex'
+            new_exam.filename = self.filename.replace('.tex', '') + '_options_shuffled.tex'
 
+        # ✅ Seed the RNG *on the new copy*, not on self
         if seed is not None:
-            
-            self.rng = np.random.default_rng(seed=seed)
+            new_exam.rng = np.random.default_rng(seed=seed)
+        else:
+            new_exam.rng = np.random.default_rng()
 
-        
+        # ✅ Shuffle each question’s options using the new RNG
+        for key, value in new_exam.elements.items():
+            new_exam.elements[key] = value.shuffle_options(new_exam.rng)
 
-        for key,value in self.elements.items():
-
-            new_exam.elements[key] = self.elements[key].shuffle_options(self.rng)
-
+        # ✅ Rebuild answer key and answer letters after shuffling
         new_exam.answer_key = make_answer_key(new_exam)
         new_exam.mc_answer_letters = new_exam._compute_answer_key_letters()
 
-        return new_exam
+        # ✅ Return a completely independent shuffled exam
+        return deepcopy(new_exam)
 
     def shuffle_options_and_questions(self,filename=None,seed=None,shuffle_within_groups=True):
         """Shuffles both questions and options in the exam.
@@ -952,33 +971,133 @@ class mc_exam:
 
 class MCExam(mc_exam):
     """Wrapper around mc_exam for pure multiple-choice exams."""
+
     def __init__(self, exam_file=None, **kwargs):
+        if exam_file:
+            self.filepath = Path(exam_file).resolve()
+            self.filename = self.filepath.name   # <-- only the short file name
+            exam_file = str(self.filepath)
+        else:
+            self.filepath = None
+            self.filename = None
+
         super().__init__(exam_file=exam_file, **kwargs)
 
-    # def to_latex(self, filename=None):
-    #     """Override to disable FR answer reveal logic."""
-    #     # Call parent to_latex but skip FR cleanup if present
-    #     output = super().export_exam(filename=filename)
-    #     return output
+    # ----------------------------------------------------------
+    @classmethod
+    def from_string(cls, tex, correct_string='CORRECT', seed=None, source_path=None, filename_hint=None):
+        """Build an MCExam directly from a LaTeX string (no file needed)."""
+        self = cls.__new__(cls)
+        self.correct_string = correct_string
+        self.rng = np.random.default_rng(seed=seed)
+        self.filepath = Path(source_path).resolve() if source_path else None
+        self.filename = filename_hint or (self.filepath.name if self.filepath else None)
+        self.exam_header = ""
+        self.exam_footer = ""
+
+        # Normalize and isolate inner mcquestions environment if present
+        tex = tex.replace('\r\n', '\n').replace('\r', '\n')
+        m = re.search(r'\\begin\{mcquestions\}(.*?)\\end\{mcquestions\}', tex, flags=re.DOTALL)
+        inner = m.group(1) if m else tex
+
+        # Remove commented lines
+        self.mc_lines = [ln for ln in inner.splitlines() if not ln.lstrip().startswith('%')]
+
+        # --- Parse questions and groups exactly as in mc_exam.__init__ ---
+        self.elements = {}
+        index = 0
+        open_group = False
+
+        for n, line in enumerate(self.mc_lines):
+            if line.lstrip().startswith('%'):
+                continue
+            if 'begin{mcgroup}' in line:
+                group_start = n
+                open_group = True
+            elif 'end{mcgroup}' in line:
+                group_end = n
+                open_group = False
+                group_lines = self.mc_lines[group_start:group_end]
+                self.elements[index] = mc_group(group_lines, correct_string=self.correct_string)
+                index += 1
+            elif (('\\shuffle' in line or '\\noshuffle' in line) and not open_group):
+                length = mc_exam.get_question_length(self, self.mc_lines, n)
+                start = n
+                end = n + length
+                question_string = ''.join(self.mc_lines[start:end]).strip()
+                mc = mc_question(question_string, correct_string=self.correct_string)
+                self.elements[index] = mc
+                index += 1
+
+        # Build metadata
+        self.question_count = sum(
+            1 if isinstance(v, mc_question) else len(v.elements)
+            for v in self.elements.values()
+        )
+        self.answer_key = make_answer_key(self)
+        self.mc_answer_letters = self._compute_answer_key_letters()
+
+        return self
 
 
 class FRExam:
-    r"""Handles free-response (FR) exams using \question[points] syntax.
+    r"""Handles free-response (FR) exams using \question[points] syntax."""
 
-    Supports:
-    - Inline FR questions between \begin{frquestions} ... \end{frquestions}
-    - External question files included via \input{...}
-    """
+    def __init__(self, filename=None):
+        self.filepath = Path(filename).resolve() if filename else None
+        self.filename = str(self.filepath) if filename else None
+        self.questions = []
+        self.question_files = []
+        self.exam_header = ""
+        self.exam_footer = ""
 
-    def __init__(self, exam_file=None):
-        self.exam_file = exam_file
+        if filename:
+            self.load_exam(filename)
+
+    # ---------------------------------------------------------
+    @classmethod
+    def from_string(cls, tex, source_path=None, filename_hint=None):
+        self = cls.__new__(cls)
+        self.filepath = Path(source_path).resolve() if source_path else None
+        self.filename = filename_hint or (self.filepath.name if self.filepath else None)
+        self.questions = []
+        self.question_files = []
+        self.exam_header = ""
+        self.exam_footer = ""
+
+        tex = tex.replace('\r\n', '\n').replace('\r', '\n')
+        m = re.search(r'\\begin\{frquestions\}(.*?)\\end\{frquestions\}', tex, flags=re.DOTALL)
+        inner = m.group(1) if m else tex
+
+        lines = inner.splitlines()
+        cleaned = []
+        skip_block = False
+        for line in lines:
+            stripped = line.lstrip()
+            if stripped.startswith('%\\question'):
+                skip_block = True
+                continue
+            if skip_block:
+                if stripped == "" or stripped.startswith('\\question'):
+                    skip_block = False
+                continue
+            if stripped.startswith('%'):
+                continue
+            cleaned.append(line)
+
+        body = "\n".join(cleaned)
+        self._extract_questions_from_text(body, self.filename or "(inline)")
+        return self
+
+        self.filepath = Path(filename).resolve() if filename else None
+        self.filename = str(self.filepath) if filename else None
         self.questions = []        # list of dicts: {"file", "points", "text"}
         self.question_files = []
         self.exam_header = ""
         self.exam_footer = ""
 
-        if exam_file:
-            self.load_exam(exam_file)
+        if filename:
+            self.load_exam(filename)
 
     # ---------------------------------------------------------
     def _filter_visibility(self, text, reveal=False):
@@ -1010,7 +1129,7 @@ class FRExam:
         return text
 
     def _replace_answer_envs(self, text, reveal=False):
-        """
+        r"""
         Replace or remove all \begin{answer}...\end{answer} blocks safely.
         Works even if the block includes \input{} or TikZ code.
         """
@@ -1052,39 +1171,47 @@ class FRExam:
         return re.sub(r'\\input\{([^}]+)\}', repl, text)
 
     def load_exam(self, filename):
-        """Load a free-response exam file preserving inline and external questions."""
-        text = Path(filename).read_text(encoding="utf-8")
-        base_dir = Path(filename).parent
+        r"""Load and parse free-response questions from a .tex file,
+        skipping commented-out \question blocks.
+        """
+        text = self.filepath.read_text(encoding="utf-8")
 
-        self.questions = []
-        self.question_files = []
+        # --- Remove commented-out question blocks line by line ---
+        # --- Remove commented or fully empty question blocks safely ---
+        lines = text.splitlines()
+        cleaned_lines = []
+        skip_block = False
 
-        # Capture region inside frquestions if it exists
-        m = re.search(r'\\begin\{frquestions\}(.*?)\\end\{frquestions\}', text, flags=re.DOTALL)
-        body = m.group(1) if m else text
-        self.exam_header = text[:m.start()] if m else ""
-        self.exam_footer = text[m.end():] if m else ""
+        for line in lines:
+            stripped = line.lstrip()
 
-        # --- Step 1: expand only question files at the top level ---
-        def expand_inputs_only_if_question(mobj):
-            raw = mobj.group(0)
-            fname = mobj.group(1)
-            qpath = base_dir / (fname if fname.endswith(".tex") else f"{fname}.tex")
-            try:
-                content = qpath.read_text(encoding="utf-8")
-            except Exception:
-                return raw  # leave unexpanded if unreadable
+            # If this line itself starts with a comment or a commented question → skip it
+            if stripped.startswith('%') or stripped.startswith('%\\question'):
+                continue
 
-            # Expand only if the input file actually contains a \question
-            if r'\question' in content:
-                return content
-            else:
-                return raw  # keep figure inputs etc. as-is
+            # If we’re currently skipping a commented block, continue until blank or next question
+            if skip_block:
+                if stripped == "" or stripped.startswith('\\question'):
+                    skip_block = False
+                continue
 
-        body = re.sub(r'\\input\{([^}]+)\}', expand_inputs_only_if_question, body)
+            # Detect start of a *real* question
+            if stripped.startswith('\\question'):
+                cleaned_lines.append(line)
+                continue
 
-        # --- Step 2: extract questions ---
-        token_pattern = re.compile(r'(\\question(?:\[\d+\])?)', re.DOTALL)
+            # Keep normal lines (not comments)
+            cleaned_lines.append(line)
+
+        body = "\n".join(cleaned_lines)
+
+        body = "\n".join(cleaned_lines)
+
+        # Match any uncommented \question[...] line and capture the full token
+        token_pattern = re.compile(
+            r'(?m)^[ \t]*(?<!%)((?:\\question)(?:\[\d+\])?)',
+            re.DOTALL
+        )
         matches = list(token_pattern.finditer(body))
 
         for i, match in enumerate(matches):
@@ -1092,7 +1219,6 @@ class FRExam:
             start = match.end()
             end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
             snippet = body[start:end].strip()
-
             block = f"{token} {snippet}"
             self._extract_questions_from_text(block, filename)
 
@@ -1157,7 +1283,7 @@ class FRExam:
     def export_exam(self, filename=None):
         """Export the free-response exam version (answers hidden)."""
         if filename is None:
-            filename = str(Path(self.exam_file).with_name("FR_Exam.tex"))
+            filename = str(Path(self.filename).with_name("FR_Exam.tex"))
 
         # Ensure output folder exists
         Path(filename).parent.mkdir(parents=True, exist_ok=True)
@@ -1185,6 +1311,9 @@ class FRExam:
         content = self._filter_visibility(content, reveal=False)
 
         Path(filename).write_text(content, encoding="utf-8")
+        self.filepath = Path(filename).resolve()
+        self.filename = str(self.filepath)
+
         print(f"✅ Exported FR exam (no answers): {filename}")
 
     # ---------------------------------------------------------
@@ -1217,7 +1346,7 @@ class FRExam:
     def export_key(self, filename=None):
         """Export the answer key version (answers revealed)."""
         if filename is None:
-            filename = str(Path(self.exam_file).with_name("FR_Key.tex"))
+            filename = str(Path(self.filename).with_name("FR_Key.tex"))
 
         Path(filename).parent.mkdir(parents=True, exist_ok=True)
 
@@ -1244,6 +1373,10 @@ class FRExam:
         content = self._filter_visibility(content, reveal=True)
 
         Path(filename).write_text(content, encoding="utf-8")
+
+        self.filepath = Path(filename).resolve()
+        self.filename = str(self.filepath)
+
         print(f"✅ Exported FR key (answers revealed): {filename}")
 
     # ---------------------------------------------------------
@@ -1269,22 +1402,27 @@ class FRExam:
 class MixedExam:
     """Combines MCExam and FRExam outputs into a single LaTeX document."""
 
-    def __init__(self, template, mc=None, fr=None, correct_string="CORRECT", seed=None):
+    def __init__(self, filename, mc=None, fr=None, correct_string="CORRECT", seed=None):
         """
         Args:
-            template (str): Path to the main exam LaTeX file.
+            filename (str): Path to the main exam LaTeX file.
             mc (MCExam, optional): Pre-parsed multiple-choice exam.
             fr (FRExam, optional): Pre-parsed free-response exam.
             correct_string (str): Marker for correct MC answers.
             seed (int, optional): Random seed for reproducibility.
         """
-        from .exam import MCExam, FRExam
+        # from .exam import MCExam, FRExam
 
-        self.template = Path(template)
-        self.template_text = self.template.read_text(encoding="utf-8")
+        self.filepath = Path(filename).resolve()
+        self.filename = self.filepath.name  # only the short name
+        self.file_text = self.filepath.read_text(encoding="utf-8")
+        base_dir = self.filepath.parent
         self.correct_string = correct_string
         self.seed = seed
-        base_dir = self.template.parent
+        
+        self._source_path = Path(self.filepath).resolve()  # remember original source file
+        self._frozen_export_base = False                   # default: no explicit base
+        self._base_path_for_exports = None                 # will hold explicit base when set
 
         # Accept preloaded objects
         self.mc = mc
@@ -1292,34 +1430,101 @@ class MixedExam:
 
         # --- Detect MC section ---
         if self.mc is None:
-            mc_input = re.search(r'\\input\{([^}]*(?:mcquestions)[^}]*)\}', self.template_text)
-            if mc_input:
-                mc_path = base_dir / (mc_input.group(1) + ("" if mc_input.group(1).endswith(".tex") else ".tex"))
-                if mc_path.exists():
-                    print(f"📘 Auto-loading MC section from {mc_path.name}")
-                    self.mc = MCExam(mc_path, correct_string=correct_string, seed=seed)
-                else:
-                    print(f"⚠️ MC file not found: {mc_path}")
-            elif "\\begin{mcquestions}" in self.template_text:
+            mc_inputs = re.findall(
+                r'(?m)^\s*(?!%)\\input\{([^}]*mc[^}]*)\}',
+                self.file_text
+            )
+            if mc_inputs:
+                merged = ""
+                for fname in mc_inputs:
+                    mc_path = base_dir / (fname if fname.endswith(".tex") else f"{fname}.tex")
+                    if mc_path.exists():
+                        print(f"📘 Including MC file: {mc_path.name}")
+                        text = mc_path.read_text(encoding="utf-8")
+
+                        # Clean commented-out shuffle/noshuffle blocks
+                        lines = text.splitlines()
+                        cleaned_lines = []
+                        skip_block = False
+                        brace_depth = 0
+
+                        for line in lines:
+                            stripped = line.lstrip()
+                            if (not skip_block) and (stripped.startswith('%\\shuffle') or stripped.startswith('%\\noshuffle')):
+                                skip_block = True
+                                brace_depth = 0
+                                continue
+
+                            if skip_block:
+                                brace_depth += line.count('{')
+                                brace_depth -= line.count('}')
+                                if brace_depth <= 0 and '}' in line:
+                                    skip_block = False
+                                continue
+
+                            if not stripped.startswith('%'):
+                                cleaned_lines.append(line)
+
+                        merged += "\n".join(cleaned_lines) + "\n"
+                    else:
+                        print(f"⚠️ MC file not found: {mc_path}")
+
+                # ✅ Build MC exam from string directly (no temp file)
+                merged_mc_tex = "\\begin{mcquestions}\n" + merged + "\\end{mcquestions}\n"
+                self.mc = MCExam.from_string(
+                    merged_mc_tex,
+                    correct_string=correct_string,
+                    seed=seed,
+                    source_path=self.filepath,
+                    filename_hint=self.filename,
+                )
+
+            elif "\\begin{mcquestions}" in self.file_text:
                 print("📘 Detected inline MC questions in main file")
-                self.mc = MCExam(template, correct_string=correct_string, seed=seed)
+                self.mc = MCExam(self.filename, correct_string=correct_string, seed=seed)
 
         # --- Detect FR section ---
         if self.fr is None:
-            fr_input = re.search(r'\\input\{([^}]*(?:frquestions)[^}]*)\}', self.template_text)
+            fr_input = re.search(r'\\input\{([^}]*(?:fr[_]?questions)[^}]*)\}', self.file_text)
             if fr_input:
                 fr_path = base_dir / (fr_input.group(1) + ("" if fr_input.group(1).endswith(".tex") else ".tex"))
                 if fr_path.exists():
                     print(f"📝 Auto-loading FR section from {fr_path.name}")
-                    self.fr = FRExam(fr_path)
+                    text = fr_path.read_text(encoding="utf-8")
+
+                    lines = text.splitlines()
+                    cleaned_lines = []
+                    skip_block = False
+
+                    for line in lines:
+                        stripped = line.lstrip()
+                        if not skip_block and stripped.startswith('%\\question'):
+                            skip_block = True
+                            continue
+
+                        if skip_block:
+                            if stripped == "" or stripped.startswith('\\question'):
+                                skip_block = False
+                            continue
+
+                        cleaned_lines.append(line)
+
+                    cleaned_text = "\n".join(cleaned_lines)
+
+                    # ✅ Store inline FR LaTeX directly in memory
+                    self.fr_text = cleaned_text
+
+                    # ✅ Build FR exam directly from string, no file creation
+                    self.fr = FRExam.from_string(
+                        cleaned_text,
+                        source_path=self.filepath,
+                        filename_hint=self.filename,
+                    )
                 else:
                     print(f"⚠️ FR file not found: {fr_path}")
-            elif "\\begin{frquestions}" in self.template_text:
+            elif "\\begin{frquestions}" in self.file_text:
                 print("📝 Detected inline FR questions in main file")
-                self.fr = FRExam(template)
-
-        if not (self.mc or self.fr):
-            raise ValueError("No MC or FR content detected or provided!")
+                self.fr = FRExam(self.filename)
 
     # ----------------------------------------------------------------------
     def _filter_visibility(self, text, reveal=False):
@@ -1352,7 +1557,36 @@ class MixedExam:
             except Exception:
                 return m.group(0)
             return content if r'\question' in content else m.group(0)
-        return re.sub(r'\\input\{([^}]+)\}', repl, text)
+            # Only match \input lines that are NOT commented out
+        return re.sub(r'(?m)^\s*(?!%)\\input\{([^}]+)\}', repl, text)
+
+    # --- replace MixedExam.shuffle_options with this version ---
+    def shuffle_options(self, seed=None, filename=None):
+        """
+        Return a new MixedExam object with shuffled MC options,
+        preserving FR questions and structure.
+        If `filename` is provided, it becomes the new exam's base path
+        for later export_exam/export_key calls.
+        """
+        from copy import deepcopy
+        new_exam = deepcopy(self)
+        new_exam.mc = new_exam.mc.shuffle_options(seed=seed)
+
+        # ✅ Handle filename and directory properly
+        if filename:
+            out_path = Path(filename).expanduser().resolve()
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            new_exam.filepath = out_path
+            new_exam.filename = out_path.name
+            # Mark this as the base for later exports
+            new_exam._base_path_for_exports = out_path
+            new_exam._frozen_export_base = True
+        else:
+            new_exam._frozen_export_base = False
+            new_exam._base_path_for_exports = None
+
+        print(f"✅ Shuffled MC options with seed={seed}")
+        return new_exam
 
     # ----------------------------------------------------------------------
     def to_latex(self, key=False):
@@ -1378,48 +1612,130 @@ class MixedExam:
         return m.group(1).strip() if m else latex_text or ""
 
     def _assemble_exam(self, mc_inner, fr_inner):
-        """Inserts MC and FR inner content into the template."""
-        base_dir = self.template.parent
-        text = self._expand_question_inputs(self.template_text, base_dir)
+        """Insert MC and FR content into the LaTeX template cleanly."""
+        text = self.file_text
 
-        # Insert MC block
-        if self.mc:
-            mc_block = f"\\begin{{mcquestions}}\n{mc_inner}\n\\end{{mcquestions}}"
-            if re.search(r'\\input\{[^}]*mcquestions[^}]*\}', text):
-                text = re.sub(r'\\input\{[^}]*mcquestions[^}]*\}', lambda m: mc_block, text)
-            else:
-                text = re.sub(
-                    r'\\begin\{mcquestions\}.*?\\end\{mcquestions\}',
-                    lambda m: mc_block, text, flags=re.DOTALL)
+        # --- Replace all uncommented \input lines for MC with the merged block ---
+        # (This avoids nested environments and removes leftover \input lines.)
+        
+        text = re.sub(
+            r'(?m)^[ \t]*(?!%)\\input\{[^}]*mc[^}]*\}.*?$',
+            "",  # remove all MC input lines
+            text,
+        )
 
-        # Insert FR block
-        if self.fr:
-            fr_block = f"\\begin{{frquestions}}\n{fr_inner}\n\\end{{frquestions}}"
-            if re.search(r'\\input\{[^}]*frquestions[^}]*\}', text):
-                text = re.sub(r'\\input\{[^}]*frquestions[^}]*\}', lambda m: fr_block, text)
-            else:
-                text = re.sub(
-                    r'\\begin\{frquestions\}.*?\\end\{frquestions\}',
-                    lambda m: fr_block, text, flags=re.DOTALL)
+        # Build a full MC environment wrapper (so we always have begin/end)
+        mc_block = f"\\begin{{mcquestions}}\n{mc_inner.strip()}\n\\end{{mcquestions}}\n"
+
+        # Insert the merged MC block after the MC header comment if present
+        if re.search(r'(?m)^% BEGIN MULTIPLE CHOICE QUESTIONS', text):
+            text = re.sub(
+                r'(?m)^% BEGIN MULTIPLE CHOICE QUESTIONS.*?\n',
+                lambda m: m.group(0) + mc_block,
+                text,
+            )
+        else:
+            # Fallback: insert MC block before FR section or at the end
+            text = re.sub(
+                r'(?m)^\\begin\{frquestions\}',
+                mc_block + '\n\\begin{frquestions}',
+                text,
+                count=1,
+            )
+
+        # Remove any now-empty or comment-only mcquestions environments left behind
+        text = re.sub(
+            r'(?ms)^\\begin\{mcquestions\}[\s%]*?(?:%.*?\n|\s)*?\\end\{mcquestions\}',
+            '',
+            text
+        )
+
+        # --- Replace all uncommented \input lines for FR with merged block ---
+        text = re.sub(
+            r'(?m)^[ \t]*(?!%)\\input\{[^}]*fr[^}]*\}.*?$',
+            "",  # remove FR input lines
+            text,
+        )
+
+        # The merged FR inner content (already stripped of wrappers)
+        fr_block = fr_inner.strip()
+
+        # Insert FR questions immediately *inside* the existing frquestions environment
+        text = re.sub(
+            r'(?ms)(\\begin\{frquestions\}\s*)',
+            lambda m: m.group(1) + fr_block + "\n\n",
+            text,
+        )
+
+        # 🧹 Normalize any accidental double \begin or \end lines
+        text = re.sub(
+            r'(?ms)\\begin\{frquestions\}\s*\\begin\{frquestions\}',
+            r'\\begin{frquestions}',
+            text,
+        )
+        text = re.sub(
+            r'(?ms)\\end\{frquestions\}\s*\\end\{frquestions\}',
+            r'\\end{frquestions}',
+            text,
+        )
+
+        # ✅ Ensure exactly one blank line after the final \end{frquestions}
+        text = re.sub(
+            r'(\\end\{frquestions\})(?!\n\n)',
+            r'\1\n\n',
+            text
+        )
+
+        # ✅ Ensure exactly one blank line after the final \end{frquestions}
+        text = re.sub(
+            r'(\\end\{frquestions\})(?!\n\n)',
+            r'\1\n\n',
+            text
+        )
 
         return text
 
     # ----------------------------------------------------------------------
+    # --- replace MixedExam.export_exam with this version ---
     def export_exam(self, filename=None):
-        """Exports the mixed student version (no FR answers, no keyonly content)."""
-        filename = filename or "Exam_Mixed.tex"
+        """Export the mixed student version (no FR answers, no keyonly content)."""
+        if filename:
+            out_path = Path(filename).expanduser().resolve()
+        elif getattr(self, "_frozen_export_base", False) and getattr(self, "_base_path_for_exports", None):
+            # Use the frozen base exactly
+            out_path = self._base_path_for_exports
+        else:
+            base = Path(self._source_path if hasattr(self, "_source_path") else self.filepath)
+            stem = re.sub(r"_Exported(_Key)?$", "", base.stem)
+            out_path = base.with_name(f"{stem}_Exported.tex")
+
         tex = self.to_latex(key=False)
         tex = self._filter_visibility(tex, reveal=False)
-        Path(filename).write_text(tex, encoding="utf-8")
-        print(f"✅ Exported mixed exam (no answers): {filename}")
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(tex, encoding="utf-8")
+
+        print(f"✅ Exported mixed exam (no answers): {out_path}")
+        
+
 
     def export_key(self, filename=None):
-        """Exports the mixed instructor key (FR answers shown, includes keyonly)."""
-        filename = filename or "Exam_Mixed_Key.tex"
+        """Export the mixed instructor key (FR answers shown, includes keyonly)."""
+        if filename:
+            out_path = Path(filename).expanduser().resolve()
+        elif getattr(self, "_frozen_export_base", False) and getattr(self, "_base_path_for_exports", None):
+            base = self._base_path_for_exports
+            out_path = base.with_name(f"{base.stem}_Key{base.suffix}")
+        else:
+            base = Path(self._source_path if hasattr(self, "_source_path") else self.filepath)
+            stem = re.sub(r"_Exported(_Key)?$", "", base.stem)
+            out_path = base.with_name(f"{stem}_Exported_Key.tex")
+
         tex = self.to_latex(key=True)
         tex = self._filter_visibility(tex, reveal=True)
-        Path(filename).write_text(tex, encoding="utf-8")
-        print(f"✅ Exported mixed exam key: {filename}")
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(tex, encoding="utf-8")
+
+        print(f"✅ Exported mixed exam key: {out_path}")
 
     # ----------------------------------------------------------------------
     def summary(self):

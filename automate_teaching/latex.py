@@ -1,4 +1,5 @@
-import os,subprocess, shutil
+import os, subprocess, shutil
+from pathlib import Path
 
 def is_command_available(command):
     """Checks if a command is available in the system's PATH.
@@ -267,66 +268,146 @@ def DataFrame_to_array(df,include_index=True,include_column_headers=True,keep_in
 
 '''Contains programs for the management of lecture notes, slides, tables, and figures'''
 
-def compile(x=None):
-    """Compiles LaTeX files in the current directory or specified files.
+
+import subprocess
+import shutil
+from pathlib import Path
+
+def compile(x=None, keep_aux=False):
+    """
+    Compile LaTeX files in the current directory, a folder, or specific files.
 
     Args:
-        x (str or list, optional): Filename or list of filenames to compile. If None, compiles all `.tex` files in the current directory.
-
-    Deletes:
-        Auxiliary files generated during compilation.
-
-    Raises:
-        RuntimeError: If `pdflatex` or `bibtex` is not available in the system.
+        x (str, list, or None):
+            - None: compile all `.tex` files in the current directory.
+            - str (folder): compile all `.tex` files in that folder.
+            - str (file): compile a single `.tex` file.
+            - list/tuple: compile each file in the list.
+        keep_aux (bool): 
+            - False (default): delete auxiliary files after compiling.
+            - True: keep all auxiliary files for debugging.
     """
+
+    def is_command_available(cmd):
+        return shutil.which(cmd) is not None
 
     if not is_command_available("pdflatex"):
-        raise RuntimeError("`pdflatex` is not installed or not found in PATH. Please install MacTeX or ensure `pdflatex` is accessible.")
-    if not is_command_available("bibtex"):
-        raise RuntimeError("`bibtex` is not installed or not found in PATH. Please install MacTeX or ensure `bibtex` is accessible.")
+        raise RuntimeError("`pdflatex` is not installed or not found in PATH.")
 
-    os.chdir(os.getcwd())
+    # -----------------------------------------------------------
+    # Determine what to compile
+    # -----------------------------------------------------------
+    files_to_compile = []
 
     if x is None:
-        for file in os.listdir('.'):
-            if file.endswith('.tex'):
-                pdf_latex(file)
-    elif isinstance(x, str):
-        pdf_latex(x)
-    else:
-        for file in x:
-            pdf_latex(file)
+        files_to_compile = [f for f in os.listdir('.') if f.endswith('.tex')]
 
-    for file in os.listdir('.'):
-        if file.endswith(('.aux', '.log', '.out', '.gz', '.snm', '.nav', '.toc', '.blg', '.bbl', '.vrb')):
-            os.remove(file)
+    elif isinstance(x, str):
+        path = Path(x)
+        if path.is_dir():
+            # ✅ compile all .tex files in that folder
+            files_to_compile = sorted(str(f) for f in path.glob("*.tex"))
+        elif path.is_file() and path.suffix == ".tex":
+            files_to_compile = [str(path)]
+        else:
+            raise ValueError(f"Unrecognized input path: {x}")
+
+    elif isinstance(x, (list, tuple)):
+        files_to_compile = list(x)
+
+    else:
+        raise TypeError("`x` must be None, a string path, or a list of filenames.")
+
+    if not files_to_compile:
+        print("⚠️ No .tex files found to compile.")
+        return
+
+    # -----------------------------------------------------------
+    # Compile each file
+    # -----------------------------------------------------------
+    for tex_file in files_to_compile:
+        tex_path = Path(tex_file)
+        print(f"🧩 Compiling: {tex_path.name}")
+        try:
+            subprocess.run(
+                ["pdflatex", "-interaction=nonstopmode", tex_path.name],
+                cwd=tex_path.parent,
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            # Second pass for references
+            subprocess.run(
+                ["pdflatex", "-interaction=nonstopmode", tex_path.name],
+                cwd=tex_path.parent,
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+            print(f"✅ Compiled: {tex_path.with_suffix('.pdf').name}")
+        except subprocess.CalledProcessError:
+            print(f"❌ Compilation failed for {tex_path}")
+
+    # -----------------------------------------------------------
+    # Prepare cleanup directories (must come BEFORE keep_aux check!)
+    # -----------------------------------------------------------
+    search_dirs = {Path(f).resolve().parent for f in files_to_compile}
+
+    # -----------------------------------------------------------
+    # Optional cleanup
+    # -----------------------------------------------------------
+    if not keep_aux:
+        aux_exts = (
+            ".aux", ".log", ".out", ".gz", ".snm", ".nav",
+            ".toc", ".blg", ".bbl", ".vrb", ".fdb_latexmk", ".fls", ".synctex.gz"
+        )
+        deleted = 0
+
+        for d in search_dirs:
+            for ext in aux_exts:
+                for f in d.glob(f"*{ext}"):
+                    try:
+                        f.unlink()
+                        deleted += 1
+                    except Exception:
+                        pass
+        if deleted:
+            print(f"🧹 Deleted {deleted} auxiliary files.")
+    else:
+        print("📁 Auxiliary files kept.")
 
 def pdf_latex(file_name):
-    """Compiles a LaTeX file using `pdflatex`.
+    """Compiles a LaTeX file using pdflatex and bibtex in its own directory."""
+    from pathlib import Path
 
-    Args:
-        file_name (str): Name of the LaTeX file to compile.
-
-    Raises:
-        RuntimeError: If `pdflatex` or `bibtex` is not available in the system.
-    """
-
+    tex_path = Path(file_name).resolve()
+    workdir = tex_path.parent
+    tex_name = tex_path.name
     FNULL = open(os.devnull, 'w')
-    pdf_latex_cmd = f'pdflatex "{file_name}"'
-    if not file_name.endswith('.tex'):
-        pdf_latex_cmd += '.tex'
 
-    bibtex_cmd = pdf_latex_cmd.replace('.tex', '.aux').replace('pdflatex', 'bibtex')
+    pdf_latex_cmd = ['pdflatex', tex_name]
+    bibtex_cmd = ['bibtex', tex_name.replace('.tex', '.aux')]
 
     try:
-        subprocess.call(pdf_latex_cmd, shell=True, stdout=FNULL)
-        subprocess.call(pdf_latex_cmd, shell=True, stdout=FNULL)
-        subprocess.call(bibtex_cmd, shell=True, stdout=FNULL)
-        subprocess.call(bibtex_cmd, shell=True, stdout=FNULL)
-        subprocess.call(pdf_latex_cmd, shell=True, stdout=FNULL)
-        subprocess.call(pdf_latex_cmd, shell=True, stdout=FNULL)
+        subprocess.run(pdf_latex_cmd, cwd=workdir, stdout=FNULL)
+        subprocess.run(pdf_latex_cmd, cwd=workdir, stdout=FNULL)
+        subprocess.run(bibtex_cmd, cwd=workdir, stdout=FNULL)
+        subprocess.run(pdf_latex_cmd, cwd=workdir, stdout=FNULL)
+        subprocess.run(pdf_latex_cmd, cwd=workdir, stdout=FNULL)
     except Exception as e:
-        raise RuntimeError(f"An error occurred while running `pdflatex` or `bibtex`: {e}")
+        raise RuntimeError(f"Error while running pdflatex or bibtex: {e}")
+
+
+def clean_aux_files(file_name):
+    """Removes LaTeX auxiliary files in the same directory as the given file."""
+    aux_exts = ('.aux', '.log', '.out', '.gz', '.snm', '.nav', '.toc', '.blg', '.bbl', '.vrb')
+    folder = Path(file_name).resolve().parent
+    for f in folder.iterdir():
+        if f.suffix in aux_exts:
+            try:
+                f.unlink()
+            except Exception:
+                pass
     
 
 def make_handout(slides_file_name,handout_file_name):
