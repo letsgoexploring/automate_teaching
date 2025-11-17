@@ -1399,7 +1399,7 @@ class FRExam:
         print("-" * 60)
         print(f"Total questions: {len(self.questions)}\n")
 
-class MixedExam:
+class Exam:
     """Combines MCExam and FRExam outputs into a single LaTeX document."""
 
     def __init__(self, filename, mc=None, fr=None, correct_string="CORRECT", seed=None):
@@ -1560,10 +1560,10 @@ class MixedExam:
             # Only match \input lines that are NOT commented out
         return re.sub(r'(?m)^\s*(?!%)\\input\{([^}]+)\}', repl, text)
 
-    # --- replace MixedExam.shuffle_options with this version ---
+    # --- replace Exam.shuffle_options with this version ---
     def shuffle_options(self, seed=None, filename=None):
         """
-        Return a new MixedExam object with shuffled MC options,
+        Return a new Exam object with shuffled MC options,
         preserving FR questions and structure.
         If `filename` is provided, it becomes the new exam's base path
         for later export_exam/export_key calls.
@@ -1611,92 +1611,140 @@ class MixedExam:
         m = re.search(rf'\\begin\{{{env_name}\}}(.*?)\\end\{{{env_name}\}}', latex_text or "", flags=re.DOTALL)
         return m.group(1).strip() if m else latex_text or ""
 
+    def _assert_single_env(self, text: str, env: str) -> None:
+        """Fail fast if we don't have exactly one full env block."""
+        pattern = rf"(?s)\\begin\{{{env}\}}.*?\\end\{{{env}\}}"
+        count = len(re.findall(pattern, text))
+        if count != 1:
+            raise ValueError(f"{env}: expected 1 block, found {count}")
+
+    def to_latex(self, key=False):
+        mc_inner = fr_inner = ""
+        if self.mc:
+            mc_tex = self.mc.to_latex(key=key)
+            mc_inner = self._extract_body(mc_tex, "mcquestions")
+        if self.fr:
+            fr_tex = self.fr.to_latex(key=key)
+            fr_inner = self._extract_body(fr_tex, "frquestions")
+
+        combined = self._assemble_exam(mc_inner, fr_inner)
+        combined = self._replace_answer_envs(combined, reveal=key)
+        combined = self._filter_visibility(combined, reveal=key)
+
+        # 🔒 Guard: exactly one MC + one FR
+        self._assert_single_env(combined, "mcquestions")
+        self._assert_single_env(combined, "frquestions")
+        return combined
+
+    def _replace_or_insert_env(self, text, env, inner,
+                               anchor_comment=None,
+                               insert_before_env=None,
+                               insert_after_env=None):
+        """
+        Replace FIRST \begin{env}...\end{env} with `inner` (wrapped) without
+        deleting the newly inserted block. Uses a sentinel to protect it.
+        """
+        block = f"\\begin{{{env}}}\n{inner.strip()}\n\\end{{{env}}}\n"
+        pattern = rf"(?s)\\begin\{{{env}\}}.*?\\end\{{{env}\}}"
+        SENTINEL = f"__AT_{env.upper()}_BLOCK__"
+
+        # Case 1: env exists → replace first with SENTINEL, delete rest, then restore
+        if re.search(pattern, text):
+            # Replace only the first occurrence with a sentinel (safe: no backslash parsing)
+            text = re.sub(pattern, lambda _m: SENTINEL, text, count=1)
+            # Remove all remaining occurrences
+            text = re.sub(pattern, "", text)
+            # Restore the sentinel to the final block
+            text = text.replace(SENTINEL, block, 1)
+            return text
+
+        # Case 2: no env → insert near anchors if available
+        if anchor_comment and re.search(anchor_comment, text):
+            text = re.sub(anchor_comment,
+                          lambda m: m.group(0) + "\n" + block,
+                          text, count=1)
+            return text
+
+        if insert_before_env and re.search(rf"\\begin\{{{insert_before_env}\}}", text):
+            text = re.sub(rf"\\begin\{{{insert_before_env}\}}",
+                          lambda _m: block + f"\n\\begin{{{insert_before_env}}}",
+                          text, count=1)
+            return text
+
+        if insert_after_env and re.search(rf"\\end\{{{insert_after_env}\}}", text):
+            text = re.sub(rf"\\end\{{{insert_after_env}\}}",
+                          lambda _m: f"\\end{{{insert_after_env}}}\n\n{block}",
+                          text, count=1)
+            return text
+
+        # Fallback: before \end{document}
+        text = re.sub(r"\\end\{document\}",
+                      lambda _m: block + "\n\\end{document}",
+                      text, count=1)
+        return text
+
+
     def _assemble_exam(self, mc_inner, fr_inner):
-        """Insert MC and FR content into the LaTeX template cleanly."""
+        """
+        Build final LaTeX by replacing/insert MC & FR envs. All re.sub that
+        emit LaTeX use callables to avoid 'bad escape \s' errors.
+        """
         text = self.file_text
 
-        # --- Replace all uncommented \input lines for MC with the merged block ---
-        # (This avoids nested environments and removes leftover \input lines.)
-        
-        text = re.sub(
-            r'(?m)^[ \t]*(?!%)\\input\{[^}]*mc[^}]*\}.*?$',
-            "",  # remove all MC input lines
+        # 1) Strip uncommented \input lines (we inline now)
+        text = re.sub(r'(?m)^[ \t]*(?!%)\\input\{[^}]*mc[^}]*\}.*?$', "", text)
+        text = re.sub(r'(?m)^[ \t]*(?!%)\\input\{[^}]*fr[^}]*\}.*?$', "", text)
+
+        # 2) Prepare inners
+        mc_inner = (mc_inner or "").strip()
+        fr_inner = (fr_inner or "").strip()
+
+        # 3) Replace/insert MC block
+        text = self._replace_or_insert_env(
             text,
+            env="mcquestions",
+            inner=mc_inner,
+            anchor_comment=r'(?m)^% BEGIN MULTIPLE CHOICE QUESTIONS.*?$',
+            insert_before_env="frquestions",
         )
 
-        # Build a full MC environment wrapper (so we always have begin/end)
-        mc_block = f"\\begin{{mcquestions}}\n{mc_inner.strip()}\n\\end{{mcquestions}}\n"
-
-        # Insert the merged MC block after the MC header comment if present
-        if re.search(r'(?m)^% BEGIN MULTIPLE CHOICE QUESTIONS', text):
-            text = re.sub(
-                r'(?m)^% BEGIN MULTIPLE CHOICE QUESTIONS.*?\n',
-                lambda m: m.group(0) + mc_block,
-                text,
-            )
-        else:
-            # Fallback: insert MC block before FR section or at the end
-            text = re.sub(
-                r'(?m)^\\begin\{frquestions\}',
-                mc_block + '\n\\begin{frquestions}',
-                text,
-                count=1,
-            )
-
-        # Remove any now-empty or comment-only mcquestions environments left behind
-        text = re.sub(
-            r'(?ms)^\\begin\{mcquestions\}[\s%]*?(?:%.*?\n|\s)*?\\end\{mcquestions\}',
-            '',
-            text
-        )
-
-        # --- Replace all uncommented \input lines for FR with merged block ---
-        text = re.sub(
-            r'(?m)^[ \t]*(?!%)\\input\{[^}]*fr[^}]*\}.*?$',
-            "",  # remove FR input lines
+        # 4) Replace/insert FR block
+        text = self._replace_or_insert_env(
             text,
+            env="frquestions",
+            inner=fr_inner,
+            anchor_comment=r'(?m)^% FREE RESPONSE QUESTIONS.*?$',
+            insert_after_env="mcquestions",
         )
 
-        # The merged FR inner content (already stripped of wrappers)
-        fr_block = fr_inner.strip()
-
-        # Insert FR questions immediately *inside* the existing frquestions environment
-        text = re.sub(
-            r'(?ms)(\\begin\{frquestions\}\s*)',
-            lambda m: m.group(1) + fr_block + "\n\n",
-            text,
-        )
-
-        # 🧹 Normalize any accidental double \begin or \end lines
+        # 5) Clean accidental duplicate begin/end lines (use callables)
         text = re.sub(
             r'(?ms)\\begin\{frquestions\}\s*\\begin\{frquestions\}',
-            r'\\begin{frquestions}',
+            lambda _m: '\\begin{frquestions}',
             text,
         )
         text = re.sub(
             r'(?ms)\\end\{frquestions\}\s*\\end\{frquestions\}',
-            r'\\end{frquestions}',
+            lambda _m: '\\end{frquestions}',
+            text,
+        )
+        text = re.sub(
+            r'(?ms)\\begin\{mcquestions\}\s*\\begin\{mcquestions\}',
+            lambda _m: '\\begin{mcquestions}',
+            text,
+        )
+        text = re.sub(
+            r'(?ms)\\end\{mcquestions\}\s*\\end\{mcquestions\}',
+            lambda _m: '\\end{mcquestions}',
             text,
         )
 
-        # ✅ Ensure exactly one blank line after the final \end{frquestions}
-        text = re.sub(
-            r'(\\end\{frquestions\})(?!\n\n)',
-            r'\1\n\n',
-            text
-        )
-
-        # ✅ Ensure exactly one blank line after the final \end{frquestions}
-        text = re.sub(
-            r'(\\end\{frquestions\})(?!\n\n)',
-            r'\1\n\n',
-            text
-        )
-
+        # 6) Normalize whitespace
+        text = re.sub(r'\n{3,}', '\n\n', text).strip() + "\n"
         return text
 
     # ----------------------------------------------------------------------
-    # --- replace MixedExam.export_exam with this version ---
+    # --- replace Exam.export_exam with this version ---
     def export_exam(self, filename=None):
         """Export the mixed student version (no FR answers, no keyonly content)."""
         if filename:
