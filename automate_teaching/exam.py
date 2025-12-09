@@ -6,35 +6,78 @@ import string
 import re
 from pathlib import Path
 
+_UNESCAPED_PERCENT_RE = re.compile(r'(?<!\\)%')
+
+def _split_option_comment(option: str):
+    """
+    Split one option into (main_text, comment_text, had_comment) at the first
+    *unescaped* '%' in the body (after '\item'). '\%' stays in main_text.
+    """
+    s = option.strip()
+    body = s[len('\\item'):].lstrip() if s.startswith('\\item') else s
+    m = _UNESCAPED_PERCENT_RE.search(body)
+    if not m:
+        return body.rstrip(), "", False
+    main = body[:m.start()].rstrip()
+    comment = body[m.end():].strip()  # text after '%'
+    return main, comment, True
+
+def _has_correct(text: str, correct_token: str) -> bool:
+    """Detect CORRECT token robustly (word boundary, case-insensitive)."""
+    return re.search(rf'\b{re.escape(correct_token)}\b', text, flags=re.IGNORECASE) is not None
+
+def _strip_correct_tokens(text: str, correct_token: str) -> str:
+    """Remove all 'CORRECT' tokens from comment tail."""
+    return re.sub(rf'\b{re.escape(correct_token)}\b', '', text, flags=re.IGNORECASE).strip()
+
+def _ensure_trailing_sentence_punct(text: str) -> str:
+    """Ensure comment ends with '.', '!' or '?'. If none, append '.'."""
+    if not text:
+        return text
+    return text if text.endswith(('.', '!', '?')) else (text + '.')
+
+def _normalize_comment_tail(raw_comment: str, is_correct: bool, correct_token: str) -> str:
+    """
+    Normalize comment:
+    - remove any CORRECT tokens from tail,
+    - ensure terminal punctuation,
+    - if correct, append '  CORRECT' at the very end.
+    """
+    tail = _strip_correct_tokens(raw_comment, correct_token)
+    tail = _ensure_trailing_sentence_punct(tail) if tail else tail
+    if is_correct:
+        tail = (tail + '  ' + correct_token).strip()
+    return tail
+
+def _rebuild_option(main: str, comment: str) -> str:
+    """Rebuild a single option with a real LaTeX comment (one space after %)."""
+    return ('\\item ' + main) if not comment else ('\\item ' + main + ' % ' + comment)
+
 
 def make_answer_key(exam):
-    """Creates an answer key for the given multiple choice exam.
-
-    Args:
-        exam (mc_exam): An exam object containing elements, options, and a 
-            `correct_string` to identify correct answers.
-
-    Returns:
-        dict: A dictionary representing the answer key.
-    """
-
+    """Creates an answer key for the given multiple choice exam."""
     answer_key = deepcopy(exam.elements)
 
-    for key,value in exam.elements.items():
-        if isinstance(value,mc_question):
-            
-            for n,option in enumerate(exam.elements[key].options):
-                if exam.correct_string in option:
-                    answer_key[key].options[n] = '\\item \\hl{'+option.replace('\\item','').lstrip().replace(exam.correct_string,'').replace('\\%','PERCENTSIGNHERE').replace('%','').replace('PERCENTSIGNHERE','\\%')+'}'+' %'+exam.correct_string
-            
-        
+    def _highlight(option: str) -> str:
+        main, comment, had_comment = _split_option_comment(option)
+        is_correct = _has_correct((comment or option), exam.correct_string)
+        main_clean = main.rstrip()  # no trailing space inside \hl{...}
+        norm_comment = _normalize_comment_tail(comment, is_correct, exam.correct_string) \
+                       if (had_comment or is_correct) else ""
+        base = '\\item \\hl{' + main_clean + '}' if is_correct else '\\item ' + main_clean
+        return base if not norm_comment else base + ' % ' + norm_comment
+
+    for key, value in exam.elements.items():
+        if isinstance(value, mc_question):
+            for n, opt in enumerate(value.options):
+                if _has_correct(opt, exam.correct_string):
+                    answer_key[key].options[n] = _highlight(opt)
         else:
-            for sub_key,sub_value in value.elements.items():
-    
-                for n,option in enumerate(exam.elements[key].elements[sub_key].options):
-                    if exam.correct_string in option:
-                        answer_key[key].elements[sub_key].options[n] = '\\item \\hl{'+option.replace('\\item','').lstrip().replace(exam.correct_string,'').replace('\\%','PERCENTSIGNHERE').replace('%','').replace('PERCENTSIGNHERE','\\%')+'}'+' %'+exam.correct_string
-        
+            for sub_key, sub_value in value.elements.items():
+                for n, opt in enumerate(sub_value.options):
+                    if _has_correct(opt, exam.correct_string):
+                        answer_key[key].elements[sub_key].options[n] = _highlight(opt)
+
     return answer_key
         
         
@@ -169,60 +212,39 @@ class mc_question:
         return new_question
         
     def add_periods(self, include_equations=True, correct_string=None):
-        """Adds periods to the end of each option if not already present.
-        If an equation already ends with a period inside $, no new period is added.
-        """
-        for n, option in enumerate(self.options):
-            option_text = (
-                option.replace('\\item', '')
-                .lstrip()
-                .replace(correct_string or '', '')
-                .replace('\\%', 'PERCENTSIGNHERE')
-                .replace('%', '')
-                .replace('PERCENTSIGNHERE', '\\%')
-                .rstrip()
-            )
+        """Add period to main text; normalize comment; put CORRECT at end of comment."""
+        corr = correct_string or self.correct_string
+        new_opts = []
+        for option in self.options:
+            main, comment, had_comment = _split_option_comment(option)
 
-            # 🧠 Detect if the text already ends with a period (outside or inside math)
-            already_has_period = option_text.endswith('.')
-
-            if not already_has_period:
-                # Check for math at the end, e.g., $y=x$ or $y=x.$
-                m = re.search(r'\$(.*?)\$', option_text)
+            # Add period to main if needed, respecting trailing math $...$
+            if not main.endswith('.'):
+                m = re.search(r'\$(.*?)\$\s*$', main)
                 if m:
-                    inner_math = m.group(1).strip()
-                    # ✅ If math ends with a period, do NOT add another
-                    if not inner_math.endswith('.'):
-                        if include_equations:
-                            option_text += '.'
+                    inner = m.group(1).strip()
+                    if include_equations and not inner.endswith('.'):
+                        main += '.'
                 else:
-                    # No math environment — add a period normally
-                    option_text += '.'
+                    main += '.'
 
-            if correct_string and correct_string in option:
-                option_text += ' %' + self.correct_string
+            # Normalize comment and append '  CORRECT' if applicable
+            is_correct = _has_correct((comment or option), corr)
+            norm_comment = _normalize_comment_tail(comment, is_correct, corr) if (had_comment or is_correct) else ""
+            new_opts.append(_rebuild_option(main, norm_comment))
+        self.options = new_opts
 
-            self.options[n] = '\\item ' + option_text
-    
-    
-    def capitalize_first(self,correct_string=None):
-        """Capitalizes the first letter of each option.
-
-        Args:
-            correct_string (str, optional): The marker for the correct answer. Defaults to None.
-        """
-    
-        for n,option in enumerate(self.options):
-        
-            option_text = option.replace('\\item','').lstrip().replace(correct_string,'').replace('\\%','PERCENTSIGNHERE').replace('%','').replace('PERCENTSIGNHERE','\\%').rstrip()
-            
-            option_text = option_text[0].upper() + option_text[1:]
-            
-            if correct_string in option:
-            
-                option_text+=' %'+self.correct_string
-            
-            self.options[n] = '\\item '+option_text
+    def capitalize_first(self, correct_string=None):
+        """Capitalize main text only; preserve comment as-is (no punctuation here)."""
+        corr = correct_string or self.correct_string
+        new_opts = []
+        for option in self.options:
+            main, comment, had_comment = _split_option_comment(option)
+            if main:
+                main = main[0].upper() + main[1:]
+            # keep existing comment text here; CORRECT placement is handled in add_periods/make_answer_key
+            new_opts.append(_rebuild_option(main, comment if had_comment else ""))
+        self.options = new_opts
 
 
 class mc_group:
@@ -986,7 +1008,10 @@ class MCExam(mc_exam):
     # ----------------------------------------------------------
     @classmethod
     def from_string(cls, tex, correct_string='CORRECT', seed=None, source_path=None, filename_hint=None):
-        """Build an MCExam directly from a LaTeX string (no file needed)."""
+        """
+        Build an MCExam directly from a LaTeX string (no file needed).
+        Key fix: use splitlines(keepends=True) to preserve newlines.
+        """
         self = cls.__new__(cls)
         self.correct_string = correct_string
         self.rng = np.random.default_rng(seed=seed)
@@ -1000,8 +1025,11 @@ class MCExam(mc_exam):
         m = re.search(r'\\begin\{mcquestions\}(.*?)\\end\{mcquestions\}', tex, flags=re.DOTALL)
         inner = m.group(1) if m else tex
 
-        # Remove commented lines
-        self.mc_lines = [ln for ln in inner.splitlines() if not ln.lstrip().startswith('%')]
+        # IMPORTANT: keepends=True to retain '\n' so LaTeX tables don't collapse
+        self.mc_lines = [
+            ln for ln in inner.splitlines(keepends=True)
+            if not ln.lstrip().startswith('%')
+        ]
 
         # --- Parse questions and groups exactly as in mc_exam.__init__ ---
         self.elements = {}
