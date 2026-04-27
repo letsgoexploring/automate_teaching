@@ -1,143 +1,111 @@
+"""automate_teaching — utilities for exam generation, LaTeX compilation, and Google API integration."""
+
 import numpy as np
-import os
 import subprocess
 
-from . import google
+from . import google_api
 from . import exam
 from . import latex
 
 
-##################################################################################################
-# latex functions
-# from . import latex_tools as latex
-# from . import latex_tools as latex
+class Homework:
+    """Format and export homework answers as LaTeX commands or Gradescope strings.
 
-##################################################################################################
-# homework class
-
-class homework:
-    
-    """Class for formatting and saving homework answers in LaTeX or Gradescope formats. This class allows for storing, formatting, and exporting answers as LaTeX commands or Gradescope-compatible strings."""
+    Provides methods for storing numeric or string answers, formatting them
+    for LaTeX output files, and generating Gradescope-compatible answer strings.
+    """
 
     def __init__(self, filename=None):
-        
-        """Initializes an instance of the `homework` class.
+        """Initialize a Homework instance.
 
         Args:
-            filename (str, optional): Name of the LaTeX file to save answers to. Default is None.
-
-        Attributes:
-            filename (str): File name for the LaTeX output file.
-            latex_answers (dict): Dictionary for storing answers as LaTeX commands.
+            filename (str, optional): Default filename for LaTeX output.
+                Defaults to None.
         """
-
-        # Set filename attribute
         self.filename = filename
-
-        # Initialize dictionary to store answers for LaTeX file
-        self.latex_answers = dict()
+        self.latex_answers = {}
 
     def add_latex_answer(self, name, value, precision=4):
-        
-        """Adds an answer as a LaTeX command to the `latex_answers` dictionary.
+        """Add an answer as a LaTeX newcommand entry.
+
+        String values are stored as-is. Numeric values are rounded and
+        formatted with the specified number of decimal places.
 
         Args:
-            name (str): Name of the new LaTeX command. Must conform to LaTeX naming conventions.
-            value (str or numeric): Answer to be stored. Strings are stored as-is, numeric values are formatted.
-            precision (int): Number of decimal places to round numeric values. Default is 4.
-
-        Returns:
-            None
-
-        Adds:
-            self.latex_answers[name]: The formatted value as a LaTeX command.
+            name (str): Name of the LaTeX command. Must conform to LaTeX
+                naming conventions (letters only, no numbers or symbols).
+            value (str or numeric): The answer to store.
+            precision (int, optional): Decimal places for numeric values.
+                Defaults to 4.
         """
-
-        # If value is a string, do not format
-        if type(value) == str:
+        if isinstance(value, str):
             self.latex_answers[name] = value
-
-        # If value is numeric, format to string with appropriate number of trailing decimals
         else:
             self.latex_answers[name] = ('{0:.' + str(precision) + 'f}').format(value)
 
-    def gs_answer(self, value, tolerance=8, precision=0.005):
-        
-        """Generates a Gradescope-compatible formatted string for an answer.
+    def gs_answer(self, value, tolerance=8, precision=2):
+        """Return a Gradescope-compatible formatted answer string.
 
         Args:
-            value (str or numeric): Answer to format for Gradescope.
-            tolerance (float): Error tolerance for the answer. Default is 8.
-            precision (float): Precision for rounding numeric values. Default is 0.005.
+            value (str or numeric): The answer to format.
+            tolerance (float, optional): Numeric tolerance for grading.
+                Defaults to 8.
+            precision (int, optional): Number of decimal places for numeric
+                rounding. Defaults to 2.
 
         Returns:
-            str: A Gradescope-compatible formatted string.
+            str: A Gradescope answer string of the form '[____](=value+-tolerance)'.
         """
-
-        # If value is a string, do not format
-        if type(value) == str:
+        if isinstance(value, str):
             return '[____](=' + value + '+-' + str(tolerance) + ')'
-
-        # If value is numeric, format to string with appropriate number of trailing decimals and tolerance
-        else:
-            return '[____](=' + str(np.round(value, precision)) + '+-' + str(tolerance) + ')'
+        return '[____](=' + str(np.round(value, precision)) + '+-' + str(tolerance) + ')'
 
     def write_answer_file(self, filename):
-        
-        """Exports LaTeX answers as new commands in a `.tex` file.
+        """Write all stored answers to a LaTeX file as newcommand definitions.
+
+        Appends '.tex' to the filename if it is not already present.
 
         Args:
-            filename (str): Name of the LaTeX file to save answers to. Appends `.tex` if missing.
-
-        Returns:
-            None
+            filename (str): Destination file path.
         """
-
-        # Append '.tex' if missing
         if not filename.endswith('.tex'):
             filename += '.tex'
 
-        # Create and save file
-        with open(filename, 'w') as newfile:
-            # Iterate over elements of self.latex_answers
+        with open(filename, 'w', encoding='utf-8') as newfile:
             for key, item in self.latex_answers.items():
                 newfile.write('\\newcommand{\\' + key + '}{' + item + '}\n')
 
 
 def notebook_to_python(notebook_name):
-	
-	"""Exports a Jupyter Notebook file to a Python script.
+    """Export a Jupyter notebook to a Python script using nbconvert.
 
     Args:
-        notebook_name (str): Name of the Jupyter Notebook file (with or without `.ipynb` extension).
-
-    Returns:
-        None
+        notebook_name (str): Path to the notebook file, with or without
+            the '.ipynb' extension.
     """
+    if not notebook_name.endswith('.ipynb'):
+        notebook_name = notebook_name + '.ipynb'
+    subprocess.run(
+        ['jupyter', 'nbconvert', '--to', 'script', notebook_name],
+        check=True,
+    )
 
-	if not notebook_name.endswith('.ipynb'):
-		notebook_name = notebook_name+'.ipynb'
-	shell_command = 'jupyter nbconvert --to script \"'+notebook_name+'\"'
-	print(shell_command)
-	subprocess.call(shell_command, shell=True)
 
-def notebook_to_html(notebook_name,execute=False):
-	
-	"""Exports a Jupyter Notebook file to an HTML file.
+def notebook_to_html(notebook_name, execute=False):
+    """Export a Jupyter notebook to an HTML file using nbconvert.
 
     Args:
-        notebook_name (str): Name of the Jupyter Notebook file (with or without `.ipynb` extension).
-        execute (bool): Whether to execute the notebook before converting. Default is False.
-
-    Returns:
-        None
+        notebook_name (str): Path to the notebook file, with or without
+            the '.ipynb' extension.
+        execute (bool, optional): If True, execute the notebook before
+            converting. Defaults to False.
     """
+    if not notebook_name.endswith('.ipynb'):
+        notebook_name = notebook_name + '.ipynb'
 
-	if not notebook_name.endswith('.ipynb'):
-		notebook_name = notebook_name+'.ipynb'
-	if execute:
-		shell_command = 'jupyter nbconvert --execute --to html \"'+notebook_name+'\"'
-	else:
-		shell_command = 'jupyter nbconvert --to html \"'+notebook_name+'\"'
-	print(shell_command)
-	subprocess.call(shell_command, shell=True)
+    cmd = ['jupyter', 'nbconvert', '--to', 'html']
+    if execute:
+        cmd.append('--execute')
+    cmd.append(notebook_name)
+
+    subprocess.run(cmd, check=True)

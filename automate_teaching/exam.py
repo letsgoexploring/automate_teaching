@@ -1,17 +1,36 @@
 import pandas as pd
 import numpy as np
 from copy import deepcopy
-import os
 import string
 import re
 from pathlib import Path
 
+# ---------------------------------------------------------------------------
+# Module-level regex constants
+# ---------------------------------------------------------------------------
+
 _UNESCAPED_PERCENT_RE = re.compile(r'(?<!\\)%')
 
-def _split_option_comment(option: str):
-    """
-    Split one option into (main_text, comment_text, had_comment) at the first
-    *unescaped* '%' in the body (after '\item'). '\%' stays in main_text.
+
+# ---------------------------------------------------------------------------
+# Module-level LaTeX text helpers
+# ---------------------------------------------------------------------------
+
+def _split_option_comment(option):
+    """Split one option into (main_text, comment_text, had_comment).
+
+    Splits at the first unescaped '%' after the '\\item' prefix.
+    Escaped percents ('\\%') are left in the main text.
+
+    Args:
+        option (str): A single answer option string, optionally starting
+            with '\\item'.
+
+    Returns:
+        tuple: A three-element tuple (main, comment, had_comment) where
+            main (str) is the body text before any comment, comment (str)
+            is the text after the '%', and had_comment (bool) indicates
+            whether a '%' was present.
     """
     s = option.strip()
     body = s[len('\\item'):].lstrip() if s.startswith('\\item') else s
@@ -19,29 +38,68 @@ def _split_option_comment(option: str):
     if not m:
         return body.rstrip(), "", False
     main = body[:m.start()].rstrip()
-    comment = body[m.end():].strip()  # text after '%'
+    comment = body[m.end():].strip()
     return main, comment, True
 
-def _has_correct(text: str, correct_token: str) -> bool:
-    """Detect CORRECT token robustly (word boundary, case-insensitive)."""
+
+def _has_correct(text, correct_token):
+    """Check whether text contains the correct-answer token.
+
+    Uses a word-boundary, case-insensitive search so partial matches
+    (e.g., 'INCORRECTLY') are not flagged.
+
+    Args:
+        text (str): The text to search.
+        correct_token (str): The token to look for (e.g., 'CORRECT').
+
+    Returns:
+        bool: True if the token is found as a whole word, False otherwise.
+    """
     return re.search(rf'\b{re.escape(correct_token)}\b', text, flags=re.IGNORECASE) is not None
 
-def _strip_correct_tokens(text: str, correct_token: str) -> str:
-    """Remove all 'CORRECT' tokens from comment tail."""
+
+def _strip_correct_tokens(text, correct_token):
+    """Remove all occurrences of the correct-answer token from text.
+
+    Args:
+        text (str): Source text.
+        correct_token (str): The token to remove (e.g., 'CORRECT').
+
+    Returns:
+        str: The text with all token occurrences removed and whitespace
+            stripped.
+    """
     return re.sub(rf'\b{re.escape(correct_token)}\b', '', text, flags=re.IGNORECASE).strip()
 
-def _ensure_trailing_sentence_punct(text: str) -> str:
-    """Ensure comment ends with '.', '!' or '?'. If none, append '.'."""
+
+def _ensure_trailing_sentence_punct(text):
+    """Append a period to text if it does not already end with sentence punctuation.
+
+    Args:
+        text (str): Input text.
+
+    Returns:
+        str: Text ending with '.', '!', or '?'.
+    """
     if not text:
         return text
     return text if text.endswith(('.', '!', '?')) else (text + '.')
 
-def _normalize_comment_tail(raw_comment: str, is_correct: bool, correct_token: str) -> str:
-    """
-    Normalize comment:
-    - remove any CORRECT tokens from tail,
-    - ensure terminal punctuation,
-    - if correct, append '  CORRECT' at the very end.
+
+def _normalize_comment_tail(raw_comment, is_correct, correct_token):
+    """Normalize a LaTeX comment tail for an answer option.
+
+    Removes any existing correct-answer tokens from the comment, ensures
+    terminal punctuation, then appends the token at the very end if the
+    option is correct.
+
+    Args:
+        raw_comment (str): The raw comment text (the part after '%').
+        is_correct (bool): Whether this option is the correct answer.
+        correct_token (str): The marker string for the correct answer.
+
+    Returns:
+        str: The normalized comment tail.
     """
     tail = _strip_correct_tokens(raw_comment, correct_token)
     tail = _ensure_trailing_sentence_punct(tail) if tail else tail
@@ -49,26 +107,216 @@ def _normalize_comment_tail(raw_comment: str, is_correct: bool, correct_token: s
         tail = (tail + '  ' + correct_token).strip()
     return tail
 
-def _rebuild_option(main: str, comment: str) -> str:
-    """Rebuild a single option with a real LaTeX comment (one space after %)."""
+
+def _rebuild_option(main, comment):
+    """Reconstruct a single answer option as a LaTeX item string.
+
+    Args:
+        main (str): The main body text of the option.
+        comment (str): The comment text (without the leading '%'), or an
+            empty string if there is no comment.
+
+    Returns:
+        str: A string of the form '\\item <main>' or
+            '\\item <main> % <comment>'.
+    """
     return ('\\item ' + main) if not comment else ('\\item ' + main + ' % ' + comment)
 
 
+# ---------------------------------------------------------------------------
+# Module-level structural helpers (shared across all classes)
+# ---------------------------------------------------------------------------
+
+def _get_question_length(mc_lines, starting_line_number):
+    """Count the number of lines that a single MC question spans.
+
+    A question is complete once two balanced brace pairs have been closed
+    — the header pair and the options-block pair.
+
+    Args:
+        mc_lines (list of str): Full list of lines being parsed.
+        starting_line_number (int): Index of the line where the question
+            begins.
+
+    Returns:
+        int: Number of lines from starting_line_number that belong to
+            this question.
+    """
+    total_lines = len(mc_lines)
+    left = right = pairs = 0
+    open_outer = False
+
+    for i in range(total_lines - starting_line_number):
+        for char in mc_lines[starting_line_number + i]:
+            if char == '{':
+                left += 1
+                if not open_outer:
+                    open_outer = True
+            elif char == '}':
+                right += 1
+            if left - right == 0 and open_outer:
+                pairs += 1
+                open_outer = False
+            if pairs == 2:
+                break
+        else:
+            continue
+        break
+    return i + 1
+
+
+def _filter_visibility(text, reveal=False):
+    """Remove LaTeX blocks that should not appear in the current output version.
+
+    Strips 'keyonly' environments from student exams and 'examonly'
+    environments from answer keys.
+
+    Args:
+        text (str): LaTeX source text.
+        reveal (bool, optional): If True, produce the key version (remove
+            examonly blocks). If False, produce the student version (remove
+            keyonly blocks). Defaults to False.
+
+    Returns:
+        str: Filtered LaTeX text.
+    """
+    text = text.replace('\r\n', '\n').replace('\r', '\n')
+    if reveal:
+        text = re.sub(r'(?s)\\begin\s*\{examonly\}.*?\\end\s*\{examonly\}', '', text)
+    else:
+        text = re.sub(r'(?s)\\begin\s*\{keyonly\}.*?\\end\s*\{keyonly\}', '', text)
+    return text
+
+
+def _replace_answer_envs(text, reveal=False):
+    r"""Replace or remove all \begin{answer}...\end{answer} blocks.
+
+    Works even when blocks contain \input{} or TikZ code.
+
+    Args:
+        text (str): LaTeX source text.
+        reveal (bool, optional): If True, replace each block with formatted
+            answer text. If False, remove blocks entirely. Defaults to False.
+
+    Returns:
+        str: Text with answer environments handled.
+    """
+    def repl(m):
+        inner = m.group(1).strip()
+        if reveal:
+            return f"\n\n\\\n\n\\emph{{Answer:}} {inner}\n\n\\\n\n"
+        return ""
+
+    return re.sub(
+        r'\\begin\{answer\}(.*?)\\end\{answer\}',
+        repl,
+        text,
+        flags=re.DOTALL
+    )
+
+
+def _strip_commented_lines(lines, commented_block_prefix='%\\question'):
+    """Remove comment lines and skip blocks that begin with a commented token.
+
+    A line starting with '%' is always dropped. A block starting with the
+    commented_block_prefix is skipped until a blank line or a real
+    '\\question' line is encountered.
+
+    Args:
+        lines (list of str): Source lines to filter.
+        commented_block_prefix (str, optional): The prefix that signals
+            the start of a skip block. Defaults to '%\\question'.
+
+    Returns:
+        list of str: Cleaned lines with comments and skip blocks removed.
+    """
+    cleaned = []
+    skip_block = False
+    for line in lines:
+        stripped = line.lstrip()
+        if stripped.startswith(commented_block_prefix):
+            skip_block = True
+            continue
+        if skip_block:
+            if stripped == "" or stripped.startswith('\\question'):
+                skip_block = False
+            continue
+        if stripped.startswith('%'):
+            continue
+        cleaned.append(line)
+    return cleaned
+
+
+def _parse_mc_lines(mc_lines, correct_string):
+    """Parse a list of MC question lines into an elements dict.
+
+    Recognises standalone questions (lines containing '\\shuffle' or
+    '\\noshuffle') and question groups (delimited by 'begin{mcgroup}' /
+    'end{mcgroup}').
+
+    Args:
+        mc_lines (list of str): Lines from inside an mcquestions environment,
+            with comment lines already removed.
+        correct_string (str): Marker token for the correct answer.
+
+    Returns:
+        dict: Mapping of integer index to MCQuestion or MCGroup objects,
+            in the order they appear in the source.
+    """
+    elements = {}
+    index = 0
+    open_group = False
+    group_start = 0
+
+    for n, line in enumerate(mc_lines):
+        if line.lstrip().startswith('%'):
+            continue
+
+        if 'begin{mcgroup}' in line:
+            group_start = n
+            open_group = True
+        elif 'end{mcgroup}' in line:
+            group_lines = mc_lines[group_start:n]
+            elements[index] = MCGroup(group_lines, correct_string=correct_string)
+            index += 1
+            open_group = False
+        elif ('\\shuffle' in line or '\\noshuffle' in line) and not open_group:
+            length = _get_question_length(mc_lines, n)
+            question_string = ''.join(mc_lines[n:n + length]).strip()
+            elements[index] = MCQuestion(question_string, correct_string=correct_string)
+            index += 1
+
+    return elements
+
+
 def make_answer_key(exam):
-    """Creates an answer key for the given multiple choice exam."""
+    """Create an answer key for a multiple-choice exam.
+
+    Wraps the text of each correct answer option in a LaTeX '\\hl{}'
+    command for highlighting.
+
+    Args:
+        exam (MCExam): The exam object whose elements will be copied and
+            annotated.
+
+    Returns:
+        dict: A deep copy of exam.elements with correct options highlighted.
+    """
     answer_key = deepcopy(exam.elements)
 
-    def _highlight(option: str) -> str:
+    def _highlight(option):
         main, comment, had_comment = _split_option_comment(option)
         is_correct = _has_correct((comment or option), exam.correct_string)
-        main_clean = main.rstrip()  # no trailing space inside \hl{...}
-        norm_comment = _normalize_comment_tail(comment, is_correct, exam.correct_string) \
-                       if (had_comment or is_correct) else ""
+        main_clean = main.rstrip()
+        norm_comment = (
+            _normalize_comment_tail(comment, is_correct, exam.correct_string)
+            if (had_comment or is_correct) else ""
+        )
         base = '\\item \\hl{' + main_clean + '}' if is_correct else '\\item ' + main_clean
         return base if not norm_comment else base + ' % ' + norm_comment
 
     for key, value in exam.elements.items():
-        if isinstance(value, mc_question):
+        if isinstance(value, MCQuestion):
             for n, opt in enumerate(value.options):
                 if _has_correct(opt, exam.correct_string):
                     answer_key[key].options[n] = _highlight(opt)
@@ -79,146 +327,155 @@ def make_answer_key(exam):
                         answer_key[key].elements[sub_key].options[n] = _highlight(opt)
 
     return answer_key
-        
-        
-    
-class mc_question:
-    """Defines a class for storing and managing the content of a multiple-choice question."""
-    
-    def __init__(self,question_string=None,correct_string=None):
-        """Initializes an mc_question instance.
 
-        Parses the question string to extract the question header, options, 
-        and settings for shuffling, "all of the above," and "none of the above."
+
+# ---------------------------------------------------------------------------
+# Core data classes
+# ---------------------------------------------------------------------------
+
+class MCQuestion:
+    """Stores and manages the content of a single multiple-choice question."""
+
+    def __init__(self, question_string=None, correct_string=None):
+        """Initialize an MCQuestion instance.
+
+        Parses the question string to extract the question header, answer
+        options, and settings for shuffling, 'all of the above', and
+        'none of the above'. The '\\all' and '\\none' special tokens are
+        recognised only when they appear on a '\\item' line, so that
+        occurrences of those strings elsewhere in the question body (e.g.
+        'students must answer \\all parts') are not misread as special
+        answer choices. Detected tokens are removed from the options list
+        and tracked as boolean flags so they can always be appended last
+        during export.
 
         Args:
-            question_string (str, optional): The full content of the multiple-choice question, 
-                including options. Defaults to None.
-            correct_string (str, optional): The marker indicating the correct answer. Defaults to None.
+            question_string (str, optional): The full LaTeX content of the
+                question, including its options block. Defaults to None.
+            correct_string (str, optional): The marker that identifies the
+                correct answer (e.g., 'CORRECT'). Defaults to None.
         """
-        
+
         def get_question_split_point(question_string):
-            """Finds the index of the end of the first pair of braces in the question string.
+            """Find the character index that ends the first brace-pair.
+
+            Locates the boundary between the question header (the
+            '\\shuffle{...}{...}' portion) and the opening of the options
+            block.
 
             Args:
-                question_string (str): A string containing the entire content of a multiple-choice question.
+                question_string (str): The full content of a multiple-choice
+                    question.
 
             Returns:
-                int: The index of the split point, where the question header ends and the options begin.
+                int: Index of the character immediately after the closing
+                    brace of the first outer brace pair.
             """
-        
-            # Initialize counts of left and right braces
             left_brace_count = 0
             right_brace_count = 0
-        
-            # Boolean to identify whether an outer brace is currently unclosed.
             open_outer_brace = False
-        
-            # Iterate over characters in question_string and find first pair of outer braces    
-            for i,char in enumerate(question_string):
-                if char=='{':
-                    left_brace_count+=1
-                    if open_outer_brace == False:
+
+            for i, char in enumerate(question_string):
+                if char == '{':
+                    left_brace_count += 1
+                    if not open_outer_brace:
                         open_outer_brace = True
-                elif char=='}':
-                    right_brace_count+=1
-        
-                # Escape if the end of the first pair was found.
-                if left_brace_count-right_brace_count==0 and open_outer_brace:
-                    
+                elif char == '}':
+                    right_brace_count += 1
+
+                if left_brace_count - right_brace_count == 0 and open_outer_brace:
                     break
-                
-        
-            return i+1
+
+            return i + 1
 
         self.correct_string = correct_string
-    
-        if question_string is not None:
 
+        if question_string is not None:
             self.question_string = question_string
-            
+
             split_point = get_question_split_point(self.question_string)
             self.question_header = self.question_string[:split_point]
 
-            if 'noshuffle' in self.question_header:
-                self.to_shuffle = False
-            else:
-                self.to_shuffle = True
-
+            self.to_shuffle = 'noshuffle' not in self.question_header
 
             options = question_string[split_point:].lstrip().rstrip()[1:-1].lstrip().rstrip()
 
             self.all_of_above = False
             self.none_of_above = False
-            
             self.all_of_above_correct = False
             self.none_of_above_correct = False
-            
-            
-            if '\\all' in options:
-                self.all_of_above=True
-                
-                for option_line in options.split('\n'):
-                    if '\\all' in option_line and self.correct_string in option_line:
+
+            # Only treat \all and \none as special tokens when they appear on
+            # a \item line. This prevents question body text that happens to
+            # contain \all (e.g. "students must answer \all parts") from being
+            # misread as an "All of the above" answer choice.
+            for option_line in options.split('\n'):
+                stripped_line = option_line.lstrip()
+                if not stripped_line.startswith('\\item'):
+                    continue
+                if '\\all' in stripped_line:
+                    self.all_of_above = True
+                    if self.correct_string in stripped_line:
                         self.all_of_above_correct = True
-                        options = options.replace(option_line,'')
-                        break
-                
-                options = options.replace('\\all','')
-            
-            if '\\none' in options:
-                self.none_of_above = True
-                
-                for option_line in options.split('\n'):
-                    if '\\none' in option_line and self.correct_string in option_line:
+                    options = options.replace(option_line, '')
+                elif '\\none' in stripped_line:
+                    self.none_of_above = True
+                    if self.correct_string in stripped_line:
                         self.none_of_above_correct = True
-                        options = options.replace(option_line,'')
-                        break
-                
-                options = options.replace('\\none','')
-            
+                    options = options.replace(option_line, '')
+
             options = options.lstrip().rstrip()
-            
             options = options.split('\\item')[1:]
-            
+
             for n in range(len(options)):
-                options[n] = '\\item '+options[n].lstrip().rstrip()
-            
+                options[n] = '\\item ' + options[n].lstrip().rstrip()
+
             self.options = options
 
+    def shuffle_options(self, rng):
+        """Shuffle the answer options of this question.
 
-    def shuffle_options(self,rng):
-        """Shuffles the options of the question if shuffling is desired.
+        The '\\all' and '\\none' options are not stored in self.options (they
+        are tracked as flags) and are therefore unaffected by shuffling.
+        They will always be appended last during export.
 
         Args:
-            rng (numpy.random.Generator): A random number generator for shuffling.
+            rng (numpy.random.Generator): Random number generator used for
+                shuffling.
 
         Returns:
-            mc_question: A new mc_question instance with shuffled options.
+            MCQuestion: A new MCQuestion instance with options reordered.
         """
-    
         new_question = deepcopy(self)
-    
-        if self.to_shuffle:
 
+        if self.to_shuffle:
             options = np.r_[self.options]
-    
-            N_options = len(self.options)
-    
-            choice = rng.choice(np.arange(N_options),replace=False,size=N_options)
-    
+            n_options = len(self.options)
+            choice = rng.choice(np.arange(n_options), replace=False, size=n_options)
             new_question.options = options[choice].tolist()
-    
+
         return new_question
-        
+
     def add_periods(self, include_equations=True, correct_string=None):
-        """Add period to main text; normalize comment; put CORRECT at end of comment."""
+        """Add a period to the end of each option's main text if absent.
+
+        When the option ends with a LaTeX math expression ('$...$'), a
+        period is appended only when include_equations is True. The
+        comment portion is normalized and the correct-answer token is
+        moved to the very end of the comment.
+
+        Args:
+            include_equations (bool, optional): Whether to add a period
+                after trailing math expressions. Defaults to True.
+            correct_string (str, optional): Override for the correct-answer
+                token. Defaults to None, which falls back to
+                self.correct_string.
+        """
         corr = correct_string or self.correct_string
         new_opts = []
         for option in self.options:
             main, comment, had_comment = _split_option_comment(option)
 
-            # Add period to main if needed, respecting trailing math $...$
             if not main.endswith('.'):
                 m = re.search(r'\$(.*?)\$\s*$', main)
                 if m:
@@ -228,92 +485,86 @@ class mc_question:
                 else:
                     main += '.'
 
-            # Normalize comment and append '  CORRECT' if applicable
             is_correct = _has_correct((comment or option), corr)
-            norm_comment = _normalize_comment_tail(comment, is_correct, corr) if (had_comment or is_correct) else ""
+            norm_comment = (
+                _normalize_comment_tail(comment, is_correct, corr)
+                if (had_comment or is_correct) else ""
+            )
             new_opts.append(_rebuild_option(main, norm_comment))
         self.options = new_opts
 
     def capitalize_first(self, correct_string=None):
-        """Capitalize main text only; preserve comment as-is (no punctuation here)."""
-        corr = correct_string or self.correct_string
+        """Capitalize the first letter of each option's main text.
+
+        The comment portion is preserved unchanged. Correct-answer token
+        placement is left to add_periods or make_answer_key.
+
+        Args:
+            correct_string (str, optional): Override for the correct-answer
+                token (unused here but accepted for a consistent signature).
+                Defaults to None.
+        """
         new_opts = []
         for option in self.options:
             main, comment, had_comment = _split_option_comment(option)
             if main:
                 main = main[0].upper() + main[1:]
-            # keep existing comment text here; CORRECT placement is handled in add_periods/make_answer_key
             new_opts.append(_rebuild_option(main, comment if had_comment else ""))
         self.options = new_opts
 
 
-class mc_group:
-    """Defines a class for storing and managing a group of multiple-choice questions."""
-    
+class MCGroup:
+    """Stores and manages a group of related multiple-choice questions."""
+
     def __init__(self, group_lines, correct_string):
-        """Initializes an mc_group instance."""
+        """Initialize an MCGroup instance.
+
+        Parses the provided LaTeX lines to extract the group header, count,
+        and individual MCQuestion objects.
+
+        Args:
+            group_lines (list of str): Lines of LaTeX that make up the
+                group block (excluding the '\\end{mcgroup}' line).
+            correct_string (str): The marker for correct answers, passed
+                through to each MCQuestion.
+        """
         self.correct_string = correct_string
         self.group_lines = group_lines
         self.group_string = ''.join(group_lines).strip()
 
-        # Extract count and header
         self.group_count, self.group_header = self._get_group_count_and_header(self.group_string)
 
-        self.elements = {}
-        index = 0
-        open_group = False
-        actual_count = 0
-
-        for n, line in enumerate(self.group_lines):
-            if line.lstrip().startswith('%'):
-                continue
-
-            if (('\\shuffle' in line or '\\noshuffle' in line)
-                and not open_group):
-                length = self._get_question_length(self.group_lines, n)
-                start = n
-                end = n + length
-                question_string = ''.join(self.group_lines[start:end]).strip()
-                mc = mc_question(question_string, correct_string=self.correct_string)
-                self.elements[index] = mc
-                index += 1
-                actual_count += 1
+        # group_lines[0] is the \begin{mcgroup}{N}{header} line itself.
+        # Passing it to _parse_mc_lines would trigger the open_group guard
+        # and suppress all questions inside, so skip it.
+        inner_lines = [
+            ln for ln in group_lines[1:]
+            if not ln.lstrip().startswith('%')
+        ]
+        self.elements = _parse_mc_lines(inner_lines, correct_string)
+        actual_count = len(self.elements)
 
         if actual_count != self.group_count:
             print(
-                f"⚠️ Warning: stated {self.group_count} but found {actual_count} "
+                f"Warning: stated {self.group_count} but found {actual_count} "
                 f"in group:\n{self.group_header}\n"
             )
 
         self.group_count = actual_count
 
-    # ---------------------------------------------------------------------
-    def _get_question_length(self, mc_lines, starting_line_number):
-        """Count how many lines a single question spans."""
-        total_lines = len(mc_lines)
-        left = right = pairs = 0
-        open_outer = False
-
-        for i in range(total_lines - starting_line_number):
-            for char in mc_lines[starting_line_number + i]:
-                if char == '{':
-                    left += 1
-                    if not open_outer:
-                        open_outer = True
-                elif char == '}':
-                    right += 1
-                if left - right == 0 and open_outer:
-                    pairs += 1
-                    open_outer = False
-                if pairs == 2:
-                    break
-            else:
-                continue
-            break
-        return i + 1
-
     def _get_group_count_and_header(self, group_string):
-        """Extracts the group count and header from the LaTeX group line."""
+        """Extract the stated question count and header text from the group string.
+
+        Expects the format '\\begin{mcgroup}{N}{Header text}'.
+
+        Args:
+            group_string (str): The full string for the group block.
+
+        Returns:
+            tuple: A two-element tuple (group_count, group_header) where
+                group_count (int or None) is the stated number of questions
+                and group_header (str) is the descriptive header text.
+        """
         left = right = pairs = 0
         open_outer = False
         count_start = count_end = text_start = text_end = 0
@@ -345,8 +596,16 @@ class mc_group:
         group_header = group_string[text_start:text_end]
         return group_count, group_header
 
-    # ---------------------------------------------------------------------
     def shuffle_questions(self, rng):
+        """Return a new MCGroup with questions in a randomized order.
+
+        Args:
+            rng (numpy.random.Generator): Random number generator used for
+                shuffling.
+
+        Returns:
+            MCGroup: A deep copy of this group with questions reordered.
+        """
         new_group = deepcopy(self)
         reordered_keys = rng.choice(list(new_group.elements.keys()), replace=False, size=len(new_group.elements))
         reordered_elements = {j + 1: new_group.elements[key] for j, key in enumerate(reordered_keys)}
@@ -354,30 +613,76 @@ class mc_group:
         return new_group
 
     def shuffle_options(self, rng):
+        """Return a new MCGroup with each question's options shuffled.
+
+        Args:
+            rng (numpy.random.Generator): Random number generator used for
+                shuffling.
+
+        Returns:
+            MCGroup: A deep copy of this group with options reordered.
+        """
         new_group = deepcopy(self)
         for key, value in self.elements.items():
             new_group.elements[key] = value.shuffle_options(rng)
         return new_group
 
     def add_periods(self, include_equations=True, correct_string=None):
-        for key, value in self.elements.items():
-            self.elements[key].add_periods(include_equations=True, correct_string=correct_string)
+        """Add periods to option text for all questions in the group.
+
+        Args:
+            include_equations (bool, optional): Whether to add a period
+                after trailing math expressions. Defaults to True.
+            correct_string (str, optional): Override for the correct-answer
+                token. Defaults to None.
+        """
+        for key in self.elements:
+            self.elements[key].add_periods(include_equations=include_equations, correct_string=correct_string)
 
     def capitalize_first(self, correct_string=None):
-        for key, value in self.elements.items():
+        """Capitalize the first letter of each option for all questions in the group.
+
+        Args:
+            correct_string (str, optional): Override for the correct-answer
+                token. Defaults to None.
+        """
+        for key in self.elements:
             self.elements[key].capitalize_first(correct_string=correct_string)
 
 
-class mc_exam:
-    """Defines a class for storing the content of a multiple choice exam."""
+class MCExam:
+    """Stores and manages the content of a multiple-choice exam."""
 
     def __init__(self, exam_file=None, exam_lines=None, correct_string='CORRECT', seed=None):
+        """Initialize an MCExam instance from a LaTeX file.
+
+        Reads the file, isolates the 'mcquestions' environment, and parses
+        it into MCQuestion and MCGroup objects stored in self.elements.
+        Also builds the answer key and computes letter labels.
+
+        When exam_file is None and exam_lines is also None, self.mc_lines is
+        initialised to an empty list so that the instance is in a valid (if
+        empty) state. The preferred way to build an MCExam without a file on
+        disk is MCExam.from_string().
+
+        Args:
+            exam_file (str, optional): Path to the LaTeX exam file.
+            exam_lines (list of str, optional): Pre-read lines (currently
+                unused; kept for API compatibility).
+            correct_string (str, optional): Marker for the correct answer.
+                Defaults to 'CORRECT'.
+            seed (int, optional): Seed for the internal random number
+                generator. Defaults to None.
+        """
         self.correct_string = correct_string
-        # Keep filename short if exam_file is a path
         self.filepath = Path(exam_file).resolve() if exam_file else None
         self.filename = self.filepath.name if exam_file else None
-        
         self.rng = np.random.default_rng(seed=seed)
+
+        # Default to empty state so the instance is valid even without a file.
+        self.mc_lines = []
+        self.exam_header = ''
+        self.exam_footer = ''
 
         if exam_file is not None:
             with open(exam_file, 'r', encoding='utf-8') as f:
@@ -395,577 +700,456 @@ class mc_exam:
             mc_slice = self.exam_lines[self.mc_block_start:self.mc_block_end]
             self.mc_lines = [ln for ln in mc_slice if not ln.lstrip().startswith('%')]
 
-        self.elements = {}
-        index = 0
-        open_group = False
-
-        for n, line in enumerate(self.mc_lines):
-            if line.lstrip().startswith('%'):
-                continue
-
-            if 'begin{mcgroup}' in line:
-                group_start = n
-                open_group = True
-            elif 'end{mcgroup}' in line:
-                group_end = n
-                open_group = False
-                group_lines = self.mc_lines[group_start:group_end]
-                self.elements[index] = mc_group(group_lines, correct_string=self.correct_string)
-                index += 1
-            elif (('\\shuffle' in line or '\\noshuffle' in line)
-                  and not open_group):
-                length = self.get_question_length(self.mc_lines, n)
-                start = n
-                end = n + length
-                question_string = ''.join(self.mc_lines[start:end]).strip()
-                mc = mc_question(question_string, correct_string=self.correct_string)
-                self.elements[index] = mc
-                index += 1
+        self.elements = _parse_mc_lines(self.mc_lines, self.correct_string)
 
         self.question_count = sum(
-            1 if isinstance(v, mc_question) else len(v.elements)
+            1 if isinstance(v, MCQuestion) else len(v.elements)
             for v in self.elements.values()
         )
 
         self.answer_key = make_answer_key(self)
         self.mc_answer_letters = self._compute_answer_key_letters()
 
-    # ---------------------------------------------------------
-    def _filter_visibility(self, text, reveal=False):
-        text = text.replace('\r\n', '\n').replace('\r', '\n')
-        if reveal:
-            text = re.sub(r'(?s)\\begin\s*\{examonly\}.*?\\end\s*\{examonly\}', '', text)
-        else:
-            text = re.sub(r'(?s)\\begin\s*\{keyonly\}.*?\\end\s*\{keyonly\}', '', text)
-        return text
-
-    def get_question_length(self, mc_lines, starting_line_number):
-        """Count how many lines a single question spans."""
-        total_lines = len(mc_lines)
-        left = right = pairs = 0
-        open_outer = False
-
-        for i in range(total_lines - starting_line_number):
-            for char in mc_lines[starting_line_number + i]:
-                if char == '{':
-                    left += 1
-                    if not open_outer:
-                        open_outer = True
-                elif char == '}':
-                    right += 1
-                if left - right == 0 and open_outer:
-                    pairs += 1
-                    open_outer = False
-                if pairs == 2:
-                    break
-            else:
-                continue
-            break
-        return i + 1
-
     def print_exam(self):
-        """Prints the content of the exam to the console."""
-
-        question_count = 0
-        for key,value in self.elements.items():
-            if isinstance(value,mc_question):
-                question_count+=1
-        
-                print('Question '+ str(question_count)+'\n\n')
-                print(value.question_header)
-                print()
-                for o in value.options:
-                    print(o)
-        
-                print('\n----------------------------\n')
-            else:
-                for sub_key,sub_value in value.elements.items():
-                    question_count+=1
-                    print('Question '+ str(question_count)+'\n\n')
-                    print(sub_value.question_header)
-                    print()
-                    for o in sub_value.options:
-                        print(o)
-            
-                    print('\n----------------------------\n')
+        """Print the content of the exam to the console."""
+        self._print_questions(self.elements)
 
     def print_answer_key(self):
-        """Prints the answer key for the exam to the console."""
+        """Print the answer key for the exam to the console."""
+        self._print_questions(self.answer_key)
 
+    def _print_questions(self, elements_dict):
+        """Print questions from an elements dict to the console.
+
+        Args:
+            elements_dict (dict): Mapping of index to MCQuestion or
+                MCGroup, as held by self.elements or self.answer_key.
+        """
         question_count = 0
-        for key,value in self.answer_key.items():
-            if isinstance(value,mc_question):
-                question_count+=1
-        
-                print('Question '+ str(question_count)+'\n\n')
+        for key, value in elements_dict.items():
+            if isinstance(value, MCQuestion):
+                question_count += 1
+                print('Question ' + str(question_count) + '\n\n')
                 print(value.question_header)
                 print()
                 for o in value.options:
                     print(o)
-        
                 print('\n----------------------------\n')
             else:
-                for sub_key,sub_value in value.elements.items():
-                    question_count+=1
-                    print('Question '+ str(question_count)+'\n\n')
+                for sub_key, sub_value in value.elements.items():
+                    question_count += 1
+                    print('Question ' + str(question_count) + '\n\n')
                     print(sub_value.question_header)
                     print()
                     for o in sub_value.options:
                         print(o)
-            
                     print('\n----------------------------\n')
 
     def show_duplicates(self):
-        """Displays any duplicate options in the exam questions."""
+        """Display any duplicate answer options found in the exam questions."""
 
-        def duplicated(options,question_number):
-            """Identifies and prints duplicate options for a specific question.
+        def duplicated(options, question_number):
+            """Identify and print duplicate options for a specific question.
 
             Args:
-                options (list): List of options for the question.
-                question_number (int): The question number being checked for duplicates.
+                options (list of str): Answer options for the question.
+                question_number (int): The question number being checked.
             """
-
             options = pd.Series(options)
-        
-            duplicated = options[options.duplicated()]
-        
-            if len(duplicated)>0:
-                print('Question '+str(question_number))
-            
-            for d in duplicated:
+            dupes = options[options.duplicated()]
+            if len(dupes) > 0:
+                print('Question ' + str(question_number))
+            for d in dupes:
                 print(d)
-        
-            if len(duplicated)>0:
+            if len(dupes) > 0:
                 print()
-    
-    
+
         question_count = 0
-        for key,value in self.elements.items():
-            if isinstance(value,mc_question):
-                question_count+=1
-        
-                duplicated(value.options,question_number=question_count)
-        
+        for key, value in self.elements.items():
+            if isinstance(value, MCQuestion):
+                question_count += 1
+                duplicated(value.options, question_number=question_count)
             else:
-                for sub_key,sub_value in value.elements.items():
-                    question_count+=1
-                    duplicated(sub_value.options,question_number=question_count)
+                for sub_key, sub_value in value.elements.items():
+                    question_count += 1
+                    duplicated(sub_value.options, question_number=question_count)
 
     def to_latex(self, key=False):
-        """Return the full LaTeX string for this multiple-choice exam, without writing to disk."""
+        """Return the full LaTeX string for this exam without writing to disk.
+
+        Args:
+            key (bool, optional): If True, return the answer key version.
+                Defaults to False.
+
+        Returns:
+            str: Complete LaTeX source for the exam or answer key.
+        """
         if key:
-            output = self.export_key_to_string()
-        else:
-            output = self.export_exam_to_string()
+            return self.export_key_to_string()
+        return self.export_exam_to_string()
+
+    def _write_mc_options(self, question, output):
+        """Append option lines and 'all/none of above' items to an output string.
+
+        The shuffled regular options are written first. '\\all' ('All of the
+        above') is always appended next, and '\\none' ('None of the above')
+        always comes last, so the ordering is preserved regardless of how
+        options were shuffled.
+
+        Args:
+            question (MCQuestion): The question whose options to write.
+            output (str): The LaTeX string accumulated so far.
+
+        Returns:
+            str: The output string with option lines appended.
+        """
+        for option in question.options:
+            output += '\t' + option + '\n'
+        if question.all_of_above:
+            output += '\t\\item All of the above.\n'
+        if question.none_of_above:
+            output += '\t\\item None of the above.\n'
+        return output
+
+    def _write_all_none_key(self, orig_question, output):
+        """Append highlighted 'all/none of above' items for the answer key.
+
+        Writes the items with '\\hl{}' when they are the correct answer,
+        or plain text otherwise. Always writes 'all' before 'none'.
+
+        Args:
+            orig_question (MCQuestion): The original (un-highlighted)
+                question whose flags determine what to write.
+            output (str): The LaTeX string accumulated so far.
+
+        Returns:
+            str: The output string with all/none items appended.
+        """
+        if orig_question.all_of_above:
+            if orig_question.all_of_above_correct:
+                text = '\\item \\hl{All of the above.} % ' + self.correct_string
+            else:
+                text = '\\item All of the above.'
+            output += '\t' + text + '\n'
+        if orig_question.none_of_above:
+            if orig_question.none_of_above_correct:
+                text = '\\item \\hl{None of the above.} % ' + self.correct_string
+            else:
+                text = '\\item None of the above.'
+            output += '\t' + text + '\n'
         return output
 
     def export_exam_to_string(self):
-        """Return LaTeX for the student MC exam (answers hidden), as a string."""
-        output = ''
-        output += self.exam_header
-        output += '\\begin{mcquestions}\n\n'
+        """Return LaTeX for the student exam (answers hidden) as a string.
+
+        Returns:
+            str: Complete LaTeX source for the student-facing exam.
+        """
+        output = self.exam_header + '\\begin{mcquestions}\n\n'
 
         for key, value in self.elements.items():
-            if isinstance(value, mc_question):
+            if isinstance(value, MCQuestion):
                 output += value.question_header + '\n{\n'
-                for option in value.options:
-                    output += '\t' + option + '\n'
-                if value.all_of_above:
-                    output += '\t\\item All of the above.\n'
-                if value.none_of_above_correct:
-                    output += '\t\\item None of the above.\n'
+                output = self._write_mc_options(value, output)
                 output += '}\n\n'
             else:
                 output += '\n% BEGIN MC GROUP BLOCK\n'
                 output += f'\\begin{{mcgroup}}{{{value.group_count}}}{{{value.group_header}}}\n\n'
                 for sub_key, sub_value in value.elements.items():
                     output += sub_value.question_header + '{\n'
-                    for option in sub_value.options:
-                        output += '\t' + option + '\n'
-                    if getattr(sub_value, "all_of_above", False):
-                        output += '\t\\item All of the above.\n'
-                    if getattr(sub_value, "none_of_above_correct", False):
-                        output += '\t\\item None of the above.\n'
+                    output = self._write_mc_options(sub_value, output)
                     output += '}\n\n'
                 output += '% END MC GROUP BLOCK\n\\end{mcgroup}\n\n\n'
 
-        output += '\\end{mcquestions}\n\n'
-        output += self.exam_footer
-
-        # 🚫 Remove key-only blocks from header/body/footer
-        output = self._filter_visibility(output, reveal=False)
-        return output
+        output += '\\end{mcquestions}\n\n' + self.exam_footer
+        return _filter_visibility(output, reveal=False)
 
     def export_key_to_string(self):
-        """Return LaTeX for the MC answer key (answers revealed), as a string."""
-        output = ''
-        output += self.exam_header
-        output += '\\begin{mcquestions}\n\n'
+        """Return LaTeX for the answer key (correct answers highlighted) as a string.
 
-        # Use the prebuilt self.answer_key (already has \hl on correct choices)
+        Returns:
+            str: Complete LaTeX source for the instructor answer key.
+        """
+        output = self.exam_header + '\\begin{mcquestions}\n\n'
+
         for key, value in self.answer_key.items():
-            if isinstance(value, mc_question):
+            orig = self.elements[key]
+            if isinstance(value, MCQuestion):
                 output += value.question_header + '\n{\n'
                 for option in value.options:
                     output += '\t' + option + '\n'
-                # If original had all/none flags, include them where appropriate.
-                if getattr(self.elements[key], "all_of_above", False):
-                    # label becomes next item; highlight if marked correct
-                    text = '\\item All of the above.'
-                    if getattr(self.elements[key], "all_of_above_correct", False):
-                        text = '\\item \\hl{All of the above.} % ' + self.correct_string
-                    output += '\t' + text + '\n'
-                if getattr(self.elements[key], "none_of_above", False):
-                    text = '\\item None of the above.'
-                    if getattr(self.elements[key], "none_of_above_correct", False):
-                        text = '\\item \\hl{None of the above.} % ' + self.correct_string
-                    output += '\t' + text + '\n'
+                output = self._write_all_none_key(orig, output)
                 output += '}\n\n'
             else:
-                # group
-                grp = self.elements[key]
+                grp = orig
                 output += '\n% BEGIN MC GROUP BLOCK\n'
                 output += f'\\begin{{mcgroup}}{{{grp.group_count}}}{{{grp.group_header}}}\n\n'
                 for sub_key, sub_value in value.elements.items():
                     output += sub_value.question_header + '{\n'
                     for option in sub_value.options:
                         output += '\t' + option + '\n'
-                    orig = grp.elements[sub_key]
-                    if getattr(orig, "all_of_above", False):
-                        text = '\\item All of the above.'
-                        if getattr(orig, "all_of_above_correct", False):
-                            text = '\\item \\hl{All of the above.} % ' + self.correct_string
-                        output += '\t' + text + '\n'
-                    if getattr(orig, "none_of_above", False):
-                        text = '\\item None of the above.'
-                        if getattr(orig, "none_of_above_correct", False):
-                            text = '\\item \\hl{None of the above.} % ' + self.correct_string
-                        output += '\t' + text + '\n'
+                    output = self._write_all_none_key(grp.elements[sub_key], output)
                     output += '}\n\n'
                 output += '% END MC GROUP BLOCK\n\\end{mcgroup}\n\n\n'
 
-        output += '\\end{mcquestions}\n\n'
-        output += self.exam_footer
-
-        # 🚫 Remove exam-only blocks from header/body/footer
-        output = self._filter_visibility(output, reveal=True)
-        return output
-
+        output += '\\end{mcquestions}\n\n' + self.exam_footer
+        return _filter_visibility(output, reveal=True)
 
     def export_key(self, filename=None):
-        """Exports the multiple-choice answer key with correct answers highlighted.
-        Hides exam-only blocks and includes key-only content.
+        """Export the answer key with correct answers highlighted to a LaTeX file.
+
+        Args:
+            filename (str, optional): Destination path. Defaults to the
+                original filename with '_Key' appended before the extension.
+
+        Returns:
+            str: The LaTeX string that was written.
         """
         if filename is None:
             filename = str(self.filename).replace('.tex', '') + '_Key.tex'
         self.key_filename = filename
 
-        output = ''.join([self.exam_header, '\\begin{mcquestions}\n\n'])
-
-        for key, value in self.elements.items():
-            if isinstance(value, mc_question):
-                output += self.answer_key[key].question_header + '\n{\n'
-                for option in self.answer_key[key].options:
-                    output += '\t' + option + '\n'
-                if self.answer_key[key].all_of_above_correct:
-                    output += '\t\\item \\hl{All of the above.} %' + self.correct_string + '\n'
-                elif self.answer_key[key].all_of_above:
-                    output += '\t\\item All of the above.\n'
-                if self.answer_key[key].none_of_above_correct:
-                    output += '\t\\item \\hl{None of the above.} %' + self.correct_string + '\n'
-                elif self.answer_key[key].none_of_above:
-                    output += '\t\\item None of the above.\n'
-                output += '}\n\n'
-            else:
-                output += f'\n% BEGIN MC GROUP BLOCK\n\\begin{{mcgroup}}{{{value.group_count}}}{{{value.group_header}}}\n\n'
-                for sub_key, sub_value in value.elements.items():
-                    output += self.answer_key[key].elements[sub_key].question_header + '{\n'
-                    for option in self.answer_key[key].elements[sub_key].options:
-                        output += '\t' + option + '\n'
-                    if self.answer_key[key].elements[sub_key].all_of_above_correct:
-                        output += '\t\\item \\hl{All of the above.} %' + self.correct_string + '\n'
-                    elif self.answer_key[key].elements[sub_key].all_of_above:
-                        output += '\t\\item All of the above.\n'
-                    if self.answer_key[key].elements[sub_key].none_of_above_correct:
-                        output += '\t\\item \\hl{None of the above.} %' + self.correct_string + '\n'
-                    elif self.answer_key[key].elements[sub_key].none_of_above:
-                        output += '\t\\item None of the above.\n'
-                    output += '}\n\n'
-                output += '% END MC GROUP BLOCK\n\\end{mcgroup}\n\n\n'
-
-        output += '\\end{mcquestions}\n\n'
-        output += ''.join(self.exam_footer) if isinstance(self.exam_footer, list) else str(self.exam_footer)
-
-        # 🧹 Hide exam-only and reveal key-only content
-        output = self._filter_visibility(output, reveal=True)
-
-        with open(filename, 'w', encoding='utf-8') as newfile:
-            newfile.write(output)
-
-        print(f"✅ Exported MC key: {filename}")
+        output = self.export_key_to_string()
+        Path(filename).write_text(output, encoding='utf-8')
+        print("Exported MC key: " + filename)
         return output
 
-
-    def export_exam(self,filename=None):
-        """Exports the exam content to a LaTeX file.
+    def export_exam(self, filename=None):
+        """Export the student exam to a LaTeX file.
 
         Args:
-            filename (str, optional): Path to save the LaTeX file. Defaults to the original filename with an appended suffix.
+            filename (str, optional): Destination path. Defaults to the
+                original filename.
+
+        Returns:
+            str: The LaTeX string that was written.
         """
-        
         if filename is None:
-            
             filename = str(self.filename).replace('.tex', '') + '.tex'
 
-        output = ''
-
-        output +=self.exam_header
-        
-        output +='\\begin{mcquestions}\n\n'
-        
-        for key,value in self.elements.items():
-            if isinstance(value,mc_question):
-                # self.question_count+=1
-        
-                output+= self.elements[key].question_header+'\n{\n'
-                
-                for option in self.elements[key].options:
-                    output+='\t'+option+'\n'
-                if self.elements[key].all_of_above:
-                    output+='\t\\item All of the above.\n'
-                if self.elements[key].none_of_above_correct:
-                    output+='\t\\item None of the above.\n'
-                output+='}\n\n'
-            
-            else:
-                output+='\n% BEGIN MC GROUP BLOCK\n\\begin{mcgroup}{'+str(value.group_count)+'}{'+value.group_header+'}\n\n'
-                
-                for sub_key,sub_value in value.elements.items():
-                    
-                    output+= self.elements[key].elements[sub_key].question_header+'{\n'
-        
-                    for option in self.elements[key].elements[sub_key].options:
-                        output+='\t'+option+'\n'
-                    if self.elements[key].elements[sub_key].all_of_above:
-                        output+='\t\\item All of the above.\n'
-                    if self.elements[key].elements[sub_key].none_of_above_correct:
-                        output+='\t\\item None of the above.\n'
-                    output+='}\n\n'
-        
-                output+='% END MC GROUP BLOCK\n\\end{mcgroup}\n\n\n'
-        
-        output += '\\end{mcquestions}\n\n'
-        output += self.exam_footer
-
-        # 🧹 Remove key-only blocks (since this is the student version)
-        output = self._filter_visibility(output, reveal=False)
-
-        with open(filename, 'w', encoding='utf-8') as newfile:
-            newfile.write(output)
+        output = self.export_exam_to_string()
+        Path(filename).write_text(output, encoding='utf-8')
 
         self.filepath = Path(filename).resolve()
         self.filename = str(self.filepath)
 
-        print(f"✅ Exported MC exam: {filename}")
+        print("Exported MC exam: " + filename)
         return output
-            
-            
-    def shuffle_questions(self,filename=None,seed=None,shuffle_within_groups=True):
-        """Shuffles the questions in the exam.
+
+    def export_mc_answers_to_text(self, filename=None, header_text=None, mc_start=1):
+        """Export the MC answer letters to a plain-text file.
+
+        Each line contains a question number and its correct-answer letter(s),
+        e.g. '1. (b)'. The caller can pass mc_start to offset the numbering
+        when MC questions do not begin at question 1 in the overall exam.
 
         Args:
-            filename (str, optional): Path to save the shuffled exam.
-            seed (int, optional): Random seed for reproducibility.
-            shuffle_within_groups (bool): Whether to shuffle questions within groups.
-        
-        Returns:
-            mc_exam: A new instance with shuffled questions.
-        """
+            filename (str, optional): Destination path. Defaults to the
+                original filename with '_MC_Answers.txt' appended before
+                the extension.
+            header_text (str, optional): A title line written at the top of
+                the file. A blank line is inserted between the header and
+                the answer list. Defaults to None.
+            mc_start (int, optional): The global question number assigned to
+                the first MC question. Defaults to 1.
 
+        Returns:
+            str: The text that was written to the file.
+        """
+        if filename is None:
+            stem = str(self.filename).replace('.tex', '')
+            filename = stem + '_MC_Answers.txt'
+
+        lines = []
+        if header_text is not None:
+            lines.append(header_text)
+            lines.append('')
+
+        for i, letters in enumerate(self.mc_answer_letters):
+            lines.append(f'{mc_start + i}. {letters}')
+
+        output = '\n'.join(lines) + '\n'
+        Path(filename).write_text(output, encoding='utf-8')
+        print('Exported MC answers: ' + filename)
+        return output
+
+    def shuffle_questions(self, filename=None, seed=None, shuffle_within_groups=True):
+        """Return a new exam with questions shuffled.
+
+        When at least one standalone MCQuestion exists, one is always placed
+        first; the remaining standalone questions and any MCGroups are then
+        randomly interleaved. When the exam contains only MCGroups (no
+        standalone questions), all groups are shuffled without the
+        forced-first-question step.
+
+        Args:
+            filename (str, optional): Filename for the returned exam object.
+            seed (int, optional): Random seed for reproducibility.
+            shuffle_within_groups (bool, optional): Whether to also shuffle
+                questions within each MCGroup. Defaults to True.
+
+        Returns:
+            MCExam: A new instance with shuffled questions.
+        """
         new_exam = deepcopy(self)
-        
+
         if filename is not None:
             new_exam.filename = filename
-
         else:
-            new_exam.filename = self.filename.replace('.tex','')+'_questions_shuffled'+'.tex'
+            new_exam.filename = Path(self.filename).stem + '_questions_shuffled.tex'
 
         if seed is not None:
-            
             self.rng = np.random.default_rng(seed=seed)
 
-        
-        # Get keys of which elements are MC questions and which are question groups
         mc_question_keys = []
         mc_group_keys = []
-        
-        for key,value in self.elements.items():
-        
-            if isinstance(value,mc_question):
-        
-                mc_question_keys.append(key)
-        
-            else:
-        
-                mc_group_keys.append(key)
-        
-        # Randomly select a MC question to out at top of exam
-        first_choice = self.rng.choice(np.arange(len(mc_question_keys)))
-        
-        # Array that will store the new element ordering
-        reordered_keys = np.r_[mc_question_keys[first_choice]]
-        
-        # Remove the chosen elemet from the list of MC question keys
-        del mc_question_keys[first_choice]
-        
-        # Combine keys for remaining MC questions and question groups
-        remaining_options = np.r_[mc_question_keys,mc_group_keys]
-        
-        # Number of choices
-        M = len(self.elements) - 1
-        
-        # Randomly draw the rest of the ordering
-        remaining_choices = self.rng.choice(np.arange(M),replace=False,size=M)
-        
-        # The reordered keys
-        reordered_keys = np.r_[reordered_keys,remaining_options[remaining_choices]]
-        
-        # The reordered elements dictionary
-        reordered_elements = {j+1 : self.elements[key] for j,key in enumerate(reordered_keys) }
 
+        for key, value in self.elements.items():
+            if isinstance(value, MCQuestion):
+                mc_question_keys.append(key)
+            else:
+                mc_group_keys.append(key)
+
+        if mc_question_keys:
+            # Pin one standalone question first, then randomly interleave the rest.
+            first_choice = self.rng.choice(np.arange(len(mc_question_keys)))
+            reordered_keys = np.r_[mc_question_keys[first_choice]]
+            del mc_question_keys[first_choice]
+
+            remaining_options = np.r_[mc_question_keys, mc_group_keys]
+            M = len(self.elements) - 1
+            if M > 0:
+                remaining_choices = self.rng.choice(np.arange(M), replace=False, size=M)
+                reordered_keys = np.r_[reordered_keys, remaining_options[remaining_choices]]
+        else:
+            # Exam has only groups — shuffle them directly.
+            M = len(mc_group_keys)
+            group_choices = self.rng.choice(np.arange(M), replace=False, size=M)
+            reordered_keys = np.array(mc_group_keys)[group_choices]
+
+        reordered_elements = {j + 1: self.elements[key] for j, key in enumerate(reordered_keys)}
         new_exam.elements = reordered_elements
 
-        # Reorder the questions in each group
         if shuffle_within_groups:
-            for key,value in new_exam.elements.items():
-            
-                if isinstance(value,mc_group):
-                    
+            for key, value in new_exam.elements.items():
+                if isinstance(value, MCGroup):
                     new_exam.elements[key] = new_exam.elements[key].shuffle_questions(self.rng)
-
 
         new_exam.answer_key = make_answer_key(new_exam)
         new_exam.mc_answer_letters = new_exam._compute_answer_key_letters()
 
-        
-        
         return new_exam
 
-    def set_seed(self,seed=None):
-        """Sets the random seed for reproducibility.
+    def set_seed(self, seed=None):
+        """Set the random seed for the exam's internal random number generator.
 
         Args:
-            seed (int, optional): Random seed value.
+            seed (int, optional): Seed value. Defaults to None.
         """
-
         self.rng = np.random.default_rng(seed=seed)
 
     def shuffle_options(self, filename=None, seed=None):
-        """Shuffles the options within each question.
+        """Return a new exam with answer options shuffled within each question.
+
+        The '\\all' and '\\none' options always remain at the end (in that
+        order) because they are stored as flags and appended during export
+        rather than held in the options list.
 
         Args:
-            filename (str, optional): Path to save the shuffled exam.
+            filename (str, optional): Filename for the returned exam object.
             seed (int, optional): Random seed for reproducibility.
 
         Returns:
-            mc_exam: A new mc_exam instance with shuffled options.
+            MCExam: A new MCExam instance with shuffled options.
         """
-
-        # Create a full deep copy so we don't mutate the original
         new_exam = deepcopy(self)
 
-        # ✅ Set the filename
         if filename is not None:
             new_exam.filename = filename
         else:
-            new_exam.filename = self.filename.replace('.tex', '') + '_options_shuffled.tex'
+            new_exam.filename = Path(self.filename).stem + '_options_shuffled.tex'
 
-        # ✅ Seed the RNG *on the new copy*, not on self
-        if seed is not None:
-            new_exam.rng = np.random.default_rng(seed=seed)
-        else:
-            new_exam.rng = np.random.default_rng()
+        new_exam.rng = np.random.default_rng(seed=seed)
 
-        # ✅ Shuffle each question’s options using the new RNG
         for key, value in new_exam.elements.items():
             new_exam.elements[key] = value.shuffle_options(new_exam.rng)
 
-        # ✅ Rebuild answer key and answer letters after shuffling
         new_exam.answer_key = make_answer_key(new_exam)
         new_exam.mc_answer_letters = new_exam._compute_answer_key_letters()
 
-        # ✅ Return a completely independent shuffled exam
-        return deepcopy(new_exam)
+        return new_exam
 
-    def shuffle_options_and_questions(self,filename=None,seed=None,shuffle_within_groups=True):
-        """Shuffles both questions and options in the exam.
+    def shuffle_options_and_questions(self, filename=None, seed=None, shuffle_within_groups=True):
+        """Return a new exam with both options and questions shuffled.
 
         Args:
-            filename (str, optional): Path to save the shuffled exam.
+            filename (str, optional): Filename for the returned exam object.
             seed (int, optional): Random seed for reproducibility.
-            shuffle_within_groups (bool): Whether to shuffle questions within groups.
+            shuffle_within_groups (bool, optional): Whether to shuffle
+                questions within groups. Defaults to True.
 
         Returns:
-            mc_exam: A new instance with shuffled options and questions.
+            MCExam: A new instance with shuffled options and questions.
         """
-
-        new_exam = deepcopy(self)
-        
         if filename is not None:
-            new_exam.filename = filename
-
+            out_filename = filename
         else:
-            new_exam.filename = self.filename.replace('.tex','')+'_options_shuffled'+'.tex'
+            out_filename = Path(self.filename).stem + '_options_shuffled.tex'
 
         if seed is not None:
-            
             self.rng = np.random.default_rng(seed=seed)
 
-        return self.shuffle_options(seed=seed,filename=filename).shuffle_questions(filename=filename,shuffle_within_groups=shuffle_within_groups)
+        return (
+            self.shuffle_options(seed=seed, filename=out_filename)
+                .shuffle_questions(filename=out_filename, shuffle_within_groups=shuffle_within_groups)
+        )
 
-    def add_periods(self,include_equations=True):
-        """Adds periods to the end of sentences in the exam answer choices.
+    def add_periods(self, include_equations=True):
+        """Add periods to the end of answer choice text throughout the exam.
 
         Args:
-            include_equations (bool): Whether to include equations in the operation.
+            include_equations (bool, optional): Whether to add a period
+                after trailing math expressions. Defaults to True.
         """
-    
-        for key,value in self.elements.items():
-
-            self.elements[key].add_periods(include_equations=True,correct_string=self.correct_string)
+        for key in self.elements:
+            self.elements[key].add_periods(include_equations=include_equations, correct_string=self.correct_string)
 
         self.answer_key = make_answer_key(self)
-    
-    
+
     def capitalize_first(self):
-        """Capitalizes the first letter of each sentence in the exam answer choices."""
-
-        for key,value in self.elements.items():
-
+        """Capitalize the first letter of each answer choice throughout the exam."""
+        for key in self.elements:
             self.elements[key].capitalize_first(correct_string=self.correct_string)
 
         self.answer_key = make_answer_key(self)
-
 
     def _compute_answer_key_letters(
         self,
         option_characters=string.ascii_lowercase,
         option_character_format='(CHARACTER)',
     ):
-        """Compute and return the answer key as letter labels (A, B, C, D, ...)."""
+        """Compute letter labels for each correct answer in the exam.
 
+        Args:
+            option_characters (str, optional): Characters to use for option
+                labels. Defaults to lowercase ASCII.
+            option_character_format (str, optional): Format string where
+                'CHARACTER' is replaced by the label letter. Defaults to
+                '(CHARACTER)'.
+
+        Returns:
+            list of str: One entry per question (or sub-question), each
+                a comma-separated string of correct-answer letter labels.
+        """
         key_letters = []
         self.option_characters = option_characters
         self.option_character_format = option_character_format
 
         for key, item in self.elements.items():
-            if isinstance(item, mc_question):
-                # find correct answers in single question
+            if isinstance(item, MCQuestion):
                 letters = self._letters_for_question(item, option_characters, option_character_format)
                 key_letters.append(', '.join(letters))
             else:
-                # grouped questions
                 for sub_key, sub_value in item.elements.items():
                     letters = self._letters_for_question(sub_value, option_characters, option_character_format)
                     key_letters.append(', '.join(letters))
@@ -973,44 +1157,50 @@ class mc_exam:
         return key_letters
 
     def _letters_for_question(self, q, option_chars, fmt):
-        """Return a list of letter labels for one question's correct answers."""
+        """Return formatted letter labels for a single question's correct answers.
+
+        Args:
+            q (MCQuestion): The question to evaluate.
+            option_chars (str): Character sequence for option labels.
+            fmt (str or None): Format string replacing 'CHARACTER' with the
+                label, or None to return raw characters.
+
+        Returns:
+            list of str: Letter labels (formatted or raw) for each correct
+                option, including 'all of above' and 'none of above' when
+                applicable.
+        """
         letters = []
         for n, opt in enumerate(q.options):
-            if self.correct_string in opt:
+            # Use _has_correct (word-boundary regex) to avoid matching substrings
+            # like 'INCORRECTLY' when correct_string is 'CORRECT'.
+            if _has_correct(opt, self.correct_string):
                 letters.append(option_chars[n])
-        if getattr(q, "all_of_above_correct", False):
+        if getattr(q, 'all_of_above_correct', False):
             letters.append(option_chars[len(q.options)])
-        if getattr(q, "none_of_above_correct", False):
+        if getattr(q, 'none_of_above_correct', False):
             letters.append(option_chars[len(q.options) + 1])
         if fmt is not None:
-            letters = [fmt.replace("CHARACTER", l) for l in letters]
+            letters = [fmt.replace('CHARACTER', l) for l in letters]
         return letters
 
-
-# ----------------------------------------------------------
-# Step 1: Simple split into MCExam and FRExam
-# ----------------------------------------------------------
-
-class MCExam(mc_exam):
-    """Wrapper around mc_exam for pure multiple-choice exams."""
-
-    def __init__(self, exam_file=None, **kwargs):
-        if exam_file:
-            self.filepath = Path(exam_file).resolve()
-            self.filename = self.filepath.name   # <-- only the short file name
-            exam_file = str(self.filepath)
-        else:
-            self.filepath = None
-            self.filename = None
-
-        super().__init__(exam_file=exam_file, **kwargs)
-
-    # ----------------------------------------------------------
     @classmethod
     def from_string(cls, tex, correct_string='CORRECT', seed=None, source_path=None, filename_hint=None):
-        """
-        Build an MCExam directly from a LaTeX string (no file needed).
-        Key fix: use splitlines(keepends=True) to preserve newlines.
+        """Build an MCExam directly from a LaTeX string without a file on disk.
+
+        Args:
+            tex (str): LaTeX source containing an 'mcquestions' environment
+                (or raw question content).
+            correct_string (str, optional): Marker for the correct answer.
+                Defaults to 'CORRECT'.
+            seed (int, optional): Seed for the internal RNG. Defaults to None.
+            source_path (str, optional): Path of the originating file, used
+                to set self.filepath. Defaults to None.
+            filename_hint (str, optional): Short filename to assign to
+                self.filename. Defaults to None.
+
+        Returns:
+            MCExam: A fully initialized MCExam instance.
         """
         self = cls.__new__(cls)
         self.correct_string = correct_string
@@ -1020,46 +1210,20 @@ class MCExam(mc_exam):
         self.exam_header = ""
         self.exam_footer = ""
 
-        # Normalize and isolate inner mcquestions environment if present
         tex = tex.replace('\r\n', '\n').replace('\r', '\n')
         m = re.search(r'\\begin\{mcquestions\}(.*?)\\end\{mcquestions\}', tex, flags=re.DOTALL)
         inner = m.group(1) if m else tex
 
-        # IMPORTANT: keepends=True to retain '\n' so LaTeX tables don't collapse
+        # keepends=True preserves '\n' so LaTeX tables do not collapse
         self.mc_lines = [
             ln for ln in inner.splitlines(keepends=True)
             if not ln.lstrip().startswith('%')
         ]
 
-        # --- Parse questions and groups exactly as in mc_exam.__init__ ---
-        self.elements = {}
-        index = 0
-        open_group = False
+        self.elements = _parse_mc_lines(self.mc_lines, correct_string)
 
-        for n, line in enumerate(self.mc_lines):
-            if line.lstrip().startswith('%'):
-                continue
-            if 'begin{mcgroup}' in line:
-                group_start = n
-                open_group = True
-            elif 'end{mcgroup}' in line:
-                group_end = n
-                open_group = False
-                group_lines = self.mc_lines[group_start:group_end]
-                self.elements[index] = mc_group(group_lines, correct_string=self.correct_string)
-                index += 1
-            elif (('\\shuffle' in line or '\\noshuffle' in line) and not open_group):
-                length = mc_exam.get_question_length(self, self.mc_lines, n)
-                start = n
-                end = n + length
-                question_string = ''.join(self.mc_lines[start:end]).strip()
-                mc = mc_question(question_string, correct_string=self.correct_string)
-                self.elements[index] = mc
-                index += 1
-
-        # Build metadata
         self.question_count = sum(
-            1 if isinstance(v, mc_question) else len(v.elements)
+            1 if isinstance(v, MCQuestion) else len(v.elements)
             for v in self.elements.values()
         )
         self.answer_key = make_answer_key(self)
@@ -1068,10 +1232,20 @@ class MCExam(mc_exam):
         return self
 
 
+# ---------------------------------------------------------------------------
+# Free-response exam
+# ---------------------------------------------------------------------------
+
 class FRExam:
-    r"""Handles free-response (FR) exams using \question[points] syntax."""
+    r"""Handles free-response exams using the \question[points] syntax."""
 
     def __init__(self, filename=None):
+        """Initialize an FRExam, optionally loading from a LaTeX file.
+
+        Args:
+            filename (str, optional): Path to the LaTeX exam file. If
+                provided, the file is read and parsed immediately.
+        """
         self.filepath = Path(filename).resolve() if filename else None
         self.filename = str(self.filepath) if filename else None
         self.questions = []
@@ -1082,9 +1256,24 @@ class FRExam:
         if filename:
             self.load_exam(filename)
 
-    # ---------------------------------------------------------
     @classmethod
     def from_string(cls, tex, source_path=None, filename_hint=None):
+        r"""Build an FRExam directly from a LaTeX string without a file on disk.
+
+        When source_path is provided its parent directory is used to resolve
+        any \input{} commands that reference sub-files containing a
+        \question token.
+
+        Args:
+            tex (str): LaTeX source containing free-response question content.
+            source_path (str, optional): Path of the originating file, used
+                to resolve relative \input{} paths. Defaults to None.
+            filename_hint (str, optional): Short filename to assign to
+                self.filename. Defaults to None.
+
+        Returns:
+            FRExam: A fully initialized FRExam instance.
+        """
         self = cls.__new__(cls)
         self.filepath = Path(source_path).resolve() if source_path else None
         self.filename = filename_hint or (self.filepath.name if self.filepath else None)
@@ -1097,145 +1286,58 @@ class FRExam:
         m = re.search(r'\\begin\{frquestions\}(.*?)\\end\{frquestions\}', tex, flags=re.DOTALL)
         inner = m.group(1) if m else tex
 
-        lines = inner.splitlines()
-        cleaned = []
-        skip_block = False
-        for line in lines:
-            stripped = line.lstrip()
-            if stripped.startswith('%\\question'):
-                skip_block = True
-                continue
-            if skip_block:
-                if stripped == "" or stripped.startswith('\\question'):
-                    skip_block = False
-                continue
-            if stripped.startswith('%'):
-                continue
-            cleaned.append(line)
+        # Expand \input{} sub-files when a base directory is available.
+        base_dir = self.filepath.parent if self.filepath else None
+        if base_dir is not None:
+            inner = self._expand_question_inputs(inner, base_dir)
 
-        body = "\n".join(cleaned)
+        body = "\n".join(_strip_commented_lines(inner.splitlines()))
         self._extract_questions_from_text(body, self.filename or "(inline)")
         return self
 
-        self.filepath = Path(filename).resolve() if filename else None
-        self.filename = str(self.filepath) if filename else None
-        self.questions = []        # list of dicts: {"file", "points", "text"}
-        self.question_files = []
-        self.exam_header = ""
-        self.exam_footer = ""
-
-        if filename:
-            self.load_exam(filename)
-
-    # ---------------------------------------------------------
-    def _filter_visibility(self, text, reveal=False):
-        """
-        Remove or reveal content depending on output type (exam vs key).
-
-        - In exam version (reveal=False): remove keyonly blocks entirely.
-        - In key version   (reveal=True): remove examonly blocks entirely.
-        This version handles any whitespace, newlines, and indentation.
-        """
-        # Normalize line endings first (in case of \r\n)
-        text = text.replace('\r\n', '\n').replace('\r', '\n')
-
-        if reveal:
-            # Remove examonly blocks completely
-            text = re.sub(
-                r'(?s)\\begin\s*\{examonly\}.*?\\end\s*\{examonly\}',
-                '',
-                text
-            )
-        else:
-            # Remove keyonly blocks completely
-            text = re.sub(
-                r'(?s)\\begin\s*\{keyonly\}.*?\\end\s*\{keyonly\}',
-                '',
-                text
-            )
-
-        return text
-
-    def _replace_answer_envs(self, text, reveal=False):
-        r"""
-        Replace or remove all \begin{answer}...\end{answer} blocks safely.
-        Works even if the block includes \input{} or TikZ code.
-        """
-        def repl(m):
-            inner = m.group(1).strip()
-            if reveal:
-                # Add blank lines before and after, plus a LaTeX line break at the end
-                return f"\n\n\\\n\n\\emph{{Answer:}} {inner}\n\n\\\n\n"
-            else:
-                return ""
-
-        return re.sub(
-            r'\\begin\{answer\}(.*?)\\end\{answer\}',
-            repl,
-            text,
-            flags=re.DOTALL
-        )
-
     def _expand_question_inputs(self, text, base_dir):
-        """
-        Replace \\input{...} with file contents ONLY if that file contains '\\question'.
-        Leaves figure/TikZ inputs inside answers untouched.
+        r"""Expand \input{...} commands, but only for files containing \question.
+
+        Figure and TikZ inputs inside answer blocks are left untouched.
+
+        Args:
+            text (str): LaTeX source text.
+            base_dir (Path): Directory used to resolve relative file paths.
+
+        Returns:
+            str: Text with qualifying \input commands replaced by file
+                contents.
         """
         def repl(m):
-            raw = m.group(0)             # the literal \input{...}
+            raw = m.group(0)
             fname = m.group(1)
             qpath = base_dir / (fname if fname.endswith(".tex") else f"{fname}.tex")
             try:
                 content = qpath.read_text(encoding="utf-8")
             except Exception:
-                return raw  # leave as-is if unreadable
-
-            # Only inline if this file actually contains a \question
-            if r'\question' in content:
-                return content
-            else:
                 return raw
+            return content if r'\question' in content else raw
 
         return re.sub(r'\\input\{([^}]+)\}', repl, text)
 
     def load_exam(self, filename):
-        r"""Load and parse free-response questions from a .tex file,
-        skipping commented-out \question blocks.
+        r"""Load and parse free-response questions from a LaTeX file.
+
+        Expands \input{} commands that reference files containing a
+        \question token before parsing, so that questions stored in
+        separate sub-files are included. Figure and TikZ inputs inside
+        answer blocks are left untouched. Commented-out \question blocks
+        (lines beginning with '%') are skipped automatically.
+
+        Args:
+            filename (str): Path to the LaTeX file to read.
         """
         text = self.filepath.read_text(encoding="utf-8")
+        # Expand sub-file \input{} commands before stripping comments so
+        # that questions stored in separate files are included.
+        text = self._expand_question_inputs(text, self.filepath.parent)
+        body = "\n".join(_strip_commented_lines(text.splitlines()))
 
-        # --- Remove commented-out question blocks line by line ---
-        # --- Remove commented or fully empty question blocks safely ---
-        lines = text.splitlines()
-        cleaned_lines = []
-        skip_block = False
-
-        for line in lines:
-            stripped = line.lstrip()
-
-            # If this line itself starts with a comment or a commented question → skip it
-            if stripped.startswith('%') or stripped.startswith('%\\question'):
-                continue
-
-            # If we’re currently skipping a commented block, continue until blank or next question
-            if skip_block:
-                if stripped == "" or stripped.startswith('\\question'):
-                    skip_block = False
-                continue
-
-            # Detect start of a *real* question
-            if stripped.startswith('\\question'):
-                cleaned_lines.append(line)
-                continue
-
-            # Keep normal lines (not comments)
-            cleaned_lines.append(line)
-
-        body = "\n".join(cleaned_lines)
-
-        body = "\n".join(cleaned_lines)
-
-        # Match any uncommented \question[...] line and capture the full token
         token_pattern = re.compile(
             r'(?m)^[ \t]*(?<!%)((?:\\question)(?:\[\d+\])?)',
             re.DOTALL
@@ -1247,23 +1349,28 @@ class FRExam:
             start = match.end()
             end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
             snippet = body[start:end].strip()
-            block = f"{token} {snippet}"
-            self._extract_questions_from_text(block, filename)
+            self._extract_questions_from_text(f"{token} {snippet}", filename)
 
-    # ---------------------------------------------------------
     def _extract_questions_from_text(self, text, source):
-        r"""Find all \question[...] blocks within a given text, preserving layout commands."""
-        # Capture any layout commands that appear *before* the first question
+        r"""Find and store all \question[...] blocks within a text string.
+
+        Preserves leading layout commands (e.g., '\\newpage') that appear
+        before the first question.
+
+        Args:
+            text (str): LaTeX text to parse for questions.
+            source (str): Label indicating the source file or context,
+                stored with each question for reference.
+        """
         leading_layout = ""
         m_leading = re.match(r'^\s*((?:\\newpage|\\clearpage|\\vspace\*?\{[^}]*\}\s*)+)', text)
         if m_leading:
             leading_layout = m_leading.group(1)
-            text = text[m_leading.end():]  # remove them from the text, but keep separately
+            text = text[m_leading.end():]
 
-        # Find all question occurrences (with possible internal layout)
         pattern = re.compile(
-            r'((?:\\newpage|\\clearpage|\\vspace\*?\{[^}]*\}\s*)*)'  # layout before question
-            r'(\\question(?:\[\d+\])?)', 
+            r'((?:\\newpage|\\clearpage|\\vspace\*?\{[^}]*\}\s*)*)'
+            r'(\\question(?:\[\d+\])?)',
             re.DOTALL
         )
 
@@ -1272,16 +1379,12 @@ class FRExam:
             prefix_spacing = match.group(1) or ""
             question_token = match.group(2)
             start = match.end()
-
-            # Get text until next question or end
             end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
             question_body = text[start:end].strip()
 
-            # Extract points
             m_points = re.match(r'\\question\[(\d+)\]', question_token)
             points = int(m_points.group(1)) if m_points else None
 
-            # For the first question in the file, attach any leading \newpage
             if i == 0 and leading_layout:
                 prefix_spacing = leading_layout + prefix_spacing
 
@@ -1293,75 +1396,51 @@ class FRExam:
                 "text": full_text.strip()
             })
 
-    # ---------------------------------------------------------
-        # ---------------------------------------------------------
     def reveal_answers(self, text=None):
-        """Reveal answers defined with \\begin{answer} ... \\end{answer}."""
+        r"""Return the exam text with \begin{answer}...\end{answer} blocks revealed.
+
+        Args:
+            text (str, optional): LaTeX text to process. Defaults to the
+                concatenated text of all stored questions.
+
+        Returns:
+            str: LaTeX text with answer environments expanded.
+        """
         if text is None and self.questions:
             text = "\n\n".join(q["text"] for q in self.questions)
 
-        # Use the robust environment replacer
-        text = self._replace_answer_envs(text, reveal=True)
-
-        # Hide exam-only blocks
-        text = self._filter_visibility(text, reveal=True)
+        text = _replace_answer_envs(text, reveal=True)
+        text = _filter_visibility(text, reveal=True)
         return text
 
-    # ---------------------------------------------------------
-    def export_exam(self, filename=None):
-        """Export the free-response exam version (answers hidden)."""
-        if filename is None:
-            filename = str(Path(self.filename).with_name("FR_Exam.tex"))
+    def _build_fr_body(self, key=False):
+        """Build a list of processed question text strings.
 
-        # Ensure output folder exists
-        Path(filename).parent.mkdir(parents=True, exist_ok=True)
+        Args:
+            key (bool, optional): If True, reveal answer environments.
+                Defaults to False.
 
+        Returns:
+            list of str: Each element is the processed text of one question.
+        """
         body_parts = []
         for q in self.questions:
-            text = q["text"]
-
-            # 1️⃣ Remove answer environments first
-            text = self._replace_answer_envs(text, reveal=False)
-            # 2️⃣ Then hide key-only blocks
-            text = self._filter_visibility(text, reveal=False)
-
+            text = _replace_answer_envs(q["text"], reveal=key)
+            text = _filter_visibility(text, reveal=key)
             body_parts.append(text.strip())
+        return body_parts
 
-        content = (
-            self.exam_header
-            + "\n\\begin{frquestions}\n"
-            + "\n\n".join(body_parts)
-            + "\n\\end{frquestions}\n"
-            + self.exam_footer
-        )
-
-        # 🧹 Final cleanup — remove keyonly blocks from header/footer too
-        content = self._filter_visibility(content, reveal=False)
-
-        Path(filename).write_text(content, encoding="utf-8")
-        self.filepath = Path(filename).resolve()
-        self.filename = str(self.filepath)
-
-        print(f"✅ Exported FR exam (no answers): {filename}")
-
-    # ---------------------------------------------------------
     def to_latex(self, key=False):
-        """Return the full LaTeX string for this free-response exam."""
-        body_parts = []
+        """Return the full LaTeX string for this free-response exam.
 
-        for q in self.questions:
-            text = q["text"]
+        Args:
+            key (bool, optional): If True, reveal answer environments.
+                Defaults to False.
 
-            if key:
-                text = self._replace_answer_envs(text, reveal=True)
-                text = self._filter_visibility(text, reveal=True)
-            else:
-                text = self._replace_answer_envs(text, reveal=False)
-                text = self._filter_visibility(text, reveal=False)
-
-            body_parts.append(text.strip())
-
-        body = "\n\n".join(body_parts)
+        Returns:
+            str: Complete LaTeX source for the exam or answer key.
+        """
+        body = "\n\n".join(self._build_fr_body(key=key))
         return (
             self.exam_header
             + "\n\\begin{frquestions}\n"
@@ -1370,55 +1449,68 @@ class FRExam:
             + self.exam_footer
         )
 
-    # ---------------------------------------------------------
-    def export_key(self, filename=None):
-        """Export the answer key version (answers revealed)."""
-        if filename is None:
-            filename = str(Path(self.filename).with_name("FR_Key.tex"))
+    def _export(self, filename, key=False):
+        """Write a LaTeX file for either the student exam or the answer key.
 
+        Args:
+            filename (str): Destination file path.
+            key (bool, optional): If True, write the answer key version.
+                Defaults to False.
+        """
         Path(filename).parent.mkdir(parents=True, exist_ok=True)
-
-        body_parts = []
-        for q in self.questions:
-            text = q["text"]
-
-            # 1️⃣ Replace answer environments first (reveal them)
-            text = self._replace_answer_envs(text, reveal=True)
-            # 2️⃣ Then remove exam-only blocks
-            text = self._filter_visibility(text, reveal=True)
-
-            body_parts.append(text.strip())
 
         content = (
             self.exam_header
             + "\n\\begin{frquestions}\n"
-            + "\n\n".join(body_parts)
+            + "\n\n".join(self._build_fr_body(key=key))
             + "\n\\end{frquestions}\n"
             + self.exam_footer
         )
-
-        # 🧹 Final cleanup — remove examonly blocks from header/footer too
-        content = self._filter_visibility(content, reveal=True)
+        content = _filter_visibility(content, reveal=key)
 
         Path(filename).write_text(content, encoding="utf-8")
-
         self.filepath = Path(filename).resolve()
         self.filename = str(self.filepath)
 
-        print(f"✅ Exported FR key (answers revealed): {filename}")
+    def export_exam(self, filename=None):
+        """Export the student exam version (answers hidden) to a LaTeX file.
 
-    # ---------------------------------------------------------
+        Args:
+            filename (str, optional): Destination path. Defaults to
+                'FR_Exam.tex' in the same directory as the source file.
+        """
+        if filename is None:
+            filename = str(Path(self.filename).with_name("FR_Exam.tex"))
+        self._export(filename, key=False)
+        print("Exported FR exam (no answers): " + filename)
+
+    def export_key(self, filename=None):
+        """Export the answer key version (answers revealed) to a LaTeX file.
+
+        Args:
+            filename (str, optional): Destination path. Defaults to
+                'FR_Key.tex' in the same directory as the source file.
+        """
+        if filename is None:
+            filename = str(Path(self.filename).with_name("FR_Key.tex"))
+        self._export(filename, key=True)
+        print("Exported FR key (answers revealed): " + filename)
+
     def summary(self, max_chars=80):
-        """Print a summary of all parsed free-response questions in order."""
+        """Print a summary of all parsed free-response questions.
+
+        Args:
+            max_chars (int, optional): Maximum number of characters to show
+                in the question preview. Defaults to 80.
+        """
         if not self.questions:
-            print("⚠️ No questions loaded.")
+            print("No questions loaded.")
             return
 
-        print("\n📝 Free-Response Exam Summary")
+        print("\nFree-Response Exam Summary")
         print("-" * 60)
 
         for i, q in enumerate(self.questions, 1):
-            # Compact preview of the question text
             preview = re.sub(r'\s+', ' ', q["text"]).strip()
             preview = preview[:max_chars] + ("..." if len(preview) > max_chars else "")
             pts = f"[{q['points']} pts]" if q.get("points") else ""
@@ -1427,36 +1519,46 @@ class FRExam:
         print("-" * 60)
         print(f"Total questions: {len(self.questions)}\n")
 
+
+# ---------------------------------------------------------------------------
+# Combined exam
+# ---------------------------------------------------------------------------
+
 class Exam:
-    """Combines MCExam and FRExam outputs into a single LaTeX document."""
+    """Combines MCExam and FRExam content into a single LaTeX document."""
 
     def __init__(self, filename, mc=None, fr=None, correct_string="CORRECT", seed=None):
-        """
+        """Initialize an Exam by loading and parsing a main LaTeX file.
+
+        Auto-detects MC and FR sections from '\\input{}' statements or
+        inline environments. Pre-built MCExam and FRExam objects may be
+        passed directly to bypass auto-detection.
+
         Args:
             filename (str): Path to the main exam LaTeX file.
             mc (MCExam, optional): Pre-parsed multiple-choice exam.
+                Defaults to None (auto-detect).
             fr (FRExam, optional): Pre-parsed free-response exam.
-            correct_string (str): Marker for correct MC answers.
+                Defaults to None (auto-detect).
+            correct_string (str, optional): Marker for correct MC answers.
+                Defaults to 'CORRECT'.
             seed (int, optional): Random seed for reproducibility.
+                Defaults to None.
         """
-        # from .exam import MCExam, FRExam
-
         self.filepath = Path(filename).resolve()
-        self.filename = self.filepath.name  # only the short name
+        self.filename = self.filepath.name
         self.file_text = self.filepath.read_text(encoding="utf-8")
         base_dir = self.filepath.parent
         self.correct_string = correct_string
         self.seed = seed
-        
-        self._source_path = Path(self.filepath).resolve()  # remember original source file
-        self._frozen_export_base = False                   # default: no explicit base
-        self._base_path_for_exports = None                 # will hold explicit base when set
 
-        # Accept preloaded objects
+        self._source_path = self.filepath
+        self._frozen_export_base = False
+        self._base_path_for_exports = None
+
         self.mc = mc
         self.fr = fr
 
-        # --- Detect MC section ---
         if self.mc is None:
             mc_inputs = re.findall(
                 r'(?m)^\s*(?!%)\\input\{([^}]*mc[^}]*)\}',
@@ -1467,10 +1569,10 @@ class Exam:
                 for fname in mc_inputs:
                     mc_path = base_dir / (fname if fname.endswith(".tex") else f"{fname}.tex")
                     if mc_path.exists():
-                        print(f"📘 Including MC file: {mc_path.name}")
+                        print("Including MC file: " + mc_path.name)
                         text = mc_path.read_text(encoding="utf-8")
 
-                        # Clean commented-out shuffle/noshuffle blocks
+                        # Strip commented-out shuffle/noshuffle blocks by tracking brace depth
                         lines = text.splitlines()
                         cleaned_lines = []
                         skip_block = False
@@ -1478,7 +1580,10 @@ class Exam:
 
                         for line in lines:
                             stripped = line.lstrip()
-                            if (not skip_block) and (stripped.startswith('%\\shuffle') or stripped.startswith('%\\noshuffle')):
+                            if (not skip_block) and (
+                                stripped.startswith('%\\shuffle')
+                                or stripped.startswith('%\\noshuffle')
+                            ):
                                 skip_block = True
                                 brace_depth = 0
                                 continue
@@ -1495,9 +1600,8 @@ class Exam:
 
                         merged += "\n".join(cleaned_lines) + "\n"
                     else:
-                        print(f"⚠️ MC file not found: {mc_path}")
+                        print("Warning: MC file not found: " + str(mc_path))
 
-                # ✅ Build MC exam from string directly (no temp file)
                 merged_mc_tex = "\\begin{mcquestions}\n" + merged + "\\end{mcquestions}\n"
                 self.mc = MCExam.from_string(
                     merged_mc_tex,
@@ -1508,185 +1612,153 @@ class Exam:
                 )
 
             elif "\\begin{mcquestions}" in self.file_text:
-                print("📘 Detected inline MC questions in main file")
+                print("Detected inline MC questions in main file")
                 self.mc = MCExam(self.filename, correct_string=correct_string, seed=seed)
 
-        # --- Detect FR section ---
         if self.fr is None:
             fr_input = re.search(r'\\input\{([^}]*(?:fr[_]?questions)[^}]*)\}', self.file_text)
             if fr_input:
-                fr_path = base_dir / (fr_input.group(1) + ("" if fr_input.group(1).endswith(".tex") else ".tex"))
+                fr_fname = fr_input.group(1)
+                fr_path = base_dir / (fr_fname if fr_fname.endswith(".tex") else f"{fr_fname}.tex")
                 if fr_path.exists():
-                    print(f"📝 Auto-loading FR section from {fr_path.name}")
+                    print("Auto-loading FR section from " + fr_path.name)
                     text = fr_path.read_text(encoding="utf-8")
-
-                    lines = text.splitlines()
-                    cleaned_lines = []
-                    skip_block = False
-
-                    for line in lines:
-                        stripped = line.lstrip()
-                        if not skip_block and stripped.startswith('%\\question'):
-                            skip_block = True
-                            continue
-
-                        if skip_block:
-                            if stripped == "" or stripped.startswith('\\question'):
-                                skip_block = False
-                            continue
-
-                        cleaned_lines.append(line)
-
-                    cleaned_text = "\n".join(cleaned_lines)
-
-                    # ✅ Store inline FR LaTeX directly in memory
+                    cleaned_text = "\n".join(_strip_commented_lines(text.splitlines()))
                     self.fr_text = cleaned_text
-
-                    # ✅ Build FR exam directly from string, no file creation
                     self.fr = FRExam.from_string(
                         cleaned_text,
                         source_path=self.filepath,
                         filename_hint=self.filename,
                     )
                 else:
-                    print(f"⚠️ FR file not found: {fr_path}")
+                    print("Warning: FR file not found: " + str(fr_path))
             elif "\\begin{frquestions}" in self.file_text:
-                print("📝 Detected inline FR questions in main file")
+                print("Detected inline FR questions in main file")
                 self.fr = FRExam(self.filename)
 
-    # ----------------------------------------------------------------------
-    def _filter_visibility(self, text, reveal=False):
-        """Applies FR/MC-style visibility filtering to mixed exam LaTeX."""
-        text = text.replace('\r\n', '\n').replace('\r', '\n')
-        if reveal:
-            text = re.sub(r'(?s)\\begin\s*\{examonly\}.*?\\end\s*\{examonly\}', '', text)
-        else:
-            text = re.sub(r'(?s)\\begin\s*\{keyonly\}.*?\\end\s*\{keyonly\}', '', text)
-        return text
-
-    def _replace_answer_envs(self, text, reveal=False):
-        """Replaces or removes \\begin{answer}...\\end{answer} blocks safely."""
-        def repl(m):
-            inner = m.group(1).strip()
-            if reveal:
-                # Match FRExam’s spacing convention
-                return f"\n\n\\\n\n\\emph{{Answer:}} {inner}\n\n\\\n\n"
-            else:
-                return ""
-        return re.sub(r'\\begin\{answer\}(.*?)\\end\{answer\}', repl, text, flags=re.DOTALL)
-
-    def _expand_question_inputs(self, text, base_dir):
-        """Expand \\input{...} files *only* if they contain \\question commands."""
-        def repl(m):
-            fname = m.group(1)
-            qpath = base_dir / (fname if fname.endswith(".tex") else f"{fname}.tex")
-            try:
-                content = qpath.read_text(encoding="utf-8")
-            except Exception:
-                return m.group(0)
-            return content if r'\question' in content else m.group(0)
-            # Only match \input lines that are NOT commented out
-        return re.sub(r'(?m)^\s*(?!%)\\input\{([^}]+)\}', repl, text)
-
-    # --- replace Exam.shuffle_options with this version ---
     def shuffle_options(self, seed=None, filename=None):
+        """Return a new Exam with shuffled MC options, preserving FR questions.
+
+        Args:
+            seed (int, optional): Random seed for reproducibility.
+            filename (str, optional): If provided, sets the base path for
+                subsequent export_exam and export_key calls.
+
+        Returns:
+            Exam: A deep copy of this Exam with MC options shuffled.
         """
-        Return a new Exam object with shuffled MC options,
-        preserving FR questions and structure.
-        If `filename` is provided, it becomes the new exam's base path
-        for later export_exam/export_key calls.
-        """
-        from copy import deepcopy
         new_exam = deepcopy(self)
         new_exam.mc = new_exam.mc.shuffle_options(seed=seed)
 
-        # ✅ Handle filename and directory properly
         if filename:
             out_path = Path(filename).expanduser().resolve()
             out_path.parent.mkdir(parents=True, exist_ok=True)
             new_exam.filepath = out_path
             new_exam.filename = out_path.name
-            # Mark this as the base for later exports
             new_exam._base_path_for_exports = out_path
             new_exam._frozen_export_base = True
         else:
             new_exam._frozen_export_base = False
             new_exam._base_path_for_exports = None
 
-        print(f"✅ Shuffled MC options with seed={seed}")
+        print("Shuffled MC options with seed=" + str(seed))
         return new_exam
 
-    # ----------------------------------------------------------------------
     def to_latex(self, key=False):
-        """Return full LaTeX string for mixed exam (MC + FR combined)."""
-        mc_inner = fr_inner = ""
+        """Return the full LaTeX string for the combined MC and FR exam.
 
+        Raises ValueError if the assembled output does not contain exactly
+        one mcquestions and one frquestions environment.
+
+        Args:
+            key (bool, optional): If True, produce the answer key version.
+                Defaults to False.
+
+        Returns:
+            str: Complete LaTeX source for the exam or answer key.
+        """
+        mc_inner = fr_inner = ""
         if self.mc:
             mc_tex = self.mc.to_latex(key=key)
             mc_inner = self._extract_body(mc_tex, "mcquestions")
-
         if self.fr:
             fr_tex = self.fr.to_latex(key=key)
             fr_inner = self._extract_body(fr_tex, "frquestions")
 
         combined = self._assemble_exam(mc_inner, fr_inner)
-        combined = self._replace_answer_envs(combined, reveal=key)
-        combined = self._filter_visibility(combined, reveal=key)
+        combined = _replace_answer_envs(combined, reveal=key)
+        combined = _filter_visibility(combined, reveal=key)
+
+        self._assert_single_env(combined, "mcquestions")
+        self._assert_single_env(combined, "frquestions")
         return combined
 
     def _extract_body(self, latex_text, env_name):
-        """Extracts the inner content of a LaTeX environment (like mcquestions)."""
+        """Extract the inner content of a LaTeX environment.
+
+        Args:
+            latex_text (str): LaTeX source that contains the environment.
+            env_name (str): Name of the LaTeX environment (e.g.,
+                'mcquestions').
+
+        Returns:
+            str: Content between the \\begin and \\end tags, or the full
+                input text if the environment is not found.
+        """
         m = re.search(rf'\\begin\{{{env_name}\}}(.*?)\\end\{{{env_name}\}}', latex_text or "", flags=re.DOTALL)
         return m.group(1).strip() if m else latex_text or ""
 
-    def _assert_single_env(self, text: str, env: str) -> None:
-        """Fail fast if we don't have exactly one full env block."""
+    def _assert_single_env(self, text, env):
+        """Raise ValueError if the text does not contain exactly one environment block.
+
+        Args:
+            text (str): LaTeX source text to check.
+            env (str): Environment name to look for.
+
+        Raises:
+            ValueError: If the count of begin/end pairs is not exactly one.
+        """
         pattern = rf"(?s)\\begin\{{{env}\}}.*?\\end\{{{env}\}}"
         count = len(re.findall(pattern, text))
         if count != 1:
             raise ValueError(f"{env}: expected 1 block, found {count}")
 
-    def to_latex(self, key=False):
-        mc_inner = fr_inner = ""
-        if self.mc:
-            mc_tex = self.mc.to_latex(key=key)
-            mc_inner = self._extract_body(mc_tex, "mcquestions")
-        if self.fr:
-            fr_tex = self.fr.to_latex(key=key)
-            fr_inner = self._extract_body(fr_tex, "frquestions")
-
-        combined = self._assemble_exam(mc_inner, fr_inner)
-        combined = self._replace_answer_envs(combined, reveal=key)
-        combined = self._filter_visibility(combined, reveal=key)
-
-        # 🔒 Guard: exactly one MC + one FR
-        self._assert_single_env(combined, "mcquestions")
-        self._assert_single_env(combined, "frquestions")
-        return combined
-
     def _replace_or_insert_env(self, text, env, inner,
                                anchor_comment=None,
                                insert_before_env=None,
                                insert_after_env=None):
-        """
-        Replace FIRST \begin{env}...\end{env} with `inner` (wrapped) without
-        deleting the newly inserted block. Uses a sentinel to protect it.
+        """Replace the first occurrence of an environment or insert it near an anchor.
+
+        Uses a sentinel string to protect the newly inserted block from
+        being caught by subsequent substitutions.
+
+        Args:
+            text (str): LaTeX source text.
+            env (str): Environment name to replace or insert.
+            inner (str): Content to place inside the environment.
+            anchor_comment (str, optional): Regex matching a comment line
+                after which the block should be inserted when no existing
+                environment is found. Defaults to None.
+            insert_before_env (str, optional): Environment name before which
+                to insert when no existing environment is found. Defaults to
+                None.
+            insert_after_env (str, optional): Environment name after which
+                to insert when no existing environment is found. Defaults to
+                None.
+
+        Returns:
+            str: Updated LaTeX text.
         """
         block = f"\\begin{{{env}}}\n{inner.strip()}\n\\end{{{env}}}\n"
         pattern = rf"(?s)\\begin\{{{env}\}}.*?\\end\{{{env}\}}"
         SENTINEL = f"__AT_{env.upper()}_BLOCK__"
 
-        # Case 1: env exists → replace first with SENTINEL, delete rest, then restore
         if re.search(pattern, text):
-            # Replace only the first occurrence with a sentinel (safe: no backslash parsing)
             text = re.sub(pattern, lambda _m: SENTINEL, text, count=1)
-            # Remove all remaining occurrences
             text = re.sub(pattern, "", text)
-            # Restore the sentinel to the final block
             text = text.replace(SENTINEL, block, 1)
             return text
 
-        # Case 2: no env → insert near anchors if available
         if anchor_comment and re.search(anchor_comment, text):
             text = re.sub(anchor_comment,
                           lambda m: m.group(0) + "\n" + block,
@@ -1705,29 +1777,29 @@ class Exam:
                           text, count=1)
             return text
 
-        # Fallback: before \end{document}
         text = re.sub(r"\\end\{document\}",
                       lambda _m: block + "\n\\end{document}",
                       text, count=1)
         return text
 
-
     def _assemble_exam(self, mc_inner, fr_inner):
-        """
-        Build final LaTeX by replacing/insert MC & FR envs. All re.sub that
-        emit LaTeX use callables to avoid 'bad escape \s' errors.
+        """Build the final LaTeX output by replacing or inserting MC and FR environments.
+
+        Args:
+            mc_inner (str): Inner content for the mcquestions environment.
+            fr_inner (str): Inner content for the frquestions environment.
+
+        Returns:
+            str: Assembled LaTeX document text.
         """
         text = self.file_text
 
-        # 1) Strip uncommented \input lines (we inline now)
         text = re.sub(r'(?m)^[ \t]*(?!%)\\input\{[^}]*mc[^}]*\}.*?$', "", text)
         text = re.sub(r'(?m)^[ \t]*(?!%)\\input\{[^}]*fr[^}]*\}.*?$', "", text)
 
-        # 2) Prepare inners
         mc_inner = (mc_inner or "").strip()
         fr_inner = (fr_inner or "").strip()
 
-        # 3) Replace/insert MC block
         text = self._replace_or_insert_env(
             text,
             env="mcquestions",
@@ -1736,7 +1808,6 @@ class Exam:
             insert_before_env="frquestions",
         )
 
-        # 4) Replace/insert FR block
         text = self._replace_or_insert_env(
             text,
             env="frquestions",
@@ -1745,78 +1816,118 @@ class Exam:
             insert_after_env="mcquestions",
         )
 
-        # 5) Clean accidental duplicate begin/end lines (use callables)
-        text = re.sub(
-            r'(?ms)\\begin\{frquestions\}\s*\\begin\{frquestions\}',
-            lambda _m: '\\begin{frquestions}',
-            text,
-        )
-        text = re.sub(
-            r'(?ms)\\end\{frquestions\}\s*\\end\{frquestions\}',
-            lambda _m: '\\end{frquestions}',
-            text,
-        )
-        text = re.sub(
-            r'(?ms)\\begin\{mcquestions\}\s*\\begin\{mcquestions\}',
-            lambda _m: '\\begin{mcquestions}',
-            text,
-        )
-        text = re.sub(
-            r'(?ms)\\end\{mcquestions\}\s*\\end\{mcquestions\}',
-            lambda _m: '\\end{mcquestions}',
-            text,
-        )
+        # Clean accidental duplicate begin/end lines
+        for env in ("frquestions", "mcquestions"):
+            text = re.sub(
+                rf'(?ms)\\begin\{{{env}\}}\s*\\begin\{{{env}\}}',
+                lambda _m, e=env: f'\\begin{{{e}}}',
+                text,
+            )
+            text = re.sub(
+                rf'(?ms)\\end\{{{env}\}}\s*\\end\{{{env}\}}',
+                lambda _m, e=env: f'\\end{{{e}}}',
+                text,
+            )
 
-        # 6) Normalize whitespace
         text = re.sub(r'\n{3,}', '\n\n', text).strip() + "\n"
         return text
 
-    # ----------------------------------------------------------------------
-    # --- replace Exam.export_exam with this version ---
-    def export_exam(self, filename=None):
-        """Export the mixed student version (no FR answers, no keyonly content)."""
-        if filename:
-            out_path = Path(filename).expanduser().resolve()
-        elif getattr(self, "_frozen_export_base", False) and getattr(self, "_base_path_for_exports", None):
-            # Use the frozen base exactly
-            out_path = self._base_path_for_exports
-        else:
-            base = Path(self._source_path if hasattr(self, "_source_path") else self.filepath)
-            stem = re.sub(r"_Exported(_Key)?$", "", base.stem)
-            out_path = base.with_name(f"{stem}_Exported.tex")
+    def _resolve_export_path(self, filename, key=False):
+        """Determine the output path for an export operation.
 
-        tex = self.to_latex(key=False)
-        tex = self._filter_visibility(tex, reveal=False)
+        Args:
+            filename (str or None): Explicit path supplied by the caller, or
+                None to use automatic naming.
+            key (bool, optional): If True, append '_Key' to the stem when
+                deriving an automatic name. Defaults to False.
+
+        Returns:
+            Path: Resolved output path.
+        """
+        if filename:
+            return Path(filename).expanduser().resolve()
+        if getattr(self, "_frozen_export_base", False) and getattr(self, "_base_path_for_exports", None):
+            base = self._base_path_for_exports
+            return base.with_name(f"{base.stem}_Key{base.suffix}") if key else base
+        base = Path(self._source_path)
+        stem = re.sub(r"_Exported(_Key)?$", "", base.stem)
+        suffix = "_Exported_Key.tex" if key else "_Exported.tex"
+        return base.with_name(stem + suffix)
+
+    def export_exam(self, filename=None):
+        """Export the combined student exam (no answers, no key-only content).
+
+        Args:
+            filename (str, optional): Destination path. Defaults to the
+                source filename with '_Exported' appended before the
+                extension.
+        """
+        out_path = self._resolve_export_path(filename, key=False)
+        tex = _filter_visibility(self.to_latex(key=False), reveal=False)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(tex, encoding="utf-8")
-
-        print(f"✅ Exported mixed exam (no answers): {out_path}")
-        
-
+        print("Exported mixed exam (no answers): " + str(out_path))
 
     def export_key(self, filename=None):
-        """Export the mixed instructor key (FR answers shown, includes keyonly)."""
-        if filename:
-            out_path = Path(filename).expanduser().resolve()
-        elif getattr(self, "_frozen_export_base", False) and getattr(self, "_base_path_for_exports", None):
-            base = self._base_path_for_exports
-            out_path = base.with_name(f"{base.stem}_Key{base.suffix}")
-        else:
-            base = Path(self._source_path if hasattr(self, "_source_path") else self.filepath)
-            stem = re.sub(r"_Exported(_Key)?$", "", base.stem)
-            out_path = base.with_name(f"{stem}_Exported_Key.tex")
+        """Export the combined instructor key (FR answers shown, key-only content included).
 
-        tex = self.to_latex(key=True)
-        tex = self._filter_visibility(tex, reveal=True)
+        Args:
+            filename (str, optional): Destination path. Defaults to the
+                source filename with '_Exported_Key' appended before the
+                extension.
+        """
+        out_path = self._resolve_export_path(filename, key=True)
+        tex = _filter_visibility(self.to_latex(key=True), reveal=True)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(tex, encoding="utf-8")
+        print("Exported mixed exam key: " + str(out_path))
 
-        print(f"✅ Exported mixed exam key: {out_path}")
+    def export_mc_answers_to_text(self, filename=None, header_text=None):
+        """Export the MC answer letters to a plain-text file, with correct
+        question numbering even when FR questions precede the MC section.
 
-    # ----------------------------------------------------------------------
+        Scans the assembled exam LaTeX to determine whether the frquestions
+        environment appears before mcquestions, and if so counts the FR
+        questions to compute the MC start number.
+
+        Args:
+            filename (str, optional): Destination path. Defaults to the
+                source filename with '_MC_Answers.txt' before the extension.
+            header_text (str, optional): A title line written at the top of
+                the file. A blank line is inserted between the header and
+                the answer list. Defaults to None.
+
+        Returns:
+            str: The text that was written to the file, or None if there are
+                no MC questions.
+        """
+        if self.mc is None:
+            print('No MC questions found.')
+            return None
+
+        if filename is None:
+            base = Path(self._source_path)
+            stem = re.sub(r'_Exported(_Key)?$', '', base.stem)
+            filename = str(base.with_name(stem + '_MC_Answers.txt'))
+
+        # Determine where MC questions start in the overall question numbering.
+        mc_start = 1
+        if self.fr is not None:
+            assembled = self.to_latex(key=False)
+            fr_pos = assembled.find(r'\begin{frquestions}')
+            mc_pos = assembled.find(r'\begin{mcquestions}')
+            if fr_pos != -1 and mc_pos != -1 and fr_pos < mc_pos:
+                mc_start = len(self.fr.questions) + 1
+
+        return self.mc.export_mc_answers_to_text(
+            filename=filename,
+            header_text=header_text,
+            mc_start=mc_start,
+        )
+
     def summary(self):
-        """Print a short summary of the mixed exam contents."""
-        print("\n📘 Mixed Exam Summary")
+        """Print a short summary of the combined exam's MC and FR content."""
+        print("\nMixed Exam Summary")
         print("=" * 60)
         if self.mc:
             print(f"Multiple Choice: {getattr(self.mc, 'question_count', 'unknown')} questions")
@@ -1824,7 +1935,18 @@ class Exam:
             print(f"Free Response: {len(self.fr.questions)} questions")
 
     def verify_integrity(self, latex_text=None):
-        """Basic consistency checks for the mixed exam."""
+        """Run basic consistency checks on the combined exam LaTeX.
+
+        Verifies that each expected environment appears exactly once and
+        that no unresolved \\input statements remain.
+
+        Args:
+            latex_text (str, optional): LaTeX text to check. Defaults to
+                self.to_latex(key=False).
+
+        Returns:
+            bool: True if all checks pass, False otherwise.
+        """
         if latex_text is None:
             latex_text = self.to_latex(key=False)
 
@@ -1838,20 +1960,20 @@ class Exam:
         for env in ["mcquestions", "frquestions"]:
             b, e = count_env(env)
             if b == e == 1:
-                messages.append(f"✅ {env}: found 1 begin / 1 end.")
+                messages.append(f"OK - {env}: found 1 begin / 1 end.")
             else:
                 ok = False
-                messages.append(f"❌ {env}: found {b} \\begin and {e} \\end.")
+                messages.append(f"ERROR - {env}: found {b} \\begin and {e} \\end.")
 
         leftover_inputs = re.findall(r'\\input\{[^}]*\}', latex_text)
         if leftover_inputs:
             ok = False
-            messages.append(f"⚠️ Unresolved \\input statements found: {len(leftover_inputs)}")
+            messages.append(f"Warning: unresolved \\input statements found: {len(leftover_inputs)}")
 
-        print("\n🔍 Mixed Exam Integrity Check")
+        print("\nMixed Exam Integrity Check")
         print("=" * 50)
         for msg in messages:
             print(msg)
         print("=" * 50)
-        print("✅ Exam structure looks consistent!\n" if ok else "⚠️ Exam may have inconsistencies.\n")
+        print("Exam structure looks consistent!\n" if ok else "Exam may have inconsistencies.\n")
         return ok

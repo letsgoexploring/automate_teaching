@@ -5,16 +5,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>exam module &#8212; automate_teaching 0.0.11 documentation</title>
+    <title>exam module &#8212; automate_teaching 1.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=4468db6d" />
-    <script src="_static/documentation_options.js?v=0c446633"></script>
+    <script src="_static/documentation_options.js?v=8d563738"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="google module" href="google.html" />
+    <link rel="next" title="google_api module" href="google.html" />
     <link rel="prev" title="About automate_teaching" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
@@ -38,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           automate_teaching</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -55,9 +55,9 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">exam</span></code> module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="google.html"><code class="docutils literal notranslate"><span class="pre">google</span></code> module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="google.html"><code class="docutils literal notranslate"><span class="pre">google_api</span></code> module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="latex.html"><code class="docutils literal notranslate"><span class="pre">latex</span></code> module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="homework.html"><code class="docutils literal notranslate"><span class="pre">homework</span></code> class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homework.html"><code class="docutils literal notranslate"><span class="pre">Homework</span></code> class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functions.html">Other Functions</a></li>
 </ul>
 </ul>
@@ -78,17 +78,78 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#classes">Classes</a><ul>
-<li><a class="reference internal" href="#exam.mc_question"><code class="docutils literal notranslate"><span class="pre">mc_question</span></code></a><ul>
-<li><a class="reference internal" href="#exam.mc_question.__init__"><code class="docutils literal notranslate"><span class="pre">mc_question.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_question.shuffle_options"><code class="docutils literal notranslate"><span class="pre">mc_question.shuffle_options()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_question.add_periods"><code class="docutils literal notranslate"><span class="pre">mc_question.add_periods()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_question.capitalize_first"><code class="docutils literal notranslate"><span class="pre">mc_question.capitalize_first()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion"><code class="docutils literal notranslate"><span class="pre">MCQuestion</span></code></a><ul>
+<li><a class="reference internal" href="#exam.MCQuestion.correct_string"><code class="docutils literal notranslate"><span class="pre">MCQuestion.correct_string</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.question_string"><code class="docutils literal notranslate"><span class="pre">MCQuestion.question_string</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.question_header"><code class="docutils literal notranslate"><span class="pre">MCQuestion.question_header</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.to_shuffle"><code class="docutils literal notranslate"><span class="pre">MCQuestion.to_shuffle</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.options"><code class="docutils literal notranslate"><span class="pre">MCQuestion.options</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.all_of_above"><code class="docutils literal notranslate"><span class="pre">MCQuestion.all_of_above</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.none_of_above"><code class="docutils literal notranslate"><span class="pre">MCQuestion.none_of_above</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.all_of_above_correct"><code class="docutils literal notranslate"><span class="pre">MCQuestion.all_of_above_correct</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.none_of_above_correct"><code class="docutils literal notranslate"><span class="pre">MCQuestion.none_of_above_correct</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.shuffle_options"><code class="docutils literal notranslate"><span class="pre">MCQuestion.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.add_periods"><code class="docutils literal notranslate"><span class="pre">MCQuestion.add_periods()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.capitalize_first"><code class="docutils literal notranslate"><span class="pre">MCQuestion.capitalize_first()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#exam.mc_group"><code class="docutils literal notranslate"><span class="pre">mc_group</span></code></a><ul>
-<li><a class="reference internal" href="#exam.mc_group.__init__"><code class="docutils literal notranslate"><span class="pre">mc_group.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_group.shuffle_questions"><code class="docutils literal notranslate"><span class="pre">mc_group.shuffle_questions()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_group.shuffle_options"><code class="docutils literal notranslate"><span class="pre">mc_group.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup"><code class="docutils literal notranslate"><span class="pre">MCGroup</span></code></a><ul>
+<li><a class="reference internal" href="#exam.MCGroup.correct_string"><code class="docutils literal notranslate"><span class="pre">MCGroup.correct_string</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.group_header"><code class="docutils literal notranslate"><span class="pre">MCGroup.group_header</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.group_count"><code class="docutils literal notranslate"><span class="pre">MCGroup.group_count</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.elements"><code class="docutils literal notranslate"><span class="pre">MCGroup.elements</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.shuffle_questions"><code class="docutils literal notranslate"><span class="pre">MCGroup.shuffle_questions()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.shuffle_options"><code class="docutils literal notranslate"><span class="pre">MCGroup.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.add_periods"><code class="docutils literal notranslate"><span class="pre">MCGroup.add_periods()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.capitalize_first"><code class="docutils literal notranslate"><span class="pre">MCGroup.capitalize_first()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exam.MCExam"><code class="docutils literal notranslate"><span class="pre">MCExam</span></code></a><ul>
+<li><a class="reference internal" href="#exam.MCExam.correct_string"><code class="docutils literal notranslate"><span class="pre">MCExam.correct_string</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.filepath"><code class="docutils literal notranslate"><span class="pre">MCExam.filepath</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.filename"><code class="docutils literal notranslate"><span class="pre">MCExam.filename</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.elements"><code class="docutils literal notranslate"><span class="pre">MCExam.elements</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.answer_key"><code class="docutils literal notranslate"><span class="pre">MCExam.answer_key</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.mc_answer_letters"><code class="docutils literal notranslate"><span class="pre">MCExam.mc_answer_letters</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.question_count"><code class="docutils literal notranslate"><span class="pre">MCExam.question_count</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.from_string"><code class="docutils literal notranslate"><span class="pre">MCExam.from_string()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.print_exam"><code class="docutils literal notranslate"><span class="pre">MCExam.print_exam()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.print_answer_key"><code class="docutils literal notranslate"><span class="pre">MCExam.print_answer_key()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.show_duplicates"><code class="docutils literal notranslate"><span class="pre">MCExam.show_duplicates()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.to_latex"><code class="docutils literal notranslate"><span class="pre">MCExam.to_latex()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.export_exam"><code class="docutils literal notranslate"><span class="pre">MCExam.export_exam()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.export_key"><code class="docutils literal notranslate"><span class="pre">MCExam.export_key()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.export_mc_answers_to_text"><code class="docutils literal notranslate"><span class="pre">MCExam.export_mc_answers_to_text()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.shuffle_questions"><code class="docutils literal notranslate"><span class="pre">MCExam.shuffle_questions()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.shuffle_options"><code class="docutils literal notranslate"><span class="pre">MCExam.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.shuffle_options_and_questions"><code class="docutils literal notranslate"><span class="pre">MCExam.shuffle_options_and_questions()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.add_periods"><code class="docutils literal notranslate"><span class="pre">MCExam.add_periods()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.capitalize_first"><code class="docutils literal notranslate"><span class="pre">MCExam.capitalize_first()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.set_seed"><code class="docutils literal notranslate"><span class="pre">MCExam.set_seed()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exam.FRExam"><code class="docutils literal notranslate"><span class="pre">FRExam</span></code></a><ul>
+<li><a class="reference internal" href="#exam.FRExam.filepath"><code class="docutils literal notranslate"><span class="pre">FRExam.filepath</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.filename"><code class="docutils literal notranslate"><span class="pre">FRExam.filename</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.questions"><code class="docutils literal notranslate"><span class="pre">FRExam.questions</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.from_string"><code class="docutils literal notranslate"><span class="pre">FRExam.from_string()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.to_latex"><code class="docutils literal notranslate"><span class="pre">FRExam.to_latex()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.export_exam"><code class="docutils literal notranslate"><span class="pre">FRExam.export_exam()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.export_key"><code class="docutils literal notranslate"><span class="pre">FRExam.export_key()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.reveal_answers"><code class="docutils literal notranslate"><span class="pre">FRExam.reveal_answers()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.summary"><code class="docutils literal notranslate"><span class="pre">FRExam.summary()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exam.Exam"><code class="docutils literal notranslate"><span class="pre">Exam</span></code></a><ul>
+<li><a class="reference internal" href="#exam.Exam.mc"><code class="docutils literal notranslate"><span class="pre">Exam.mc</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.fr"><code class="docutils literal notranslate"><span class="pre">Exam.fr</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.shuffle_options"><code class="docutils literal notranslate"><span class="pre">Exam.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.to_latex"><code class="docutils literal notranslate"><span class="pre">Exam.to_latex()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.export_exam"><code class="docutils literal notranslate"><span class="pre">Exam.export_exam()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.export_key"><code class="docutils literal notranslate"><span class="pre">Exam.export_key()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.export_mc_answers_to_text"><code class="docutils literal notranslate"><span class="pre">Exam.export_mc_answers_to_text()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.summary"><code class="docutils literal notranslate"><span class="pre">Exam.summary()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.verify_integrity"><code class="docutils literal notranslate"><span class="pre">Exam.verify_integrity()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -108,7 +169,7 @@
     </a>
   </li>
   <li>
-    <a href="google.html" title="Next Chapter: google module"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">google module &raquo;</span>
+    <a href="google.html" title="Next Chapter: google_api module"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">google_api module &raquo;</span>
     </a>
   </li>
               
@@ -148,17 +209,78 @@
 </ul>
 </li>
 <li><a class="reference internal" href="#classes">Classes</a><ul>
-<li><a class="reference internal" href="#exam.mc_question"><code class="docutils literal notranslate"><span class="pre">mc_question</span></code></a><ul>
-<li><a class="reference internal" href="#exam.mc_question.__init__"><code class="docutils literal notranslate"><span class="pre">mc_question.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_question.shuffle_options"><code class="docutils literal notranslate"><span class="pre">mc_question.shuffle_options()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_question.add_periods"><code class="docutils literal notranslate"><span class="pre">mc_question.add_periods()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_question.capitalize_first"><code class="docutils literal notranslate"><span class="pre">mc_question.capitalize_first()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion"><code class="docutils literal notranslate"><span class="pre">MCQuestion</span></code></a><ul>
+<li><a class="reference internal" href="#exam.MCQuestion.correct_string"><code class="docutils literal notranslate"><span class="pre">MCQuestion.correct_string</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.question_string"><code class="docutils literal notranslate"><span class="pre">MCQuestion.question_string</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.question_header"><code class="docutils literal notranslate"><span class="pre">MCQuestion.question_header</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.to_shuffle"><code class="docutils literal notranslate"><span class="pre">MCQuestion.to_shuffle</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.options"><code class="docutils literal notranslate"><span class="pre">MCQuestion.options</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.all_of_above"><code class="docutils literal notranslate"><span class="pre">MCQuestion.all_of_above</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.none_of_above"><code class="docutils literal notranslate"><span class="pre">MCQuestion.none_of_above</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.all_of_above_correct"><code class="docutils literal notranslate"><span class="pre">MCQuestion.all_of_above_correct</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.none_of_above_correct"><code class="docutils literal notranslate"><span class="pre">MCQuestion.none_of_above_correct</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.shuffle_options"><code class="docutils literal notranslate"><span class="pre">MCQuestion.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.add_periods"><code class="docutils literal notranslate"><span class="pre">MCQuestion.add_periods()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCQuestion.capitalize_first"><code class="docutils literal notranslate"><span class="pre">MCQuestion.capitalize_first()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#exam.mc_group"><code class="docutils literal notranslate"><span class="pre">mc_group</span></code></a><ul>
-<li><a class="reference internal" href="#exam.mc_group.__init__"><code class="docutils literal notranslate"><span class="pre">mc_group.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_group.shuffle_questions"><code class="docutils literal notranslate"><span class="pre">mc_group.shuffle_questions()</span></code></a></li>
-<li><a class="reference internal" href="#exam.mc_group.shuffle_options"><code class="docutils literal notranslate"><span class="pre">mc_group.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup"><code class="docutils literal notranslate"><span class="pre">MCGroup</span></code></a><ul>
+<li><a class="reference internal" href="#exam.MCGroup.correct_string"><code class="docutils literal notranslate"><span class="pre">MCGroup.correct_string</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.group_header"><code class="docutils literal notranslate"><span class="pre">MCGroup.group_header</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.group_count"><code class="docutils literal notranslate"><span class="pre">MCGroup.group_count</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.elements"><code class="docutils literal notranslate"><span class="pre">MCGroup.elements</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.shuffle_questions"><code class="docutils literal notranslate"><span class="pre">MCGroup.shuffle_questions()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.shuffle_options"><code class="docutils literal notranslate"><span class="pre">MCGroup.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.add_periods"><code class="docutils literal notranslate"><span class="pre">MCGroup.add_periods()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCGroup.capitalize_first"><code class="docutils literal notranslate"><span class="pre">MCGroup.capitalize_first()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exam.MCExam"><code class="docutils literal notranslate"><span class="pre">MCExam</span></code></a><ul>
+<li><a class="reference internal" href="#exam.MCExam.correct_string"><code class="docutils literal notranslate"><span class="pre">MCExam.correct_string</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.filepath"><code class="docutils literal notranslate"><span class="pre">MCExam.filepath</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.filename"><code class="docutils literal notranslate"><span class="pre">MCExam.filename</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.elements"><code class="docutils literal notranslate"><span class="pre">MCExam.elements</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.answer_key"><code class="docutils literal notranslate"><span class="pre">MCExam.answer_key</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.mc_answer_letters"><code class="docutils literal notranslate"><span class="pre">MCExam.mc_answer_letters</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.question_count"><code class="docutils literal notranslate"><span class="pre">MCExam.question_count</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.from_string"><code class="docutils literal notranslate"><span class="pre">MCExam.from_string()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.print_exam"><code class="docutils literal notranslate"><span class="pre">MCExam.print_exam()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.print_answer_key"><code class="docutils literal notranslate"><span class="pre">MCExam.print_answer_key()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.show_duplicates"><code class="docutils literal notranslate"><span class="pre">MCExam.show_duplicates()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.to_latex"><code class="docutils literal notranslate"><span class="pre">MCExam.to_latex()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.export_exam"><code class="docutils literal notranslate"><span class="pre">MCExam.export_exam()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.export_key"><code class="docutils literal notranslate"><span class="pre">MCExam.export_key()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.export_mc_answers_to_text"><code class="docutils literal notranslate"><span class="pre">MCExam.export_mc_answers_to_text()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.shuffle_questions"><code class="docutils literal notranslate"><span class="pre">MCExam.shuffle_questions()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.shuffle_options"><code class="docutils literal notranslate"><span class="pre">MCExam.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.shuffle_options_and_questions"><code class="docutils literal notranslate"><span class="pre">MCExam.shuffle_options_and_questions()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.add_periods"><code class="docutils literal notranslate"><span class="pre">MCExam.add_periods()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.capitalize_first"><code class="docutils literal notranslate"><span class="pre">MCExam.capitalize_first()</span></code></a></li>
+<li><a class="reference internal" href="#exam.MCExam.set_seed"><code class="docutils literal notranslate"><span class="pre">MCExam.set_seed()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exam.FRExam"><code class="docutils literal notranslate"><span class="pre">FRExam</span></code></a><ul>
+<li><a class="reference internal" href="#exam.FRExam.filepath"><code class="docutils literal notranslate"><span class="pre">FRExam.filepath</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.filename"><code class="docutils literal notranslate"><span class="pre">FRExam.filename</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.questions"><code class="docutils literal notranslate"><span class="pre">FRExam.questions</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.from_string"><code class="docutils literal notranslate"><span class="pre">FRExam.from_string()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.to_latex"><code class="docutils literal notranslate"><span class="pre">FRExam.to_latex()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.export_exam"><code class="docutils literal notranslate"><span class="pre">FRExam.export_exam()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.export_key"><code class="docutils literal notranslate"><span class="pre">FRExam.export_key()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.reveal_answers"><code class="docutils literal notranslate"><span class="pre">FRExam.reveal_answers()</span></code></a></li>
+<li><a class="reference internal" href="#exam.FRExam.summary"><code class="docutils literal notranslate"><span class="pre">FRExam.summary()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#exam.Exam"><code class="docutils literal notranslate"><span class="pre">Exam</span></code></a><ul>
+<li><a class="reference internal" href="#exam.Exam.mc"><code class="docutils literal notranslate"><span class="pre">Exam.mc</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.fr"><code class="docutils literal notranslate"><span class="pre">Exam.fr</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.shuffle_options"><code class="docutils literal notranslate"><span class="pre">Exam.shuffle_options()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.to_latex"><code class="docutils literal notranslate"><span class="pre">Exam.to_latex()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.export_exam"><code class="docutils literal notranslate"><span class="pre">Exam.export_exam()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.export_key"><code class="docutils literal notranslate"><span class="pre">Exam.export_key()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.export_mc_answers_to_text"><code class="docutils literal notranslate"><span class="pre">Exam.export_mc_answers_to_text()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.summary"><code class="docutils literal notranslate"><span class="pre">Exam.summary()</span></code></a></li>
+<li><a class="reference internal" href="#exam.Exam.verify_integrity"><code class="docutils literal notranslate"><span class="pre">Exam.verify_integrity()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -172,7 +294,7 @@
     </a>
   </li>
   <li>
-    <a href="google.html" title="Next Chapter: google module"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">google module &raquo;</span>
+    <a href="google.html" title="Next Chapter: google_api module"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">google_api module &raquo;</span>
     </a>
   </li>
 <div id="sourcelink">
@@ -197,13 +319,14 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="exam.make_answer_key">
 <span class="sig-prename descclassname"><span class="pre">exam.</span></span><span class="sig-name descname"><span class="pre">make_answer_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exam</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.make_answer_key" title="Link to this definition">¶</a></dt>
-<dd><p>Creates an answer key for the given multiple-choice exam.</p>
+<dd><p>Creates an answer key for a multiple-choice exam by wrapping each correct
+answer option in a <code class="docutils literal notranslate"><span class="pre">\hl{}</span></code> command for highlighting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>exam</strong> (<em>mc_exam</em>) – An exam object containing elements, options, and a <cite>correct_string</cite> to identify correct answers.</p>
+<dd class="field-odd"><p><strong>exam</strong> (<a class="reference internal" href="#exam.MCExam" title="exam.MCExam"><em>MCExam</em></a>) – An <code class="docutils literal notranslate"><span class="pre">MCExam</span></code> instance whose elements will be copied and annotated.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionary representing the answer key.</p>
+<dd class="field-even"><p>A deep copy of <code class="docutils literal notranslate"><span class="pre">exam.elements</span></code> with correct options highlighted.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict</p>
@@ -215,61 +338,132 @@
 <section id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="exam.mc_question">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exam.</span></span><span class="sig-name descname"><span class="pre">mc_question</span></span><a class="headerlink" href="#exam.mc_question" title="Link to this definition">¶</a></dt>
-<dd><p>Defines a class for storing and managing the content of a multiple-choice question.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="exam.mc_question.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.mc_question.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Initializes an mc_question instance.</p>
+<dt class="sig sig-object py" id="exam.MCQuestion">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exam.</span></span><span class="sig-name descname"><span class="pre">MCQuestion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCQuestion" title="Link to this definition">¶</a></dt>
+<dd><p>Stores and manages the content of a single multiple-choice question.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">\all</span></code> and <code class="docutils literal notranslate"><span class="pre">\none</span></code> special tokens are recognised only when they
+appear on a <code class="docutils literal notranslate"><span class="pre">\item</span></code> line, so occurrences of those strings elsewhere in
+the question body are not misread as answer choices. Detected tokens are
+removed from the options list and tracked as boolean flags so they are
+always appended last during export.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>question_string</strong> (<em>str</em><em>, </em><em>optional</em>) – The full content of the multiple-choice question, including options. Defaults to None.</p></li>
-<li><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – The marker indicating the correct answer. Defaults to None.</p></li>
+<li><p><strong>question_string</strong> (<em>str</em><em>, </em><em>optional</em>) – The full LaTeX content of the question, including
+its options block. Defaults to None.</p></li>
+<li><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – The marker that identifies the correct answer
+(e.g., <code class="docutils literal notranslate"><span class="pre">'CORRECT'</span></code>). Defaults to None.</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCQuestion.correct_string">
+<span class="sig-name descname"><span class="pre">correct_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#exam.MCQuestion.correct_string" title="Link to this definition">¶</a></dt>
+<dd><p>The marker token used to identify correct answer options.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCQuestion.question_string">
+<span class="sig-name descname"><span class="pre">question_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#exam.MCQuestion.question_string" title="Link to this definition">¶</a></dt>
+<dd><p>The original full LaTeX string for the question.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCQuestion.question_header">
+<span class="sig-name descname"><span class="pre">question_header</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#exam.MCQuestion.question_header" title="Link to this definition">¶</a></dt>
+<dd><p>The <code class="docutils literal notranslate"><span class="pre">\shuffle{...}</span></code> or <code class="docutils literal notranslate"><span class="pre">\noshuffle{...}</span></code> header portion of the question.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCQuestion.to_shuffle">
+<span class="sig-name descname"><span class="pre">to_shuffle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#exam.MCQuestion.to_shuffle" title="Link to this definition">¶</a></dt>
+<dd><p>Whether the options should be shuffled. False when <code class="docutils literal notranslate"><span class="pre">\noshuffle</span></code> is used.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCQuestion.options">
+<span class="sig-name descname"><span class="pre">options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span> <span class="pre">of</span> <span class="pre">str</span></em><a class="headerlink" href="#exam.MCQuestion.options" title="Link to this definition">¶</a></dt>
+<dd><p>List of answer option strings (each prefixed with <code class="docutils literal notranslate"><span class="pre">\item</span></code>). The
+<code class="docutils literal notranslate"><span class="pre">\all</span></code> and <code class="docutils literal notranslate"><span class="pre">\none</span></code> options are not stored here; they are tracked
+as boolean flags and appended during export.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCQuestion.all_of_above">
+<span class="sig-name descname"><span class="pre">all_of_above</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#exam.MCQuestion.all_of_above" title="Link to this definition">¶</a></dt>
+<dd><p>Whether an “All of the above” option is present.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCQuestion.none_of_above">
+<span class="sig-name descname"><span class="pre">none_of_above</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#exam.MCQuestion.none_of_above" title="Link to this definition">¶</a></dt>
+<dd><p>Whether a “None of the above” option is present.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCQuestion.all_of_above_correct">
+<span class="sig-name descname"><span class="pre">all_of_above_correct</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#exam.MCQuestion.all_of_above_correct" title="Link to this definition">¶</a></dt>
+<dd><p>Whether “All of the above” is the correct answer.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCQuestion.none_of_above_correct">
+<span class="sig-name descname"><span class="pre">none_of_above_correct</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#exam.MCQuestion.none_of_above_correct" title="Link to this definition">¶</a></dt>
+<dd><p>Whether “None of the above” is the correct answer.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="exam.mc_question.shuffle_options">
-<span class="sig-name descname"><span class="pre">shuffle_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.mc_question.shuffle_options" title="Link to this definition">¶</a></dt>
-<dd><p>Shuffles the options of the question if shuffling is desired.</p>
+<dt class="sig sig-object py" id="exam.MCQuestion.shuffle_options">
+<span class="sig-name descname"><span class="pre">shuffle_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCQuestion.shuffle_options" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">MCQuestion</span></code> with answer options in a randomized order.
+The <code class="docutils literal notranslate"><span class="pre">\all</span></code> and <code class="docutils literal notranslate"><span class="pre">\none</span></code> options are unaffected because they are stored
+as flags and always appended last during export.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rng</strong> (<em>numpy.random.Generator</em>) – A random number generator for shuffling.</p>
+<dd class="field-odd"><p><strong>rng</strong> (<em>numpy.random.Generator</em>) – Random number generator used for shuffling.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A new mc_question instance with shuffled options.</p>
+<dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">MCQuestion</span></code> instance with options reordered.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#exam.mc_question" title="exam.mc_question">mc_question</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#exam.MCQuestion" title="exam.MCQuestion">MCQuestion</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="exam.mc_question.add_periods">
-<span class="sig-name descname"><span class="pre">add_periods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_equations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.mc_question.add_periods" title="Link to this definition">¶</a></dt>
-<dd><p>Adds periods to the end of each option if not already present.</p>
+<dt class="sig sig-object py" id="exam.MCQuestion.add_periods">
+<span class="sig-name descname"><span class="pre">add_periods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_equations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCQuestion.add_periods" title="Link to this definition">¶</a></dt>
+<dd><p>Adds a period to the end of each option’s main text if one is absent.
+When an option ends with a LaTeX math expression (<code class="docutils literal notranslate"><span class="pre">$...$</span></code>), a period
+is appended only when <code class="docutils literal notranslate"><span class="pre">include_equations</span></code> is True. The correct-answer
+token is moved to the very end of the comment.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>include_equations</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to include periods for options ending with equations. Defaults to True.</p></li>
-<li><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – The marker for the correct answer. Defaults to None.</p></li>
+<li><p><strong>include_equations</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to add a period after trailing math
+expressions. Defaults to True.</p></li>
+<li><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – Override for the correct-answer token. Defaults
+to None, which falls back to <code class="docutils literal notranslate"><span class="pre">self.correct_string</span></code>.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="exam.mc_question.capitalize_first">
-<span class="sig-name descname"><span class="pre">capitalize_first</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.mc_question.capitalize_first" title="Link to this definition">¶</a></dt>
-<dd><p>Capitalizes the first letter of each option.</p>
+<dt class="sig sig-object py" id="exam.MCQuestion.capitalize_first">
+<span class="sig-name descname"><span class="pre">capitalize_first</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCQuestion.capitalize_first" title="Link to this definition">¶</a></dt>
+<dd><p>Capitalizes the first letter of each option’s main text.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – The marker for the correct answer. Defaults to None.</p>
+<dd class="field-odd"><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – Override for the correct-answer token (accepted
+for a consistent signature but unused here). Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -277,53 +471,742 @@
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="exam.mc_group">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exam.</span></span><span class="sig-name descname"><span class="pre">mc_group</span></span><a class="headerlink" href="#exam.mc_group" title="Link to this definition">¶</a></dt>
-<dd><p>Defines a class for storing and managing a group of multiple-choice questions.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="exam.mc_group.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_lines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.mc_group.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Initializes an mc_group instance.</p>
+<dt class="sig sig-object py" id="exam.MCGroup">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exam.</span></span><span class="sig-name descname"><span class="pre">MCGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_lines</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCGroup" title="Link to this definition">¶</a></dt>
+<dd><p>Stores and manages a group of related multiple-choice questions delimited
+by <code class="docutils literal notranslate"><span class="pre">\begin{mcgroup}{N}{header}</span></code> and <code class="docutils literal notranslate"><span class="pre">\end{mcgroup}</span></code> in the LaTeX source.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>group_lines</strong> (<em>list</em>) – Lines from a LaTeX file between begin{mcquestions} and end{mcquestions}.</p></li>
-<li><p><strong>correct_string</strong> (<em>str</em>) – The marker indicating the correct answer for questions in the group.</p></li>
+<li><p><strong>group_lines</strong> (<em>list</em><em> of </em><em>str</em>) – Lines of LaTeX that make up the group block, excluding
+the <code class="docutils literal notranslate"><span class="pre">\end{mcgroup}</span></code> line.</p></li>
+<li><p><strong>correct_string</strong> (<em>str</em>) – The marker for correct answers, passed through to
+each <code class="docutils literal notranslate"><span class="pre">MCQuestion</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCGroup.correct_string">
+<span class="sig-name descname"><span class="pre">correct_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#exam.MCGroup.correct_string" title="Link to this definition">¶</a></dt>
+<dd><p>The marker token used to identify correct answer options.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCGroup.group_header">
+<span class="sig-name descname"><span class="pre">group_header</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#exam.MCGroup.group_header" title="Link to this definition">¶</a></dt>
+<dd><p>The descriptive header text from the <code class="docutils literal notranslate"><span class="pre">\begin{mcgroup}{N}{header}</span></code> line.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCGroup.group_count">
+<span class="sig-name descname"><span class="pre">group_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#exam.MCGroup.group_count" title="Link to this definition">¶</a></dt>
+<dd><p>The number of questions in the group (taken from the parsed source and
+corrected to match the actual count if they differ).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCGroup.elements">
+<span class="sig-name descname"><span class="pre">elements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#exam.MCGroup.elements" title="Link to this definition">¶</a></dt>
+<dd><p>Mapping of integer index to <code class="docutils literal notranslate"><span class="pre">MCQuestion</span></code> objects within this group.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="exam.mc_group.shuffle_questions">
-<span class="sig-name descname"><span class="pre">shuffle_questions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.mc_group.shuffle_questions" title="Link to this definition">¶</a></dt>
-<dd><p>Shuffles the order of questions within the group.</p>
+<dt class="sig sig-object py" id="exam.MCGroup.shuffle_questions">
+<span class="sig-name descname"><span class="pre">shuffle_questions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCGroup.shuffle_questions" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">MCGroup</span></code> with questions in a randomized order.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rng</strong> (<em>numpy.random.Generator</em>) – A random number generator for shuffling.</p>
+<dd class="field-odd"><p><strong>rng</strong> (<em>numpy.random.Generator</em>) – Random number generator used for shuffling.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A new mc_group instance with shuffled questions.</p>
+<dd class="field-even"><p>A deep copy of this group with questions reordered.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#exam.mc_group" title="exam.mc_group">mc_group</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#exam.MCGroup" title="exam.MCGroup">MCGroup</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="exam.mc_group.shuffle_options">
-<span class="sig-name descname"><span class="pre">shuffle_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.mc_group.shuffle_options" title="Link to this definition">¶</a></dt>
-<dd><p>Shuffles the options for each question in the group.</p>
+<dt class="sig sig-object py" id="exam.MCGroup.shuffle_options">
+<span class="sig-name descname"><span class="pre">shuffle_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCGroup.shuffle_options" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">MCGroup</span></code> with each question’s options shuffled.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>rng</strong> (<em>numpy.random.Generator</em>) – A random number generator for shuffling.</p>
+<dd class="field-odd"><p><strong>rng</strong> (<em>numpy.random.Generator</em>) – Random number generator used for shuffling.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A new mc_group instance with shuffled options for each question.</p>
+<dd class="field-even"><p>A deep copy of this group with options reordered.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#exam.mc_group" title="exam.mc_group">mc_group</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#exam.MCGroup" title="exam.MCGroup">MCGroup</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCGroup.add_periods">
+<span class="sig-name descname"><span class="pre">add_periods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_equations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCGroup.add_periods" title="Link to this definition">¶</a></dt>
+<dd><p>Adds periods to option text for all questions in the group. See
+<code class="docutils literal notranslate"><span class="pre">MCQuestion.add_periods</span></code> for full parameter details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>include_equations</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to add a period after trailing math
+expressions. Defaults to True.</p></li>
+<li><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – Override for the correct-answer token. Defaults
+to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCGroup.capitalize_first">
+<span class="sig-name descname"><span class="pre">capitalize_first</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCGroup.capitalize_first" title="Link to this definition">¶</a></dt>
+<dd><p>Capitalizes the first letter of each option for all questions in the group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – Override for the correct-answer token. Defaults
+to None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="exam.MCExam">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exam.</span></span><span class="sig-name descname"><span class="pre">MCExam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exam_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exam_lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CORRECT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam" title="Link to this definition">¶</a></dt>
+<dd><p>Stores and manages the content of a multiple-choice exam. Reads a LaTeX
+file, isolates the <code class="docutils literal notranslate"><span class="pre">mcquestions</span></code> environment, and parses it into
+<code class="docutils literal notranslate"><span class="pre">MCQuestion</span></code> and <code class="docutils literal notranslate"><span class="pre">MCGroup</span></code> objects. Also builds the answer key and
+computes letter labels.</p>
+<p>When <code class="docutils literal notranslate"><span class="pre">exam_file</span></code> is None the instance is initialized to a valid empty
+state. The preferred way to build an <code class="docutils literal notranslate"><span class="pre">MCExam</span></code> from a string rather than
+a file is <code class="docutils literal notranslate"><span class="pre">MCExam.from_string()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>exam_file</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the LaTeX exam file. Defaults to None.</p></li>
+<li><p><strong>exam_lines</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Pre-read lines (currently unused; kept for API
+compatibility). Defaults to None.</p></li>
+<li><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – Marker for the correct answer. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'CORRECT'</span></code>.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Seed for the internal random number generator. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCExam.correct_string">
+<span class="sig-name descname"><span class="pre">correct_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#exam.MCExam.correct_string" title="Link to this definition">¶</a></dt>
+<dd><p>The marker token used to identify correct answer options.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCExam.filepath">
+<span class="sig-name descname"><span class="pre">filepath</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">pathlib.Path</span></em><a class="headerlink" href="#exam.MCExam.filepath" title="Link to this definition">¶</a></dt>
+<dd><p>Resolved absolute path to the source file, or None if no file was given.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCExam.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#exam.MCExam.filename" title="Link to this definition">¶</a></dt>
+<dd><p>Name of the source file, or None if no file was given.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCExam.elements">
+<span class="sig-name descname"><span class="pre">elements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#exam.MCExam.elements" title="Link to this definition">¶</a></dt>
+<dd><p>Mapping of integer index to <code class="docutils literal notranslate"><span class="pre">MCQuestion</span></code> or <code class="docutils literal notranslate"><span class="pre">MCGroup</span></code> objects in
+source order.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCExam.answer_key">
+<span class="sig-name descname"><span class="pre">answer_key</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><a class="headerlink" href="#exam.MCExam.answer_key" title="Link to this definition">¶</a></dt>
+<dd><p>Deep copy of <code class="docutils literal notranslate"><span class="pre">elements</span></code> with correct options wrapped in <code class="docutils literal notranslate"><span class="pre">\hl{}</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCExam.mc_answer_letters">
+<span class="sig-name descname"><span class="pre">mc_answer_letters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span> <span class="pre">of</span> <span class="pre">str</span></em><a class="headerlink" href="#exam.MCExam.mc_answer_letters" title="Link to this definition">¶</a></dt>
+<dd><p>One entry per question (or sub-question). Each entry is a
+comma-separated string of correct-answer letter labels
+(e.g., <code class="docutils literal notranslate"><span class="pre">'(b)'</span></code>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.MCExam.question_count">
+<span class="sig-name descname"><span class="pre">question_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#exam.MCExam.question_count" title="Link to this definition">¶</a></dt>
+<dd><p>Total number of individual questions, counting each sub-question within
+a group separately.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.from_string">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CORRECT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.from_string" title="Link to this definition">¶</a></dt>
+<dd><p>Builds an <code class="docutils literal notranslate"><span class="pre">MCExam</span></code> directly from a LaTeX string without a file on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tex</strong> (<em>str</em>) – LaTeX source containing an <code class="docutils literal notranslate"><span class="pre">mcquestions</span></code> environment, or
+raw question content.</p></li>
+<li><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – Marker for the correct answer. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'CORRECT'</span></code>.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Seed for the internal RNG. Defaults to None.</p></li>
+<li><p><strong>source_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path of the originating file, used to set
+<code class="docutils literal notranslate"><span class="pre">self.filepath</span></code>. Defaults to None.</p></li>
+<li><p><strong>filename_hint</strong> (<em>str</em><em>, </em><em>optional</em>) – Short filename to assign to <code class="docutils literal notranslate"><span class="pre">self.filename</span></code>.
+Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A fully initialized <code class="docutils literal notranslate"><span class="pre">MCExam</span></code> instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#exam.MCExam" title="exam.MCExam">MCExam</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.print_exam">
+<span class="sig-name descname"><span class="pre">print_exam</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.print_exam" title="Link to this definition">¶</a></dt>
+<dd><p>Prints the content of the exam to the console.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.print_answer_key">
+<span class="sig-name descname"><span class="pre">print_answer_key</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.print_answer_key" title="Link to this definition">¶</a></dt>
+<dd><p>Prints the answer key for the exam to the console.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.show_duplicates">
+<span class="sig-name descname"><span class="pre">show_duplicates</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.show_duplicates" title="Link to this definition">¶</a></dt>
+<dd><p>Displays any duplicate answer options found across all exam questions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.to_latex">
+<span class="sig-name descname"><span class="pre">to_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.to_latex" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the full LaTeX string for this exam without writing to disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, return the answer key version. Defaults to False.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Complete LaTeX source for the exam or answer key.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.export_exam">
+<span class="sig-name descname"><span class="pre">export_exam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.export_exam" title="Link to this definition">¶</a></dt>
+<dd><p>Exports the student exam to a LaTeX file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Destination path. Defaults to the original filename.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The LaTeX string that was written.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.export_key">
+<span class="sig-name descname"><span class="pre">export_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.export_key" title="Link to this definition">¶</a></dt>
+<dd><p>Exports the answer key with correct answers highlighted to a LaTeX file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Destination path. Defaults to the original filename
+with <code class="docutils literal notranslate"><span class="pre">'_Key'</span></code> appended before the extension.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The LaTeX string that was written.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.export_mc_answers_to_text">
+<span class="sig-name descname"><span class="pre">export_mc_answers_to_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mc_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.export_mc_answers_to_text" title="Link to this definition">¶</a></dt>
+<dd><p>Exports the MC answer letters to a plain-text file. Each line contains
+a question number and its correct-answer letter, e.g. <code class="docutils literal notranslate"><span class="pre">'1.</span> <span class="pre">(b)'</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Destination path. Defaults to the original filename
+with <code class="docutils literal notranslate"><span class="pre">'_MC_Answers.txt'</span></code> appended before the extension.</p></li>
+<li><p><strong>header_text</strong> (<em>str</em><em>, </em><em>optional</em>) – A title line written at the top of the file, followed
+by a blank line. Defaults to None.</p></li>
+<li><p><strong>mc_start</strong> (<em>int</em><em>, </em><em>optional</em>) – The global question number assigned to the first MC
+question. Useful when MC questions do not start at question 1 in the
+overall exam. Defaults to 1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The text that was written to the file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.shuffle_questions">
+<span class="sig-name descname"><span class="pre">shuffle_questions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle_within_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.shuffle_questions" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a new exam with questions shuffled. When at least one standalone
+<code class="docutils literal notranslate"><span class="pre">MCQuestion</span></code> exists, one is always placed first; the remaining
+standalone questions and any <code class="docutils literal notranslate"><span class="pre">MCGroup</span></code> objects are then randomly
+interleaved. When the exam contains only <code class="docutils literal notranslate"><span class="pre">MCGroup</span></code> objects, all groups
+are shuffled without the forced-first-question step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for the returned exam object. Defaults to the
+original stem with <code class="docutils literal notranslate"><span class="pre">'_questions_shuffled.tex'</span></code> appended.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Random seed for reproducibility. Defaults to None.</p></li>
+<li><p><strong>shuffle_within_groups</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to also shuffle questions within
+each <code class="docutils literal notranslate"><span class="pre">MCGroup</span></code>. Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">MCExam</span></code> instance with shuffled questions.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#exam.MCExam" title="exam.MCExam">MCExam</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.shuffle_options">
+<span class="sig-name descname"><span class="pre">shuffle_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.shuffle_options" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a new exam with answer options shuffled within each question.
+The <code class="docutils literal notranslate"><span class="pre">\all</span></code> and <code class="docutils literal notranslate"><span class="pre">\none</span></code> options always remain at the end because they
+are stored as flags and appended during export.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for the returned exam object. Defaults to the
+original stem with <code class="docutils literal notranslate"><span class="pre">'_options_shuffled.tex'</span></code> appended.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Random seed for reproducibility. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">MCExam</span></code> instance with shuffled options.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#exam.MCExam" title="exam.MCExam">MCExam</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.shuffle_options_and_questions">
+<span class="sig-name descname"><span class="pre">shuffle_options_and_questions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle_within_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.shuffle_options_and_questions" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a new exam with both options and questions shuffled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Filename for the returned exam object. Defaults to the
+original stem with <code class="docutils literal notranslate"><span class="pre">'_options_shuffled.tex'</span></code> appended.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Random seed for reproducibility. Defaults to None.</p></li>
+<li><p><strong>shuffle_within_groups</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to shuffle questions within groups.
+Defaults to True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new <code class="docutils literal notranslate"><span class="pre">MCExam</span></code> instance with shuffled options and questions.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#exam.MCExam" title="exam.MCExam">MCExam</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.add_periods">
+<span class="sig-name descname"><span class="pre">add_periods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_equations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.add_periods" title="Link to this definition">¶</a></dt>
+<dd><p>Adds periods to the end of answer choice text throughout the exam.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>include_equations</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to add a period after trailing math
+expressions. Defaults to True.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.capitalize_first">
+<span class="sig-name descname"><span class="pre">capitalize_first</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.capitalize_first" title="Link to this definition">¶</a></dt>
+<dd><p>Capitalizes the first letter of each answer choice throughout the exam.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.MCExam.set_seed">
+<span class="sig-name descname"><span class="pre">set_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.MCExam.set_seed" title="Link to this definition">¶</a></dt>
+<dd><p>Sets the random seed for the exam’s internal random number generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Seed value. Defaults to None.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="exam.FRExam">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exam.</span></span><span class="sig-name descname"><span class="pre">FRExam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.FRExam" title="Link to this definition">¶</a></dt>
+<dd><p>Handles free-response exams using the <code class="docutils literal notranslate"><span class="pre">\question[points]</span></code> syntax. Reads a
+LaTeX file and parses all <code class="docutils literal notranslate"><span class="pre">\question</span></code> blocks into a list of question dicts.
+<code class="docutils literal notranslate"><span class="pre">\input{}</span></code> commands that reference files containing a <code class="docutils literal notranslate"><span class="pre">\question</span></code> token
+are expanded automatically; figure and TikZ inputs inside answer blocks are
+left untouched.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the LaTeX exam file. If provided, the file is read
+and parsed immediately. Defaults to None.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.FRExam.filepath">
+<span class="sig-name descname"><span class="pre">filepath</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">pathlib.Path</span></em><a class="headerlink" href="#exam.FRExam.filepath" title="Link to this definition">¶</a></dt>
+<dd><p>Resolved absolute path to the source file, or None if no file was given.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.FRExam.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#exam.FRExam.filename" title="Link to this definition">¶</a></dt>
+<dd><p>Name of the source file, or None if no file was given.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.FRExam.questions">
+<span class="sig-name descname"><span class="pre">questions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span> <span class="pre">of</span> <span class="pre">dict</span></em><a class="headerlink" href="#exam.FRExam.questions" title="Link to this definition">¶</a></dt>
+<dd><p>List of parsed question dicts. Each dict has keys <code class="docutils literal notranslate"><span class="pre">'file'</span></code> (source
+filename), <code class="docutils literal notranslate"><span class="pre">'points'</span></code> (int or None), and <code class="docutils literal notranslate"><span class="pre">'text'</span></code> (full LaTeX string
+for the question).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.FRExam.from_string">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename_hint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.FRExam.from_string" title="Link to this definition">¶</a></dt>
+<dd><p>Builds an <code class="docutils literal notranslate"><span class="pre">FRExam</span></code> directly from a LaTeX string without a file on disk.
+When <code class="docutils literal notranslate"><span class="pre">source_path</span></code> is provided its parent directory is used to resolve
+any <code class="docutils literal notranslate"><span class="pre">\input{}</span></code> commands that reference sub-files containing a
+<code class="docutils literal notranslate"><span class="pre">\question</span></code> token.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tex</strong> (<em>str</em>) – LaTeX source containing free-response question content.</p></li>
+<li><p><strong>source_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path of the originating file, used to resolve
+relative <code class="docutils literal notranslate"><span class="pre">\input{}</span></code> paths. Defaults to None.</p></li>
+<li><p><strong>filename_hint</strong> (<em>str</em><em>, </em><em>optional</em>) – Short filename to assign to <code class="docutils literal notranslate"><span class="pre">self.filename</span></code>.
+Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A fully initialized <code class="docutils literal notranslate"><span class="pre">FRExam</span></code> instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#exam.FRExam" title="exam.FRExam">FRExam</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.FRExam.to_latex">
+<span class="sig-name descname"><span class="pre">to_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.FRExam.to_latex" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the full LaTeX string for this free-response exam.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, reveal answer environments. Defaults to False.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Complete LaTeX source for the exam or answer key.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.FRExam.export_exam">
+<span class="sig-name descname"><span class="pre">export_exam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.FRExam.export_exam" title="Link to this definition">¶</a></dt>
+<dd><p>Exports the student exam version (answers hidden) to a LaTeX file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Destination path. Defaults to <code class="docutils literal notranslate"><span class="pre">'FR_Exam.tex'</span></code> in the
+same directory as the source file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.FRExam.export_key">
+<span class="sig-name descname"><span class="pre">export_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.FRExam.export_key" title="Link to this definition">¶</a></dt>
+<dd><p>Exports the answer key version (answers revealed) to a LaTeX file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Destination path. Defaults to <code class="docutils literal notranslate"><span class="pre">'FR_Key.tex'</span></code> in the
+same directory as the source file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.FRExam.reveal_answers">
+<span class="sig-name descname"><span class="pre">reveal_answers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.FRExam.reveal_answers" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the exam text with <code class="docutils literal notranslate"><span class="pre">\begin{answer}...\end{answer}</span></code> blocks
+expanded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em><em>, </em><em>optional</em>) – LaTeX text to process. Defaults to the concatenated text of
+all stored questions.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>LaTeX text with answer environments expanded.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.FRExam.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.FRExam.summary" title="Link to this definition">¶</a></dt>
+<dd><p>Prints a summary of all parsed free-response questions, showing the
+question number, point value, source file, and a short preview of the
+question text.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_chars</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of characters to show in the question
+preview. Defaults to 80.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="exam.Exam">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">exam.</span></span><span class="sig-name descname"><span class="pre">Exam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correct_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CORRECT'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.Exam" title="Link to this definition">¶</a></dt>
+<dd><p>Combines <code class="docutils literal notranslate"><span class="pre">MCExam</span></code> and <code class="docutils literal notranslate"><span class="pre">FRExam</span></code> content into a single LaTeX document.
+Auto-detects MC and FR sections from <code class="docutils literal notranslate"><span class="pre">\input{}</span></code> statements or inline
+environments. Pre-built <code class="docutils literal notranslate"><span class="pre">MCExam</span></code> and <code class="docutils literal notranslate"><span class="pre">FRExam</span></code> objects may be passed
+directly to bypass auto-detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em>) – Path to the main exam LaTeX file.</p></li>
+<li><p><strong>mc</strong> (<a class="reference internal" href="#exam.MCExam" title="exam.MCExam"><em>MCExam</em></a><em>, </em><em>optional</em>) – Pre-parsed multiple-choice exam. Defaults to None (auto-detect).</p></li>
+<li><p><strong>fr</strong> (<a class="reference internal" href="#exam.FRExam" title="exam.FRExam"><em>FRExam</em></a><em>, </em><em>optional</em>) – Pre-parsed free-response exam. Defaults to None (auto-detect).</p></li>
+<li><p><strong>correct_string</strong> (<em>str</em><em>, </em><em>optional</em>) – Marker for correct MC answers. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'CORRECT'</span></code>.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Random seed for reproducibility. Defaults to None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.Exam.mc">
+<span class="sig-name descname"><span class="pre">mc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">MCExam</span> <span class="pre">or</span> <span class="pre">None</span></em><a class="headerlink" href="#exam.Exam.mc" title="Link to this definition">¶</a></dt>
+<dd><p>The multiple-choice portion of the exam.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="exam.Exam.fr">
+<span class="sig-name descname"><span class="pre">fr</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">FRExam</span> <span class="pre">or</span> <span class="pre">None</span></em><a class="headerlink" href="#exam.Exam.fr" title="Link to this definition">¶</a></dt>
+<dd><p>The free-response portion of the exam.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.Exam.shuffle_options">
+<span class="sig-name descname"><span class="pre">shuffle_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.Exam.shuffle_options" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a new <code class="docutils literal notranslate"><span class="pre">Exam</span></code> with shuffled MC options, preserving FR questions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Random seed for reproducibility. Defaults to None.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – If provided, sets the base path for subsequent
+<code class="docutils literal notranslate"><span class="pre">export_exam</span></code> and <code class="docutils literal notranslate"><span class="pre">export_key</span></code> calls.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A deep copy of this <code class="docutils literal notranslate"><span class="pre">Exam</span></code> with MC options shuffled.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#exam.Exam" title="exam.Exam">Exam</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.Exam.to_latex">
+<span class="sig-name descname"><span class="pre">to_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.Exam.to_latex" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the full LaTeX string for the combined MC and FR exam. Raises
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if the assembled output does not contain exactly one
+<code class="docutils literal notranslate"><span class="pre">mcquestions</span></code> and one <code class="docutils literal notranslate"><span class="pre">frquestions</span></code> environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, produce the answer key version. Defaults to False.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Complete LaTeX source for the exam or answer key.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If an environment appears more or fewer than once.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.Exam.export_exam">
+<span class="sig-name descname"><span class="pre">export_exam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.Exam.export_exam" title="Link to this definition">¶</a></dt>
+<dd><p>Exports the combined student exam (no answers, no key-only content) to
+a LaTeX file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Destination path. Defaults to the source filename with
+<code class="docutils literal notranslate"><span class="pre">'_Exported'</span></code> appended before the extension.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.Exam.export_key">
+<span class="sig-name descname"><span class="pre">export_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.Exam.export_key" title="Link to this definition">¶</a></dt>
+<dd><p>Exports the combined instructor key (FR answers shown, key-only content
+included) to a LaTeX file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Destination path. Defaults to the source filename with
+<code class="docutils literal notranslate"><span class="pre">'_Exported_Key'</span></code> appended before the extension.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.Exam.export_mc_answers_to_text">
+<span class="sig-name descname"><span class="pre">export_mc_answers_to_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.Exam.export_mc_answers_to_text" title="Link to this definition">¶</a></dt>
+<dd><p>Exports the MC answer letters to a plain-text file with correct question
+numbering, even when FR questions precede the MC section. Scans the
+assembled exam to determine whether <code class="docutils literal notranslate"><span class="pre">frquestions</span></code> appears before
+<code class="docutils literal notranslate"><span class="pre">mcquestions</span></code>, and if so counts the FR questions to compute the MC
+start number automatically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Destination path. Defaults to the source filename with
+<code class="docutils literal notranslate"><span class="pre">'_MC_Answers.txt'</span></code> appended before the extension.</p></li>
+<li><p><strong>header_text</strong> (<em>str</em><em>, </em><em>optional</em>) – A title line written at the top of the file, followed
+by a blank line. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The text that was written to the file, or None if there are no
+MC questions.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.Exam.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#exam.Exam.summary" title="Link to this definition">¶</a></dt>
+<dd><p>Prints a short summary of the combined exam’s MC and FR content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="exam.Exam.verify_integrity">
+<span class="sig-name descname"><span class="pre">verify_integrity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">latex_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#exam.Exam.verify_integrity" title="Link to this definition">¶</a></dt>
+<dd><p>Runs basic consistency checks on the combined exam LaTeX. Verifies that
+each expected environment appears exactly once and that no unresolved
+<code class="docutils literal notranslate"><span class="pre">\input</span></code> statements remain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>latex_text</strong> (<em>str</em><em>, </em><em>optional</em>) – LaTeX text to check. Defaults to
+<code class="docutils literal notranslate"><span class="pre">self.to_latex(key=False)</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if all checks pass, False otherwise.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>

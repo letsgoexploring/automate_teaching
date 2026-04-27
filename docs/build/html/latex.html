@@ -5,17 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>latex module &#8212; automate_teaching 0.0.11 documentation</title>
+    <title>latex module &#8212; automate_teaching 1.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=4468db6d" />
-    <script src="_static/documentation_options.js?v=0c446633"></script>
+    <script src="_static/documentation_options.js?v=8d563738"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="homework class" href="homework.html" />
-    <link rel="prev" title="google module" href="google.html" />
+    <link rel="next" title="Homework class" href="homework.html" />
+    <link rel="prev" title="google_api module" href="google.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
@@ -38,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           automate_teaching</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -55,9 +55,9 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="exam.html"><code class="docutils literal notranslate"><span class="pre">exam</span></code> module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="google.html"><code class="docutils literal notranslate"><span class="pre">google</span></code> module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="google.html"><code class="docutils literal notranslate"><span class="pre">google_api</span></code> module</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">latex</span></code> module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="homework.html"><code class="docutils literal notranslate"><span class="pre">homework</span></code> class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homework.html"><code class="docutils literal notranslate"><span class="pre">Homework</span></code> class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functions.html">Other Functions</a></li>
 </ul>
 </ul>
@@ -73,13 +73,14 @@
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
 <li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">latex</span></code> module</a><ul>
-<li><a class="reference internal" href="#compile"><code class="docutils literal notranslate"><span class="pre">compile()</span></code></a></li>
-<li><a class="reference internal" href="#is_command_available"><code class="docutils literal notranslate"><span class="pre">is_command_available()</span></code></a></li>
+<li><a class="reference internal" href="#compile_latex"><code class="docutils literal notranslate"><span class="pre">compile_latex()</span></code></a></li>
+<li><a class="reference internal" href="#pdf_latex"><code class="docutils literal notranslate"><span class="pre">pdf_latex()</span></code></a></li>
+<li><a class="reference internal" href="#clean_aux_files"><code class="docutils literal notranslate"><span class="pre">clean_aux_files()</span></code></a></li>
 <li><a class="reference internal" href="#make_figure"><code class="docutils literal notranslate"><span class="pre">make_figure()</span></code></a></li>
 <li><a class="reference internal" href="#make_handout"><code class="docutils literal notranslate"><span class="pre">make_handout()</span></code></a></li>
 <li><a class="reference internal" href="#make_tabular"><code class="docutils literal notranslate"><span class="pre">make_tabular()</span></code></a></li>
 <li><a class="reference internal" href="#make_table"><code class="docutils literal notranslate"><span class="pre">make_table()</span></code></a></li>
-<li><a class="reference internal" href="#pdf_latex"><code class="docutils literal notranslate"><span class="pre">pdf_latex()</span></code></a></li>
+<li><a class="reference internal" href="#DataFrame_to_array"><code class="docutils literal notranslate"><span class="pre">DataFrame_to_array()</span></code></a></li>
 <li><a class="reference internal" href="#python_script"><code class="docutils literal notranslate"><span class="pre">python_script()</span></code></a></li>
 </ul>
 </li>
@@ -92,11 +93,11 @@
               
                 
   <li>
-    <a href="google.html" title="Previous Chapter: google module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; google module</span>
+    <a href="google.html" title="Previous Chapter: google_api module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; google_api module</span>
     </a>
   </li>
   <li>
-    <a href="homework.html" title="Next Chapter: homework class"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">homework class &raquo;</span>
+    <a href="homework.html" title="Next Chapter: Homework class"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Homework class &raquo;</span>
     </a>
   </li>
               
@@ -131,24 +132,25 @@
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
 <li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">latex</span></code> module</a><ul>
-<li><a class="reference internal" href="#compile"><code class="docutils literal notranslate"><span class="pre">compile()</span></code></a></li>
-<li><a class="reference internal" href="#is_command_available"><code class="docutils literal notranslate"><span class="pre">is_command_available()</span></code></a></li>
+<li><a class="reference internal" href="#compile_latex"><code class="docutils literal notranslate"><span class="pre">compile_latex()</span></code></a></li>
+<li><a class="reference internal" href="#pdf_latex"><code class="docutils literal notranslate"><span class="pre">pdf_latex()</span></code></a></li>
+<li><a class="reference internal" href="#clean_aux_files"><code class="docutils literal notranslate"><span class="pre">clean_aux_files()</span></code></a></li>
 <li><a class="reference internal" href="#make_figure"><code class="docutils literal notranslate"><span class="pre">make_figure()</span></code></a></li>
 <li><a class="reference internal" href="#make_handout"><code class="docutils literal notranslate"><span class="pre">make_handout()</span></code></a></li>
 <li><a class="reference internal" href="#make_tabular"><code class="docutils literal notranslate"><span class="pre">make_tabular()</span></code></a></li>
 <li><a class="reference internal" href="#make_table"><code class="docutils literal notranslate"><span class="pre">make_table()</span></code></a></li>
-<li><a class="reference internal" href="#pdf_latex"><code class="docutils literal notranslate"><span class="pre">pdf_latex()</span></code></a></li>
+<li><a class="reference internal" href="#DataFrame_to_array"><code class="docutils literal notranslate"><span class="pre">DataFrame_to_array()</span></code></a></li>
 <li><a class="reference internal" href="#python_script"><code class="docutils literal notranslate"><span class="pre">python_script()</span></code></a></li>
 </ul>
 </li>
 </ul>
 
   <li>
-    <a href="google.html" title="Previous Chapter: google module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; google module</span>
+    <a href="google.html" title="Previous Chapter: google_api module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; google_api module</span>
     </a>
   </li>
   <li>
-    <a href="homework.html" title="Next Chapter: homework class"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">homework class &raquo;</span>
+    <a href="homework.html" title="Next Chapter: Homework class"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Homework class &raquo;</span>
     </a>
   </li>
 <div id="sourcelink">
@@ -168,34 +170,73 @@
       
   <section id="latex-module">
 <h1><code class="docutils literal notranslate"><span class="pre">latex</span></code> module<a class="headerlink" href="#latex-module" title="Link to this heading">¶</a></h1>
-<p>This module provides utilities for managing LaTeX files, including compilation, creating figures, tables, and handling Beamer slides.</p>
+<p>This module provides utilities for managing LaTeX files, including compilation, creating figures and tables, and handling Beamer slides.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="compile">
-<span class="sig-name descname"><span class="pre">compile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compile" title="Link to this definition">¶</a></dt>
-<dd><p>Compiles LaTeX files in the current directory or specified files.</p>
+<dt class="sig sig-object py" id="compile_latex">
+<span class="sig-name descname"><span class="pre">compile_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdflatex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_aux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compile_latex" title="Link to this definition">¶</a></dt>
+<dd><p>Compiles one or more LaTeX files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>x</strong> (<em>str</em><em> or </em><em>list</em><em>, </em><em>optional</em>) – Filename or list of filenames to compile. If None, compiles all <cite>.tex</cite> files in the current directory.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>str</em><em>, </em><em>list</em><em>, or </em><em>None</em><em>, </em><em>optional</em>) – <p>What to compile.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> — compile all <code class="docutils literal notranslate"><span class="pre">.tex</span></code> files in the current directory.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code> (directory path) — compile all <code class="docutils literal notranslate"><span class="pre">.tex</span></code> files in that directory.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">str</span></code> (file path) — compile a single <code class="docutils literal notranslate"><span class="pre">.tex</span></code> file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">list</span></code> or <code class="docutils literal notranslate"><span class="pre">tuple</span></code> — compile each file in the sequence.</p></li>
+</ul>
+<p>Defaults to None.</p>
+</p></li>
+<li><p><strong>compiler</strong> (<em>str</em><em>, </em><em>optional</em>) – LaTeX compiler executable to use. Common choices are
+<code class="docutils literal notranslate"><span class="pre">'pdflatex'</span></code>, <code class="docutils literal notranslate"><span class="pre">'lualatex'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'xelatex'</span></code>. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'pdflatex'</span></code>.</p></li>
+<li><p><strong>keep_aux</strong> (<em>bool</em><em>, </em><em>optional</em>) – If False, delete auxiliary files after compilation. If
+True, keep them (useful for debugging). Defaults to False.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>RuntimeError</strong> – If <cite>pdflatex</cite> or <cite>bibtex</cite> is not available in the system.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>RuntimeError</strong> – If the requested compiler is not found in PATH.</p></li>
+<li><p><strong>ValueError</strong> – If a string argument is neither a valid directory nor
+a <code class="docutils literal notranslate"><span class="pre">.tex</span></code> file.</p></li>
+<li><p><strong>TypeError</strong> – If <code class="docutils literal notranslate"><span class="pre">x</span></code> is not None, a string, or a list/tuple.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="is_command_available">
-<span class="sig-name descname"><span class="pre">is_command_available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#is_command_available" title="Link to this definition">¶</a></dt>
-<dd><p>Checks if a command is available in the system’s PATH.</p>
+<dt class="sig sig-object py" id="pdf_latex">
+<span class="sig-name descname"><span class="pre">pdf_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdflatex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_aux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdf_latex" title="Link to this definition">¶</a></dt>
+<dd><p>Compiles a LaTeX file with BibTeX support using a four-pass compilation
+sequence: compiler twice, then BibTeX, then compiler twice more, to resolve
+all cross-references and bibliography entries.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>command</strong> (<em>str</em>) – The command to check.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_name</strong> (<em>str</em>) – Path to the <code class="docutils literal notranslate"><span class="pre">.tex</span></code> file to compile.</p></li>
+<li><p><strong>compiler</strong> (<em>str</em><em>, </em><em>optional</em>) – LaTeX compiler executable. Defaults to <code class="docutils literal notranslate"><span class="pre">'pdflatex'</span></code>.</p></li>
+<li><p><strong>keep_aux</strong> (<em>bool</em><em>, </em><em>optional</em>) – If False, delete auxiliary files after compilation.
+Defaults to False.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if the command is available, False otherwise.</p>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – If the compiler or <code class="docutils literal notranslate"><span class="pre">bibtex</span></code> is not found in PATH,
+or if any compilation step fails.</p>
 </dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clean_aux_files">
+<span class="sig-name descname"><span class="pre">clean_aux_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#clean_aux_files" title="Link to this definition">¶</a></dt>
+<dd><p>Deletes LaTeX auxiliary files in the same directory as the given file.
+Removes files with the following extensions: <code class="docutils literal notranslate"><span class="pre">.aux</span></code>, <code class="docutils literal notranslate"><span class="pre">.log</span></code>, <code class="docutils literal notranslate"><span class="pre">.out</span></code>,
+<code class="docutils literal notranslate"><span class="pre">.gz</span></code>, <code class="docutils literal notranslate"><span class="pre">.snm</span></code>, <code class="docutils literal notranslate"><span class="pre">.nav</span></code>, <code class="docutils literal notranslate"><span class="pre">.toc</span></code>, <code class="docutils literal notranslate"><span class="pre">.blg</span></code>, <code class="docutils literal notranslate"><span class="pre">.bbl</span></code>, <code class="docutils literal notranslate"><span class="pre">.vrb</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_name</strong> (<em>str</em>) – Path to any file in the target directory. The directory
+containing this file is cleaned; the file itself is not deleted.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -203,24 +244,31 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="make_figure">
 <span class="sig-name descname"><span class="pre">make_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'h'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0cm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6.5cm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_figure" title="Link to this definition">¶</a></dt>
-<dd><p>Constructs a LaTeX figure environment.</p>
+<dd><p>Builds a LaTeX figure environment string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image_filename</strong> (<em>str</em>) – Path and filename of the image file.</p></li>
-<li><p><strong>position</strong> (<em>str</em>) – Position specifier for the figure (‘h’, ‘t’, ‘b’, ‘p’). Default is ‘h’.</p></li>
-<li><p><strong>caption</strong> (<em>str</em><em>, </em><em>optional</em>) – Caption for the figure. Default is None.</p></li>
-<li><p><strong>label</strong> (<em>str</em>) – Label for referencing the figure. Default is ‘’.</p></li>
-<li><p><strong>hspace</strong> (<em>str</em>) – Horizontal position offset of the image. Default is ‘0cm’.</p></li>
-<li><p><strong>height</strong> (<em>str</em>) – Height of the image. Default is ‘6.5cm’.</p></li>
-<li><p><strong>width</strong> (<em>str</em>) – Width of the image. Default is None.</p></li>
-<li><p><strong>caption_top</strong> (<em>bool</em>) – Whether to place the caption above the figure. Default is True.</p></li>
-<li><p><strong>center_image</strong> (<em>bool</em>) – Whether to center the image in the figure environment. Default is True.</p></li>
-<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to save the generated LaTeX figure file. Default is None.</p></li>
+<li><p><strong>image_filename</strong> (<em>str</em>) – Path to the image file, as it will appear in the
+LaTeX source.</p></li>
+<li><p><strong>position</strong> (<em>str</em><em>, </em><em>optional</em>) – Float position specifier (<code class="docutils literal notranslate"><span class="pre">'h'</span></code>, <code class="docutils literal notranslate"><span class="pre">'t'</span></code>, <code class="docutils literal notranslate"><span class="pre">'b'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'p'</span></code>). Defaults to <code class="docutils literal notranslate"><span class="pre">'h'</span></code>.</p></li>
+<li><p><strong>caption</strong> (<em>str</em><em>, </em><em>optional</em>) – Caption text. Defaults to None.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for cross-referencing. Defaults to <code class="docutils literal notranslate"><span class="pre">''</span></code>.</p></li>
+<li><p><strong>hspace</strong> (<em>str</em><em>, </em><em>optional</em>) – Horizontal offset applied before the image. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'0cm'</span></code>.</p></li>
+<li><p><strong>height</strong> (<em>str</em><em>, </em><em>optional</em>) – Image height as a LaTeX dimension string. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'6.5cm'</span></code>.</p></li>
+<li><p><strong>width</strong> (<em>str</em><em>, </em><em>optional</em>) – Image width as a LaTeX dimension string. Defaults to None.</p></li>
+<li><p><strong>caption_top</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, place the caption above the image. Defaults
+to True.</p></li>
+<li><p><strong>center_image</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, wrap the image in a center environment.
+Defaults to True.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – If provided, write the LaTeX string to this file.
+Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>LaTeX string for the figure environment.</p>
+<dd class="field-even"><p>LaTeX source for the figure environment.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -231,36 +279,56 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="make_handout">
 <span class="sig-name descname"><span class="pre">make_handout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slides_file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handout_file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_handout" title="Link to this definition">¶</a></dt>
-<dd><p>Generates a LaTeX handout file for Beamer slides.</p>
+<dd><p>Generates a Beamer handout file from a slides file. Inserts <code class="docutils literal notranslate"><span class="pre">'handout,'</span></code>
+into the <code class="docutils literal notranslate"><span class="pre">\documentclass</span></code> options on the first line of the slides file so
+that overlay animations are collapsed.</p>
+<p>Raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> if the first line of the source file does not contain
+a <code class="docutils literal notranslate"><span class="pre">\documentclass[</span></code> declaration, because silently writing a corrupted
+output file would be worse than failing loudly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>slides_file_name</strong> (<em>str</em>) – Name of the original slides file.</p></li>
-<li><p><strong>handout_file_name</strong> (<em>str</em>) – Name of the generated handout file.</p></li>
+<li><p><strong>slides_file_name</strong> (<em>str</em>) – Path to the original Beamer slides file, with or
+without the <code class="docutils literal notranslate"><span class="pre">.tex</span></code> extension.</p></li>
+<li><p><strong>handout_file_name</strong> (<em>str</em>) – Path for the generated handout file, with or
+without the <code class="docutils literal notranslate"><span class="pre">.tex</span></code> extension.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the first line of the source file does not contain
+a <code class="docutils literal notranslate"><span class="pre">\documentclass[...]</span></code> options block.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="make_tabular">
-<span class="sig-name descname"><span class="pre">make_tabular</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_tabular" title="Link to this definition">¶</a></dt>
-<dd><p>Constructs a LaTeX tabular environment.</p>
+<span class="sig-name descname"><span class="pre">make_tabular</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_tabular" title="Link to this definition">¶</a></dt>
+<dd><p>Builds a LaTeX tabular environment string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – 2D array with data for the table.</p></li>
-<li><p><strong>table_spec</strong> (<em>str</em>) – Column alignment string for the tabular environment. Default is ‘’.</p></li>
-<li><p><strong>row_format</strong> (<em>dict</em>) – Row-specific formatting.</p></li>
-<li><p><strong>column_format</strong> (<em>dict</em>) – Column-specific formatting.</p></li>
-<li><p><strong>hlines</strong> (<em>list</em>) – List of row numbers for horizontal lines. Default is [].</p></li>
-<li><p><strong>clines</strong> (<em>dict</em>) – Dictionary of row numbers and column range strings for clines. Default is {}.</p></li>
-<li><p><strong>pos</strong> (<em>str</em>) – Vertical positioning specifier (‘b’, ‘c’, ‘t’). Default is ‘c’.</p></li>
-<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to save the LaTeX tabular file. Default is None.</p></li>
+<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – 2D array of cell values. Each element is converted to a string.</p></li>
+<li><p><strong>table_spec</strong> (<em>str</em><em>, </em><em>optional</em>) – Column alignment string (e.g., <code class="docutils literal notranslate"><span class="pre">'lcc'</span></code>). Defaults to
+<code class="docutils literal notranslate"><span class="pre">''</span></code>.</p></li>
+<li><p><strong>row_format</strong> (<em>dict</em><em>, </em><em>optional</em>) – Row-level formatting. Keys are 1-based row numbers;
+values are lists of LaTeX command names without the leading backslash.
+For example, <code class="docutils literal notranslate"><span class="pre">{1:</span> <span class="pre">['textbf']}</span></code> bolds the first row. Defaults to None.</p></li>
+<li><p><strong>column_format</strong> (<em>dict</em><em>, </em><em>optional</em>) – Column-level formatting. Same structure as
+<code class="docutils literal notranslate"><span class="pre">row_format</span></code> but applied per column. Defaults to None.</p></li>
+<li><p><strong>hlines</strong> (<em>list</em><em>, </em><em>optional</em>) – 1-based row numbers below which a horizontal rule is drawn.
+Use 0 for a rule above the first row. Defaults to None.</p></li>
+<li><p><strong>clines</strong> (<em>dict</em><em>, </em><em>optional</em>) – Partial horizontal rules. Keys are 1-based row numbers;
+values are lists of column-range strings (e.g.,
+<code class="docutils literal notranslate"><span class="pre">{2:</span> <span class="pre">['1-3',</span> <span class="pre">'5-6']}</span></code>). Defaults to None.</p></li>
+<li><p><strong>pos</strong> (<em>str</em><em>, </em><em>optional</em>) – Vertical alignment of the tabular relative to surrounding text
+(<code class="docutils literal notranslate"><span class="pre">'b'</span></code>, <code class="docutils literal notranslate"><span class="pre">'c'</span></code>, <code class="docutils literal notranslate"><span class="pre">'t'</span></code>). Defaults to <code class="docutils literal notranslate"><span class="pre">'c'</span></code>.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – If provided, write the LaTeX string to this file.
+Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>LaTeX string for the tabular environment.</p>
+<dd class="field-even"><p>LaTeX source for the tabular environment.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -270,27 +338,34 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="make_table">
-<span class="sig-name descname"><span class="pre">make_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'h'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_table" title="Link to this definition">¶</a></dt>
-<dd><p>Constructs a LaTeX table environment with tabular content.</p>
+<span class="sig-name descname"><span class="pre">make_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'h'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_table" title="Link to this definition">¶</a></dt>
+<dd><p>Builds a LaTeX table environment containing a tabular environment.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – 2D array with data for the table.</p></li>
-<li><p><strong>table_spec</strong> (<em>str</em>) – Column alignment string for the tabular environment. Default is ‘’.</p></li>
-<li><p><strong>row_format</strong> (<em>dict</em>) – Row-specific formatting.</p></li>
-<li><p><strong>column_format</strong> (<em>dict</em>) – Column-specific formatting.</p></li>
-<li><p><strong>hlines</strong> (<em>list</em>) – List of row numbers for horizontal lines. Default is [].</p></li>
-<li><p><strong>clines</strong> (<em>dict</em>) – Dictionary of row numbers and column range strings for clines. Default is {}.</p></li>
-<li><p><strong>position</strong> (<em>str</em>) – Position specifier for the table (‘h’, ‘t’, ‘b’, ‘p’). Default is ‘h’.</p></li>
-<li><p><strong>caption</strong> (<em>str</em><em>, </em><em>optional</em>) – Caption for the table. Default is None.</p></li>
-<li><p><strong>label</strong> (<em>str</em>) – Label for referencing the table. Default is ‘’.</p></li>
-<li><p><strong>caption_top</strong> (<em>bool</em>) – Whether to place the caption above the table. Default is True.</p></li>
-<li><p><strong>center_table</strong> (<em>bool</em>) – Whether to center the table in the environment. Default is True.</p></li>
-<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to save the LaTeX table file. Default is None.</p></li>
+<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – 2D array of cell values.</p></li>
+<li><p><strong>table_spec</strong> (<em>str</em><em>, </em><em>optional</em>) – Column alignment string. Defaults to <code class="docutils literal notranslate"><span class="pre">''</span></code>.</p></li>
+<li><p><strong>row_format</strong> (<em>dict</em><em>, </em><em>optional</em>) – Row-level formatting; see <code class="docutils literal notranslate"><span class="pre">make_tabular</span></code>. Defaults to
+None.</p></li>
+<li><p><strong>column_format</strong> (<em>dict</em><em>, </em><em>optional</em>) – Column-level formatting; see <code class="docutils literal notranslate"><span class="pre">make_tabular</span></code>.
+Defaults to None.</p></li>
+<li><p><strong>hlines</strong> (<em>list</em><em>, </em><em>optional</em>) – Row numbers for horizontal rules; see <code class="docutils literal notranslate"><span class="pre">make_tabular</span></code>.
+Defaults to None.</p></li>
+<li><p><strong>clines</strong> (<em>dict</em><em>, </em><em>optional</em>) – Partial horizontal rules; see <code class="docutils literal notranslate"><span class="pre">make_tabular</span></code>. Defaults to
+None.</p></li>
+<li><p><strong>position</strong> (<em>str</em><em>, </em><em>optional</em>) – Float position specifier. Defaults to <code class="docutils literal notranslate"><span class="pre">'h'</span></code>.</p></li>
+<li><p><strong>caption</strong> (<em>str</em><em>, </em><em>optional</em>) – Caption text. Defaults to None.</p></li>
+<li><p><strong>label</strong> (<em>str</em><em>, </em><em>optional</em>) – Label for cross-referencing. Defaults to <code class="docutils literal notranslate"><span class="pre">''</span></code>.</p></li>
+<li><p><strong>caption_top</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, place caption above the table body. Defaults
+to True.</p></li>
+<li><p><strong>center_table</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, wrap the tabular in a center environment.
+Defaults to True.</p></li>
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – If provided, write the LaTeX string to this file.
+Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>LaTeX string for the table environment.</p>
+<dd class="field-even"><p>LaTeX source for the table environment.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -299,15 +374,29 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pdf_latex">
-<span class="sig-name descname"><span class="pre">pdf_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdf_latex" title="Link to this definition">¶</a></dt>
-<dd><p>Compiles a LaTeX file using <cite>pdflatex</cite>.</p>
+<dt class="sig sig-object py" id="DataFrame_to_array">
+<span class="sig-name descname"><span class="pre">DataFrame_to_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_column_headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_index_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DataFrame_to_array" title="Link to this definition">¶</a></dt>
+<dd><p>Converts a pandas DataFrame to a NumPy array with optional headers and
+index column, suitable for passing directly to <code class="docutils literal notranslate"><span class="pre">make_tabular</span></code> or
+<code class="docutils literal notranslate"><span class="pre">make_table</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>file_name</strong> (<em>str</em>) – Name of the LaTeX file to compile.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> (<em>pandas.DataFrame</em>) – Input DataFrame.</p></li>
+<li><p><strong>include_index</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to include the row index as the first column.
+Defaults to True.</p></li>
+<li><p><strong>include_column_headers</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to include column headers as the
+first row. Defaults to True.</p></li>
+<li><p><strong>keep_index_name</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to preserve the index name in the top-left
+cell. Defaults to True.</p></li>
+</ul>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>RuntimeError</strong> – If <cite>pdflatex</cite> or <cite>bibtex</cite> is not available in the system.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array representation of the DataFrame, with headers and index
+prepended according to the selected options.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 </dl>
 </dd></dl>
@@ -315,10 +404,11 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="python_script">
 <span class="sig-name descname"><span class="pre">python_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">script</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#python_script" title="Link to this definition">¶</a></dt>
-<dd><p>Executes a Python script or list of scripts.</p>
+<dd><p>Executes one or more Python scripts as subprocesses. Appends <code class="docutils literal notranslate"><span class="pre">.py</span></code> to
+any filename that does not already have that extension.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>script</strong> (<em>str</em><em> or </em><em>list</em>) – Filename or list of filenames for Python scripts.</p>
+<dd class="field-odd"><p><strong>script</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em>) – Filename or list of filenames of Python scripts to run.</p>
 </dd>
 </dl>
 </dd></dl>

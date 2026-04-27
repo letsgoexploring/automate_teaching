@@ -1,17 +1,17 @@
-``homework`` class
+``Homework`` class
 ==================
 
-.. This class formats and saves homework answers in LaTeX or Gradescope formats.
+.. py:class:: Homework(filename=None)
 
-.. py:class:: homework(filename=None)
+   Formats and exports homework answers as LaTeX commands or Gradescope
+   strings.
 
-   Initializes an instance of the `homework` class.
-
-   :param filename: Name of the LaTeX file to save answers to. Default is None.
+   :param filename: Default filename for LaTeX output. Defaults to None.
    :type filename: str, optional
 
 Attributes
 ----------
+
 .. py:attribute:: filename
    :type: str
 
@@ -20,44 +20,47 @@ Attributes
 .. py:attribute:: latex_answers
    :type: dict
 
-   Dictionary for storing answers as LaTeX commands.
+   Dictionary for storing answers as LaTeX ``\newcommand`` definitions.
 
 Methods
 -------
+
 .. py:method:: add_latex_answer(name, value, precision=4)
 
-   Adds an answer as a LaTeX command to the `latex_answers` dictionary.
+   Adds an answer as a LaTeX ``\newcommand`` entry to ``latex_answers``.
+   String values are stored as-is. Numeric values are rounded and formatted
+   with the specified number of decimal places.
 
-   :param name: Name of the new LaTeX command. Must conform to LaTeX naming conventions.
+   :param name: Name of the LaTeX command. Must conform to LaTeX naming
+      conventions (letters only, no numbers or symbols).
    :type name: str
-   :param value: Answer to be stored. Strings are stored as-is, numeric values are formatted.
+   :param value: Answer to be stored.
    :type value: str or numeric
-   :param precision: Number of decimal places to round numeric values. Default is 4.
+   :param precision: Number of decimal places for numeric values. Defaults
+      to 4.
    :type precision: int, optional
-   :returns: None
-   :rtype: None
+   :return: None
 
-   Adds:
-      - :py:attr:`latex_answers[name]`: The formatted value as a LaTeX command.
+.. py:method:: gs_answer(value, tolerance=8, precision=2)
 
-.. py:method:: gs_answer(value, tolerance=8, precision=0.005)
+   Returns a Gradescope-compatible formatted answer string of the form
+   ``'[____](=value+-tolerance)'``.
 
-   Generates a Gradescope-compatible formatted string for an answer.
-
-   :param value: Answer to format for Gradescope.
+   :param value: Answer to format.
    :type value: str or numeric
-   :param tolerance: Error tolerance for the answer. Default is 8.
+   :param tolerance: Numeric tolerance for grading. Defaults to 8.
    :type tolerance: float, optional
-   :param precision: Precision for rounding numeric values. Default is 0.005.
-   :type precision: float, optional
+   :param precision: Number of decimal places for rounding numeric values.
+      Defaults to 2.
+   :type precision: int, optional
    :return: A Gradescope-compatible formatted string.
    :rtype: str
 
 .. py:method:: write_answer_file(filename)
 
-   Exports LaTeX answers as new commands in a `.tex` file.
+   Writes all stored answers to a LaTeX file as ``\newcommand`` definitions.
+   Appends ``.tex`` to the filename if it is not already present.
 
-   :param filename: Name of the LaTeX file to save answers to. Appends `.tex` if missing.
+   :param filename: Destination file path.
    :type filename: str
-   :returns: None
-   :rtype: None
+   :return: None

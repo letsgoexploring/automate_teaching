@@ -5,10 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>google module &#8212; automate_teaching 0.0.11 documentation</title>
+    <title>google_api module &#8212; automate_teaching 1.0.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=4468db6d" />
-    <script src="_static/documentation_options.js?v=0c446633"></script>
+    <script src="_static/documentation_options.js?v=8d563738"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
@@ -38,7 +38,7 @@
         </button>
         <a class="navbar-brand" href="index.html">
           automate_teaching</a>
-        <span class="navbar-text navbar-version pull-left"><b>0.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -55,9 +55,9 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="exam.html"><code class="docutils literal notranslate"><span class="pre">exam</span></code> module</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">google</span></code> module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">google_api</span></code> module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="latex.html"><code class="docutils literal notranslate"><span class="pre">latex</span></code> module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="homework.html"><code class="docutils literal notranslate"><span class="pre">homework</span></code> class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="homework.html"><code class="docutils literal notranslate"><span class="pre">Homework</span></code> class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functions.html">Other Functions</a></li>
 </ul>
 </ul>
@@ -72,10 +72,42 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">google</span></code> module</a><ul>
-<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">google_api</span></code> module</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#google_api.authenticate_google_app"><code class="docutils literal notranslate"><span class="pre">authenticate_google_app()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#classes">Classes</a><ul>
-<li><a class="reference internal" href="#google.get_all_labels"><code class="docutils literal notranslate"><span class="pre">get_all_labels()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail"><code class="docutils literal notranslate"><span class="pre">Gmail</span></code></a><ul>
+<li><a class="reference internal" href="#google_api.Gmail.add_message_label"><code class="docutils literal notranslate"><span class="pre">Gmail.add_message_label()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.delete_message"><code class="docutils literal notranslate"><span class="pre">Gmail.delete_message()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_all_labels"><code class="docutils literal notranslate"><span class="pre">Gmail.get_all_labels()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_from_sender"><code class="docutils literal notranslate"><span class="pre">Gmail.get_from_sender()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_label_id"><code class="docutils literal notranslate"><span class="pre">Gmail.get_label_id()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_labeled_messages"><code class="docutils literal notranslate"><span class="pre">Gmail.get_labeled_messages()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_message"><code class="docutils literal notranslate"><span class="pre">Gmail.get_message()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_message_return_path"><code class="docutils literal notranslate"><span class="pre">Gmail.get_message_return_path()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_return_paths"><code class="docutils literal notranslate"><span class="pre">Gmail.get_return_paths()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.make_message"><code class="docutils literal notranslate"><span class="pre">Gmail.make_message()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.move_message"><code class="docutils literal notranslate"><span class="pre">Gmail.move_message()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.move_messages"><code class="docutils literal notranslate"><span class="pre">Gmail.move_messages()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.remove_message_label"><code class="docutils literal notranslate"><span class="pre">Gmail.remove_message_label()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.trash_message"><code class="docutils literal notranslate"><span class="pre">Gmail.trash_message()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar</span></code></a><ul>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.calendar_ids"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.calendar_ids</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.primary_calendar"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.primary_calendar</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.primary_calendar_id"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.primary_calendar_id</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.add_event"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.add_event()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.delete_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.delete_events()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.export_to_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.export_to_ics()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.find_future_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.find_future_events()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.import_from_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.import_from_ics()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.make_multiple_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.make_multiple_events()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.parse_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.parse_ics()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -127,10 +159,42 @@
   <div class="row">
       <div class="col-md-3">
         <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">google</span></code> module</a><ul>
-<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">google_api</span></code> module</a><ul>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#google_api.authenticate_google_app"><code class="docutils literal notranslate"><span class="pre">authenticate_google_app()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#classes">Classes</a><ul>
-<li><a class="reference internal" href="#google.get_all_labels"><code class="docutils literal notranslate"><span class="pre">get_all_labels()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail"><code class="docutils literal notranslate"><span class="pre">Gmail</span></code></a><ul>
+<li><a class="reference internal" href="#google_api.Gmail.add_message_label"><code class="docutils literal notranslate"><span class="pre">Gmail.add_message_label()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.delete_message"><code class="docutils literal notranslate"><span class="pre">Gmail.delete_message()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_all_labels"><code class="docutils literal notranslate"><span class="pre">Gmail.get_all_labels()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_from_sender"><code class="docutils literal notranslate"><span class="pre">Gmail.get_from_sender()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_label_id"><code class="docutils literal notranslate"><span class="pre">Gmail.get_label_id()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_labeled_messages"><code class="docutils literal notranslate"><span class="pre">Gmail.get_labeled_messages()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_message"><code class="docutils literal notranslate"><span class="pre">Gmail.get_message()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_message_return_path"><code class="docutils literal notranslate"><span class="pre">Gmail.get_message_return_path()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.get_return_paths"><code class="docutils literal notranslate"><span class="pre">Gmail.get_return_paths()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.make_message"><code class="docutils literal notranslate"><span class="pre">Gmail.make_message()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.move_message"><code class="docutils literal notranslate"><span class="pre">Gmail.move_message()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.move_messages"><code class="docutils literal notranslate"><span class="pre">Gmail.move_messages()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.remove_message_label"><code class="docutils literal notranslate"><span class="pre">Gmail.remove_message_label()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.Gmail.trash_message"><code class="docutils literal notranslate"><span class="pre">Gmail.trash_message()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar</span></code></a><ul>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.calendar_ids"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.calendar_ids</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.primary_calendar"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.primary_calendar</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.primary_calendar_id"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.primary_calendar_id</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.add_event"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.add_event()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.delete_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.delete_events()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.export_to_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.export_to_ics()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.find_future_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.find_future_events()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.import_from_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.import_from_ics()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.make_multiple_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.make_multiple_events()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.parse_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.parse_ics()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -160,32 +224,31 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <section id="module-google">
-<span id="google-module"></span><h1><code class="docutils literal notranslate"><span class="pre">google</span></code> module<a class="headerlink" href="#module-google" title="Link to this heading">¶</a></h1>
+  <section id="module-google_api">
+<span id="google-api-module"></span><h1><code class="docutils literal notranslate"><span class="pre">google_api</span></code> module<a class="headerlink" href="#module-google_api" title="Link to this heading">¶</a></h1>
 <section id="functions">
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">authenticate_google_app(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">credentials_path='gmail_credentials.json',</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">token_path='gmail_token.json',</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">SCOPES=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">service_name=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">service_version=None)</span></span></dt>
-<dd><p>Authenticates and initializes a Google API service.</p>
+<dt class="sig sig-object py" id="google_api.authenticate_google_app">
+<span class="sig-prename descclassname"><span class="pre">google_api.</span></span><span class="sig-name descname"><span class="pre">authenticate_google_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gmail_credentials.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gmail_token.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">SCOPES</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.authenticate_google_app" title="Link to this definition">¶</a></dt>
+<dd><p>Authenticates and returns a Google API service object. Reads cached
+credentials from <code class="docutils literal notranslate"><span class="pre">token_path</span></code> if available. When a cached token exists
+but has expired, it is refreshed silently using the stored refresh token.
+Only when no valid token exists at all is the full OAuth browser flow
+triggered. The (potentially refreshed) token is always written back to
+<code class="docutils literal notranslate"><span class="pre">token_path</span></code> so subsequent calls can reuse it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>credentials_path</strong> (<em>str</em>) – Path to the credentials file for the Google API.</p></li>
-<li><p><strong>token_path</strong> (<em>str</em>) – Path to the token file for storing user authentication.</p></li>
-<li><p><strong>SCOPES</strong> (<em>list</em>) – List of scopes for the Google API service.</p></li>
-<li><p><strong>service_name</strong> (<em>str</em>) – Name of the Google API service (e.g., ‘gmail’, ‘calendar’).</p></li>
-<li><p><strong>service_version</strong> (<em>str</em>) – Version of the Google API service (e.g., ‘v1’, ‘v3’).</p></li>
+<li><p><strong>credentials_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the OAuth client secrets file downloaded
+from the Google Cloud console. Defaults to <code class="docutils literal notranslate"><span class="pre">'gmail_credentials.json'</span></code>.</p></li>
+<li><p><strong>token_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path where the user token is cached. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'gmail_token.json'</span></code>.</p></li>
+<li><p><strong>SCOPES</strong> (<em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – OAuth scopes to request. Defaults to None.</p></li>
+<li><p><strong>service_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Google API service identifier (e.g., <code class="docutils literal notranslate"><span class="pre">'gmail'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'calendar'</span></code>). Defaults to None.</p></li>
+<li><p><strong>service_version</strong> (<em>str</em><em>, </em><em>optional</em>) – API version string (e.g., <code class="docutils literal notranslate"><span class="pre">'v1'</span></code>, <code class="docutils literal notranslate"><span class="pre">'v3'</span></code>).
+Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -201,44 +264,35 @@
 <section id="classes">
 <h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">gmail(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">credentials_path='credentials.json',</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">token_path='token.json',</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">sender=None)</span></span></dt>
-<dd><p>A class for managing Gmail messages using the Google API.</p>
+<dt class="sig sig-object py" id="google_api.Gmail">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">google_api.</span></span><span class="sig-name descname"><span class="pre">Gmail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'credentials.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'token.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail" title="Link to this definition">¶</a></dt>
+<dd><p>Manages and sends Gmail messages via the Gmail API.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>credentials_path</strong> (<em>str</em>) – Path to the Google API credentials file. Default is ‘credentials.json’.</p></li>
-<li><p><strong>token_path</strong> (<em>str</em>) – Path to the token file for authentication. Default is ‘token.json’.</p></li>
-<li><p><strong>sender</strong> (<em>str</em>) – Default sender email address. Default is None.</p></li>
+<li><p><strong>credentials_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the Google API OAuth credentials file.
+Defaults to <code class="docutils literal notranslate"><span class="pre">'credentials.json'</span></code>.</p></li>
+<li><p><strong>token_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the cached token file. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'token.json'</span></code>.</p></li>
+<li><p><strong>sender</strong> (<em>str</em><em>, </em><em>optional</em>) – Default sender email address used when no sender is
+specified in <code class="docutils literal notranslate"><span class="pre">make_message</span></code>. Defaults to None.</p></li>
 </ul>
 </dd>
 </dl>
-<p><strong>Methods</strong></p>
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">add_message_label(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">message=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">message_id=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">label_names=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">label_ids=None)</span></span></dt>
+<dt class="sig sig-object py" id="google_api.Gmail.add_message_label">
+<span class="sig-name descname"><span class="pre">add_message_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.add_message_label" title="Link to this definition">¶</a></dt>
 <dd><p>Adds one or more labels to a Gmail message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>message</strong> (<em>dict</em>) – Message metadata dictionary. Default is None.</p></li>
-<li><p><strong>message_id</strong> (<em>str</em>) – ID of the message to label.</p></li>
-<li><p><strong>label_names</strong> (<em>str</em><em> or </em><em>list</em>) – Name(s) of the label(s) to add.</p></li>
-<li><p><strong>label_ids</strong> (<em>str</em><em> or </em><em>list</em>) – ID(s) of the label(s) to add.</p></li>
+<li><p><strong>message</strong> (<em>dict</em><em>, </em><em>optional</em>) – Message metadata dict containing an <code class="docutils literal notranslate"><span class="pre">'id'</span></code> key. Used
+when <code class="docutils literal notranslate"><span class="pre">message_id</span></code> is not provided. Defaults to None.</p></li>
+<li><p><strong>message_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Gmail message ID. Defaults to None.</p></li>
+<li><p><strong>label_names</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Label name(s) to add. Accepts a single string or a
+list of strings. Defaults to None.</p></li>
+<li><p><strong>label_ids</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Label ID(s) to add. Takes precedence over
+<code class="docutils literal notranslate"><span class="pre">label_names</span></code> if both are provided. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -248,18 +302,15 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">delete_message(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">message=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">message_id=None)</span></span></dt>
+<dt class="sig sig-object py" id="google_api.Gmail.delete_message">
+<span class="sig-name descname"><span class="pre">delete_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.delete_message" title="Link to this definition">¶</a></dt>
 <dd><p>Permanently deletes a Gmail message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>message</strong> (<em>dict</em>) – Message metadata dictionary. Default is None.</p></li>
-<li><p><strong>message_id</strong> (<em>str</em>) – ID of the message to delete.</p></li>
+<li><p><strong>message</strong> (<em>dict</em><em>, </em><em>optional</em>) – Message metadata dict with an <code class="docutils literal notranslate"><span class="pre">'id'</span></code> key. Defaults
+to None.</p></li>
+<li><p><strong>message_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Gmail message ID. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -269,12 +320,13 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="google.get_all_labels">
-<span class="sig-prename descclassname"><span class="pre">google.</span></span><span class="sig-name descname"><span class="pre">get_all_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#google.get_all_labels" title="Link to this definition">¶</a></dt>
-<dd><p>Retrieves all Gmail labels for the user.</p>
+<dt class="sig sig-object py" id="google_api.Gmail.get_all_labels">
+<span class="sig-name descname"><span class="pre">get_all_labels</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.get_all_labels" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieves all Gmail labels for the authenticated account.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>DataFrame containing label names and metadata.</p>
+<dd class="field-odd"><p>DataFrame with one row per label, containing label names and
+metadata returned by the API.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>pandas.DataFrame</p>
@@ -283,73 +335,83 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">get_from_sender(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">sender,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">label_name=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">label_id=None)</span></span></dt>
-<dd><p>Finds all messages from a specific sender.</p>
+<dt class="sig sig-object py" id="google_api.Gmail.get_from_sender">
+<span class="sig-name descname"><span class="pre">get_from_sender</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.get_from_sender" title="Link to this definition">¶</a></dt>
+<dd><p>Finds all messages from a specific sender. When <code class="docutils literal notranslate"><span class="pre">label_name</span></code> is
+provided it is resolved to a label ID via <code class="docutils literal notranslate"><span class="pre">get_label_id</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>sender</strong> (<em>str</em>) – Email address of the sender to search for.</p></li>
-<li><p><strong>label_name</strong> (<em>str</em>) – Name of the Gmail label to filter messages by. Default is None.</p></li>
-<li><p><strong>label_id</strong> (<em>str</em>) – ID of the Gmail label to filter messages by. Default is None.</p></li>
+<li><p><strong>label_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Filter by this label name. Defaults to None.</p></li>
+<li><p><strong>label_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Filter by this label ID directly. Takes precedence
+over <code class="docutils literal notranslate"><span class="pre">label_name</span></code> if both are provided. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>List of message metadata dictionaries.</p>
+<dd class="field-even"><p>List of message metadata dicts, or None if no messages are
+found.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list</p>
+<dd class="field-odd"><p>list of dict or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">make_message(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">sender=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">to=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">cc=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">bcc=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">subject='No</span> <span class="pre">subject',</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">plain_text=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">html_text=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">markdown_text=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">send=True,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">attachments=None)</span></span></dt>
-<dd><p>Creates and optionally sends a Gmail message.</p>
+<dt class="sig sig-object py" id="google_api.Gmail.get_label_id">
+<span class="sig-name descname"><span class="pre">get_label_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.get_label_id" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the ID of a Gmail label by its display name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>label_name</strong> (<em>str</em>) – The exact label name (case-insensitive).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The label ID, or None if no matching label is found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.Gmail.get_labeled_messages">
+<span class="sig-name descname"><span class="pre">get_labeled_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.get_labeled_messages" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieves all messages with a specific label. When <code class="docutils literal notranslate"><span class="pre">label_name</span></code> is
+provided it is resolved to a label ID via <code class="docutils literal notranslate"><span class="pre">get_label_id</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>sender</strong> (<em>str</em>) – Email address of the sender. Default is None.</p></li>
-<li><p><strong>to</strong> (<em>str</em><em> or </em><em>list</em>) – Recipient email address(es). Default is None.</p></li>
-<li><p><strong>cc</strong> (<em>str</em>) – CC email address(es). Default is None.</p></li>
-<li><p><strong>bcc</strong> (<em>str</em>) – BCC email address(es). Default is None.</p></li>
-<li><p><strong>subject</strong> (<em>str</em>) – Email subject. Default is ‘No subject’.</p></li>
-<li><p><strong>plain_text</strong> (<em>str</em>) – Plain text content of the email. Default is None.</p></li>
-<li><p><strong>html_text</strong> (<em>str</em>) – HTML content of the email. Default is None.</p></li>
-<li><p><strong>markdown_text</strong> (<em>str</em>) – Markdown content for the email. Default is None.</p></li>
-<li><p><strong>send</strong> (<em>bool</em>) – Whether to send the email immediately. Default is True.</p></li>
-<li><p><strong>attachments</strong> (<em>str</em><em> or </em><em>list</em>) – Path(s) to attachment files. Default is None.</p></li>
+<li><p><strong>label_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Label name to filter by. Defaults to None.</p></li>
+<li><p><strong>label_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Label ID to filter by directly. Takes precedence over
+<code class="docutils literal notranslate"><span class="pre">label_name</span></code> if both are provided. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Sent message metadata if <cite>send=True</cite>, else draft metadata.</p>
+<dd class="field-even"><p>List of message metadata dicts, or None if no messages are
+found.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.Gmail.get_message">
+<span class="sig-name descname"><span class="pre">get_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.get_message" title="Link to this definition">¶</a></dt>
+<dd><p>Retrieves a full Gmail message by its ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>dict</em><em>, </em><em>optional</em>) – Message metadata dict with an <code class="docutils literal notranslate"><span class="pre">'id'</span></code> key. Defaults
+to None.</p></li>
+<li><p><strong>message_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Gmail message ID. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Full Gmail message payload returned by the API.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict</p>
@@ -358,18 +420,95 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">trash_message(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">message=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">message_id=None)</span></span></dt>
-<dd><p>Moves a Gmail message to the trash.</p>
+<dt class="sig sig-object py" id="google_api.Gmail.get_message_return_path">
+<span class="sig-name descname"><span class="pre">get_message_return_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.get_message_return_path" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the <code class="docutils literal notranslate"><span class="pre">Return-Path</span></code> (or <code class="docutils literal notranslate"><span class="pre">From</span></code>) address of a message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>message</strong> (<em>dict</em>) – Message metadata dictionary. Default is None.</p></li>
-<li><p><strong>message_id</strong> (<em>str</em>) – ID of the message to delete. Default is None.</p></li>
+<li><p><strong>message</strong> (<em>dict</em><em>, </em><em>optional</em>) – Message metadata dict with an <code class="docutils literal notranslate"><span class="pre">'id'</span></code> key. Defaults
+to None.</p></li>
+<li><p><strong>message_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Gmail message ID. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The sender email address extracted from the Return-Path or
+From header.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.Gmail.get_return_paths">
+<span class="sig-name descname"><span class="pre">get_return_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.get_return_paths" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the sender address for each message in a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>messages</strong> (<em>list</em><em> of </em><em>dict</em>) – List of message metadata dicts, each containing an
+<code class="docutils literal notranslate"><span class="pre">'id'</span></code> key.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Return-Path or From addresses, one per message.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.Gmail.make_message">
+<span class="sig-name descname"><span class="pre">make_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bcc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subject</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'No</span> <span class="pre">subject'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plain_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">html_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">markdown_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">send</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attachments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.make_message" title="Link to this definition">¶</a></dt>
+<dd><p>Creates and optionally sends a Gmail message. At least one of
+<code class="docutils literal notranslate"><span class="pre">plain_text</span></code>, <code class="docutils literal notranslate"><span class="pre">html_text</span></code>, or <code class="docutils literal notranslate"><span class="pre">markdown_text</span></code> should be provided.
+Markdown is converted to HTML before sending. If none is provided, the
+body defaults to <code class="docutils literal notranslate"><span class="pre">'No</span> <span class="pre">message'</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sender</strong> (<em>str</em><em>, </em><em>optional</em>) – Sender email address. Falls back to <code class="docutils literal notranslate"><span class="pre">self.sender</span></code> if
+not provided. Defaults to None.</p></li>
+<li><p><strong>to</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Recipient address(es). Defaults to None.</p></li>
+<li><p><strong>cc</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – CC address(es). Defaults to None.</p></li>
+<li><p><strong>bcc</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – BCC address(es). Defaults to None.</p></li>
+<li><p><strong>subject</strong> (<em>str</em><em>, </em><em>optional</em>) – Email subject line. Defaults to <code class="docutils literal notranslate"><span class="pre">'No</span> <span class="pre">subject'</span></code>.</p></li>
+<li><p><strong>plain_text</strong> (<em>str</em><em>, </em><em>optional</em>) – Plain-text email body. Defaults to None.</p></li>
+<li><p><strong>html_text</strong> (<em>str</em><em>, </em><em>optional</em>) – HTML email body. Defaults to None.</p></li>
+<li><p><strong>markdown_text</strong> (<em>str</em><em>, </em><em>optional</em>) – Markdown email body (converted to HTML). Defaults
+to None.</p></li>
+<li><p><strong>send</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, send immediately; if False, save as a draft.
+Defaults to True.</p></li>
+<li><p><strong>attachments</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – File path(s) to attach. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sent message metadata if <code class="docutils literal notranslate"><span class="pre">send=True</span></code>, draft metadata if
+<code class="docutils literal notranslate"><span class="pre">send=False</span></code>, or None if an HTTP error occurs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.Gmail.move_message">
+<span class="sig-name descname"><span class="pre">move_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_label_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.move_message" title="Link to this definition">¶</a></dt>
+<dd><p>Moves a Gmail message from one label to another. Only the labels that
+are actually specified are sent to the API, so passing only
+<code class="docutils literal notranslate"><span class="pre">new_label_name</span></code> adds a label without removing one, and passing only
+<code class="docutils literal notranslate"><span class="pre">old_label_name</span></code> removes a label without adding one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>dict</em><em>, </em><em>optional</em>) – Message metadata dict with an <code class="docutils literal notranslate"><span class="pre">'id'</span></code> key. Defaults
+to None.</p></li>
+<li><p><strong>message_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Gmail message ID. Defaults to None.</p></li>
+<li><p><strong>old_label_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Label to remove. Defaults to None.</p></li>
+<li><p><strong>new_label_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Label to add. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -379,24 +518,57 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">move_message(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">message=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">message_id=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">old_label_name=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">new_label_name=None)</span></span></dt>
-<dd><p>Moves a Gmail message from one label to another.</p>
+<dt class="sig sig-object py" id="google_api.Gmail.move_messages">
+<span class="sig-name descname"><span class="pre">move_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_label_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_label_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.move_messages" title="Link to this definition">¶</a></dt>
+<dd><p>Moves a list of Gmail messages from one label to another by calling
+<code class="docutils literal notranslate"><span class="pre">move_message</span></code> for each message.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>message</strong> (<em>dict</em>) – Message metadata dictionary. Default is None.</p></li>
-<li><p><strong>message_id</strong> (<em>str</em>) – ID of the message to move. Default is None.</p></li>
-<li><p><strong>old_label_name</strong> (<em>str</em>) – Name of the current label.</p></li>
-<li><p><strong>new_label_name</strong> (<em>str</em>) – Name of the target label.</p></li>
+<li><p><strong>messages</strong> (<em>list</em><em> of </em><em>dict</em>) – List of message metadata dicts, each with an <code class="docutils literal notranslate"><span class="pre">'id'</span></code>
+key.</p></li>
+<li><p><strong>old_label_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Label to remove from each message. Defaults to
+None.</p></li>
+<li><p><strong>new_label_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Label to add to each message. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.Gmail.remove_message_label">
+<span class="sig-name descname"><span class="pre">remove_message_label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.remove_message_label" title="Link to this definition">¶</a></dt>
+<dd><p>Removes one or more labels from a Gmail message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>dict</em><em>, </em><em>optional</em>) – Message metadata dict with an <code class="docutils literal notranslate"><span class="pre">'id'</span></code> key. Defaults
+to None.</p></li>
+<li><p><strong>message_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Gmail message ID. Defaults to None.</p></li>
+<li><p><strong>label_names</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Label name(s) to remove. Accepts a single string
+or a list. Defaults to None.</p></li>
+<li><p><strong>label_ids</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em><em>, </em><em>optional</em>) – Label ID(s) to remove. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.Gmail.trash_message">
+<span class="sig-name descname"><span class="pre">trash_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.Gmail.trash_message" title="Link to this definition">¶</a></dt>
+<dd><p>Moves a Gmail message to the trash.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>dict</em><em>, </em><em>optional</em>) – Message metadata dict with an <code class="docutils literal notranslate"><span class="pre">'id'</span></code> key. Defaults
+to None.</p></li>
+<li><p><strong>message_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Gmail message ID. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -408,63 +580,68 @@
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">calendar(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">credentials_path='credentials.json',</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">token_path='token.json')</span></span></dt>
-<dd><p>Class for interacting with Google Calendar. This class provides methods to manage calendars, add events, import/export events, and parse <cite>.ics</cite> files.</p>
+<dt class="sig sig-object py" id="google_api.GoogleCalendar">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">google_api.</span></span><span class="sig-name descname"><span class="pre">GoogleCalendar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">credentials_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'credentials.json'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'token.json'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar" title="Link to this definition">¶</a></dt>
+<dd><p>Interacts with Google Calendar via the Calendar API. On initialization,
+retrieves the list of all calendars and identifies the primary calendar.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>credentials_path</strong> (<em>str</em>) – Path to the Google Calendar credentials file. Default is ‘credentials.json’.</p></li>
-<li><p><strong>token_path</strong> (<em>str</em>) – Path to the token file for authentication. Default is ‘token.json’.</p></li>
+<li><p><strong>credentials_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the OAuth client secrets file. Defaults
+to <code class="docutils literal notranslate"><span class="pre">'credentials.json'</span></code>.</p></li>
+<li><p><strong>token_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the cached token file. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'token.json'</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
-<p><strong>Methods</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.calendar_ids">
+<span class="sig-name descname"><span class="pre">calendar_ids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">pandas.Series</span></em><a class="headerlink" href="#google_api.GoogleCalendar.calendar_ids" title="Link to this definition">¶</a></dt>
+<dd><p>Series mapping calendar display names to their calendar IDs.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.primary_calendar">
+<span class="sig-name descname"><span class="pre">primary_calendar</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#google_api.GoogleCalendar.primary_calendar" title="Link to this definition">¶</a></dt>
+<dd><p>Display name of the authenticated user’s primary calendar.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.primary_calendar_id">
+<span class="sig-name descname"><span class="pre">primary_calendar_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#google_api.GoogleCalendar.primary_calendar_id" title="Link to this definition">¶</a></dt>
+<dd><p>Calendar ID of the primary calendar.</p>
+</dd></dl>
+
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">add_event(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">start,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">end=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">duration=0,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">duration_units='H',</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">title='Event',</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">description=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">calendar_name=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">calendar_id=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">time_zone=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">all_day=False)</span></span></dt>
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.add_event">
+<span class="sig-name descname"><span class="pre">add_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Event'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_zone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">all_day</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar.add_event" title="Link to this definition">¶</a></dt>
 <dd><p>Adds a single event to a Google Calendar.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>start</strong> (<em>str</em>) – Start time of the event (e.g., “January 4, 2022 4pm”).</p></li>
-<li><p><strong>end</strong> (<em>str</em>) – End time of the event. Default is None.</p></li>
-<li><p><strong>duration</strong> (<em>float</em>) – Duration of the event in units specified by <cite>duration_units</cite>. Default is 0.</p></li>
-<li><p><strong>duration_units</strong> (<em>str</em>) – Units for event duration (e.g., ‘H’ for hours). Default is ‘H’.</p></li>
-<li><p><strong>title</strong> (<em>str</em>) – Title of the event. Default is ‘Event’.</p></li>
-<li><p><strong>description</strong> (<em>str</em>) – Description of the event. Default is None.</p></li>
-<li><p><strong>calendar_name</strong> (<em>str</em>) – Name of the calendar to add the event to. Default is None.</p></li>
-<li><p><strong>calendar_id</strong> (<em>str</em>) – ID of the calendar to add the event to. Default is None.</p></li>
-<li><p><strong>time_zone</strong> (<em>str</em>) – Time zone of the event (e.g., “America/New_York”). Default is None.</p></li>
-<li><p><strong>all_day</strong> (<em>bool</em>) – If True, creates an all-day event. Default is False.</p></li>
+<li><p><strong>start</strong> (<em>str</em>) – Event start time. Accepts natural-language strings parsed
+by pandas (e.g., <code class="docutils literal notranslate"><span class="pre">'January</span> <span class="pre">4,</span> <span class="pre">2022</span> <span class="pre">4pm'</span></code>).</p></li>
+<li><p><strong>end</strong> (<em>str</em><em>, </em><em>optional</em>) – Event end time. Defaults to None, in which case
+<code class="docutils literal notranslate"><span class="pre">duration</span></code> is used.</p></li>
+<li><p><strong>duration</strong> (<em>float</em><em>, </em><em>optional</em>) – Duration of the event in <code class="docutils literal notranslate"><span class="pre">duration_units</span></code>. Ignored
+when <code class="docutils literal notranslate"><span class="pre">end</span></code> is provided. Defaults to 0.</p></li>
+<li><p><strong>duration_units</strong> (<em>str</em><em>, </em><em>optional</em>) – Pandas offset alias for the duration unit
+(e.g., <code class="docutils literal notranslate"><span class="pre">'H'</span></code> for hours). Defaults to <code class="docutils literal notranslate"><span class="pre">'H'</span></code>.</p></li>
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Event title. Defaults to <code class="docutils literal notranslate"><span class="pre">'Event'</span></code>.</p></li>
+<li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – Event description. Defaults to None.</p></li>
+<li><p><strong>calendar_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Target calendar name. Defaults to None (uses
+primary calendar).</p></li>
+<li><p><strong>calendar_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Target calendar ID. Defaults to None (uses primary
+calendar).</p></li>
+<li><p><strong>time_zone</strong> (<em>str</em><em>, </em><em>optional</em>) – IANA time zone identifier (e.g.,
+<code class="docutils literal notranslate"><span class="pre">'America/Los_Angeles'</span></code>). Defaults to None, which uses the
+calendar’s own time zone.</p></li>
+<li><p><strong>all_day</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, create an all-day event. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If <cite>calendar_name</cite> and <cite>calendar_id</cite> do not reference the same calendar.</p>
+<dd class="field-even"><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">calendar_name</span></code> and <code class="docutils literal notranslate"><span class="pre">calendar_id</span></code> refer to
+different calendars.</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -473,25 +650,23 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">delete_events(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">events=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">calendar_name=None,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">calendar_id=None)</span></span></dt>
-<dd><p>Deletes events from a Google Calendar.</p>
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.delete_events">
+<span class="sig-name descname"><span class="pre">delete_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar.delete_events" title="Link to this definition">¶</a></dt>
+<dd><p>Deletes a list of events from a Google Calendar.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>events</strong> (<em>list</em>) – List of event dictionaries to delete.</p></li>
-<li><p><strong>calendar_name</strong> (<em>str</em>) – Name of the calendar containing the events. Default is None.</p></li>
-<li><p><strong>calendar_id</strong> (<em>str</em>) – ID of the calendar containing the events. Default is None.</p></li>
+<li><p><strong>events</strong> (<em>list</em><em> of </em><em>dict</em>) – Event dicts as returned by the Calendar API, each
+containing an <code class="docutils literal notranslate"><span class="pre">'id'</span></code> key.</p></li>
+<li><p><strong>calendar_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Calendar name. Defaults to None (uses primary
+calendar).</p></li>
+<li><p><strong>calendar_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Calendar ID. Defaults to None (uses primary
+calendar).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>ValueError</strong> – If <cite>calendar_name</cite> and <cite>calendar_id</cite> do not reference the same calendar.</p>
+<dd class="field-even"><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">calendar_name</span></code> and <code class="docutils literal notranslate"><span class="pre">calendar_id</span></code> refer to
+different calendars.</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -500,28 +675,158 @@
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">export_to_ics(</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">event,</span></span></dt>
-<dt class="sig sig-object py">
-<span class="sig-name descname"><span class="pre">ics_path='event.ics')</span></span></dt>
-<dd><p>Exports a Google Calendar event to an ICS file format.</p>
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.export_to_ics">
+<span class="sig-name descname"><span class="pre">export_to_ics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ics_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'event.ics'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar.export_to_ics" title="Link to this definition">¶</a></dt>
+<dd><p>Converts a Google Calendar event dict to an ICS file. Handles both
+timed events (<code class="docutils literal notranslate"><span class="pre">'dateTime'</span></code> key) and all-day events (<code class="docutils literal notranslate"><span class="pre">'date'</span></code> key).
+All-day events are written with <code class="docutils literal notranslate"><span class="pre">DATE</span></code> values rather than
+<code class="docutils literal notranslate"><span class="pre">DATE-TIME</span></code> values, which is required for calendar clients to display
+them correctly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>event</strong> (<em>dict</em>) – Dictionary representing a Google Calendar event.</p></li>
-<li><p><strong>ics_path</strong> (<em>str</em>) – File path to save the ICS file. Default is ‘event.ics’.</p></li>
+<li><p><strong>event</strong> (<em>dict</em>) – A Google Calendar event dict. Required keys are
+<code class="docutils literal notranslate"><span class="pre">'summary'</span></code>, <code class="docutils literal notranslate"><span class="pre">'start'</span></code> (dict with <code class="docutils literal notranslate"><span class="pre">'dateTime'</span></code> or <code class="docutils literal notranslate"><span class="pre">'date'</span></code>),
+and <code class="docutils literal notranslate"><span class="pre">'end'</span></code> (dict with <code class="docutils literal notranslate"><span class="pre">'dateTime'</span></code> or <code class="docutils literal notranslate"><span class="pre">'date'</span></code>). Optional
+keys include <code class="docutils literal notranslate"><span class="pre">'description'</span></code>, <code class="docutils literal notranslate"><span class="pre">'location'</span></code>, and a <code class="docutils literal notranslate"><span class="pre">'timeZone'</span></code>
+entry inside <code class="docutils literal notranslate"><span class="pre">'start'</span></code>/<code class="docutils literal notranslate"><span class="pre">'end'</span></code>.</p></li>
+<li><p><strong>ics_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Destination path for the ICS file. Defaults to
+<code class="docutils literal notranslate"><span class="pre">'event.ics'</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>KeyError</strong> – If required keys (‘summary’, ‘start’, ‘end’) are missing in the event.</p></li>
-<li><p><strong>ValueError</strong> – If datetime parsing fails or an invalid timezone is specified.</p></li>
+<li><p><strong>KeyError</strong> – If required event keys are missing.</p></li>
+<li><p><strong>ValueError</strong> – If datetime parsing fails or an invalid time zone
+is specified.</p></li>
 </ul>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.find_future_events">
+<span class="sig-name descname"><span class="pre">find_future_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title_contains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description_contains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxResults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar.find_future_events" title="Link to this definition">¶</a></dt>
+<dd><p>Finds future events matching a title or description keyword.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title_contains</strong> (<em>str</em><em>, </em><em>optional</em>) – Return only events whose title contains this
+string. Defaults to None.</p></li>
+<li><p><strong>description_contains</strong> (<em>str</em><em>, </em><em>optional</em>) – Return only events whose description
+contains this string. Defaults to None.</p></li>
+<li><p><strong>calendar_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Calendar to search. Defaults to None (uses
+primary calendar).</p></li>
+<li><p><strong>calendar_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Calendar ID to search. Defaults to None (uses
+primary calendar).</p></li>
+<li><p><strong>maxResults</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of results to fetch from the API
+before filtering. Defaults to 1000.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Matching future event dicts. Returns all future events if no
+filter is specified.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">calendar_name</span></code> and <code class="docutils literal notranslate"><span class="pre">calendar_id</span></code> refer to
+different calendars.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.import_from_ics">
+<span class="sig-name descname"><span class="pre">import_from_ics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ics_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_ics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar.import_from_ics" title="Link to this definition">¶</a></dt>
+<dd><p>Imports events from an ICS file into a Google Calendar.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ics_path</strong> (<em>str</em><em>, </em><em>optional</em>) – Path to the <code class="docutils literal notranslate"><span class="pre">.ics</span></code> file. Defaults to None.</p></li>
+<li><p><strong>calendar_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Target calendar name. Defaults to None (uses
+primary calendar).</p></li>
+<li><p><strong>calendar_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Target calendar ID. Defaults to None (uses primary
+calendar).</p></li>
+<li><p><strong>delete_ics</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, delete the <code class="docutils literal notranslate"><span class="pre">.ics</span></code> file after a successful
+import. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If <code class="docutils literal notranslate"><span class="pre">ics_path</span></code> does not exist.</p></li>
+<li><p><strong>ValueError</strong> – If the ICS file cannot be parsed, or if
+<code class="docutils literal notranslate"><span class="pre">calendar_name</span></code> and <code class="docutils literal notranslate"><span class="pre">calendar_id</span></code> refer to different calendars.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.make_multiple_events">
+<span class="sig-name descname"><span class="pre">make_multiple_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Event'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'H'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'B'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">periods</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_zone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar.make_multiple_events" title="Link to this definition">¶</a></dt>
+<dd><p>Creates multiple recurring events in a Google Calendar by generating a
+date range and calling <code class="docutils literal notranslate"><span class="pre">add_event</span></code> for each date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<em>str</em><em>, </em><em>optional</em>) – Event title. Defaults to <code class="docutils literal notranslate"><span class="pre">'Event'</span></code>.</p></li>
+<li><p><strong>description</strong> (<em>str</em><em>, </em><em>optional</em>) – Event description. Defaults to None.</p></li>
+<li><p><strong>start_date</strong> (<em>str</em>) – Start of the recurring series. Accepts
+natural-language strings parsed by pandas.</p></li>
+<li><p><strong>end_date</strong> (<em>str</em><em>, </em><em>optional</em>) – End of the recurring series. Defaults to None.</p></li>
+<li><p><strong>event_time</strong> (<em>str</em><em>, </em><em>optional</em>) – Time-of-day to append to <code class="docutils literal notranslate"><span class="pre">start_date</span></code> when
+generating the date range. Defaults to None.</p></li>
+<li><p><strong>duration</strong> (<em>float</em><em>, </em><em>optional</em>) – Duration of each event in <code class="docutils literal notranslate"><span class="pre">duration_units</span></code>. Defaults
+to None.</p></li>
+<li><p><strong>duration_units</strong> (<em>str</em><em>, </em><em>optional</em>) – Pandas offset alias for the duration unit.
+Defaults to <code class="docutils literal notranslate"><span class="pre">'H'</span></code>.</p></li>
+<li><p><strong>freq</strong> (<em>str</em><em>, </em><em>optional</em>) – Recurrence frequency as a pandas offset alias (e.g.,
+<code class="docutils literal notranslate"><span class="pre">'B'</span></code> for business days). Defaults to <code class="docutils literal notranslate"><span class="pre">'B'</span></code>.</p></li>
+<li><p><strong>periods</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of occurrences to generate. Defaults to None.</p></li>
+<li><p><strong>calendar_name</strong> (<em>str</em><em>, </em><em>optional</em>) – Target calendar name. Defaults to None.</p></li>
+<li><p><strong>calendar_id</strong> (<em>str</em><em>, </em><em>optional</em>) – Target calendar ID. Defaults to None.</p></li>
+<li><p><strong>time_zone</strong> (<em>str</em><em>, </em><em>optional</em>) – IANA time zone identifier. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.parse_ics">
+<span class="sig-name descname"><span class="pre">parse_ics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ics_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar.parse_ics" title="Link to this definition">¶</a></dt>
+<dd><p>Parses an ICS file into a list of Google Calendar event dicts. Text
+fields (<code class="docutils literal notranslate"><span class="pre">summary</span></code>, <code class="docutils literal notranslate"><span class="pre">location</span></code>, <code class="docutils literal notranslate"><span class="pre">description</span></code>) are returned as
+plain Python strings. Events missing a <code class="docutils literal notranslate"><span class="pre">start</span></code> or <code class="docutils literal notranslate"><span class="pre">end</span></code> field are
+silently skipped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ics_path</strong> (<em>str</em>) – Path to the <code class="docutils literal notranslate"><span class="pre">.ics</span></code> file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>One dict per <code class="docutils literal notranslate"><span class="pre">VEVENT</span></code> component found in the file. Each dict
+may contain <code class="docutils literal notranslate"><span class="pre">'summary'</span></code>, <code class="docutils literal notranslate"><span class="pre">'location'</span></code>, <code class="docutils literal notranslate"><span class="pre">'description'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'start'</span></code> (dict with <code class="docutils literal notranslate"><span class="pre">'dateTime'</span></code> and <code class="docutils literal notranslate"><span class="pre">'timeZone'</span></code>), and
+<code class="docutils literal notranslate"><span class="pre">'end'</span></code> (dict with <code class="docutils literal notranslate"><span class="pre">'dateTime'</span></code> and <code class="docutils literal notranslate"><span class="pre">'timeZone'</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dict</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If <code class="docutils literal notranslate"><span class="pre">ics_path</span></code> does not exist.</p></li>
+<li><p><strong>ValueError</strong> – If the file contains malformed ICS data.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
