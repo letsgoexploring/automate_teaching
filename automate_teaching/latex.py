@@ -103,7 +103,6 @@ def make_tabular(
     column_format=None,
     hlines=None,
     clines=None,
-    pos='c',
     filename=None,
 ):
     """Build a LaTeX tabular environment string.
@@ -112,7 +111,8 @@ def make_tabular(
         data (numpy.ndarray): 2-D array of cell values. Each element is
             converted to a string.
         table_spec (str, optional): Column alignment string (e.g., 'lcc').
-            Defaults to ''.
+            If empty, defaults to 'l' for the first column and 'c' for
+            each remaining column. Defaults to ''.
         row_format (dict, optional): Row-level formatting. Keys are
             1-based row numbers; values are lists of LaTeX command names
             (without the leading backslash). Example: ``{1: ['textbf']}``
@@ -126,8 +126,6 @@ def make_tabular(
         clines (dict, optional): Partial horizontal rules. Keys are
             1-based row numbers; values are lists of column-range strings
             (e.g., ``{2: ['1-3', '5-6']}``). Defaults to None.
-        pos (str, optional): Vertical alignment of the tabular relative
-            to surrounding text ('b', 'c', 't'). Defaults to 'c'.
         filename (str, optional): If provided, write the LaTeX string to
             this file. Defaults to None.
 
@@ -142,6 +140,11 @@ def make_tabular(
         hlines = []
     if clines is None:
         clines = {}
+
+    # Auto-detect column spec from data if not provided
+    if not table_spec:
+        ncols = len(data[0]) if len(data) > 0 else 1
+        table_spec = 'l' + 'c' * (ncols - 1)
 
     def shift_keys_down_one(dictionary):
         """Return a copy of dictionary with all integer keys decremented by 1.
@@ -159,7 +162,7 @@ def make_tabular(
     clines = shift_keys_down_one(clines)
     hlines = [int(h) - 1 for h in hlines]
 
-    tabular = '\\begin{tabular}[' + pos + ']{' + table_spec + '}'
+    tabular = '\\begin{tabular}{' + table_spec + '}'
 
     if -1 in hlines:  # original value 0 → shifted to -1
         tabular += '\\hline'
