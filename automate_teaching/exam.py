@@ -405,24 +405,48 @@ class MCQuestion:
             self.all_of_above_correct = False
             self.none_of_above_correct = False
 
-            # Only treat \all and \none as special tokens when they appear on
-            # a \item line. This prevents question body text that happens to
-            # contain \all (e.g. "students must answer \all parts") from being
-            # misread as an "All of the above" answer choice.
+            # Detect \all and \none special tokens in the options block.
+            # These tokens appear either as bare lines ("\none % CORRECT ...") or
+            # as \item lines ("\item \none % CORRECT ...").  The original guard
+            # that required startswith('\\item') missed bare occurrences, which
+            # caused the \none/\all text to bleed into the preceding regular
+            # option when the block was later split on '\item'.
+            #
+            # To avoid false positives from question-body text that happens to
+            # contain \all or \none (e.g. "students must answer \all parts"),
+            # we only look for the tokens on non-blank lines that are NOT part
+            # of a regular \item entry — i.e., lines that either start with
+            # \all/\none directly, or are \item lines that contain \all/\none
+            # (the old behaviour, kept for back-compatibility).
             for option_line in options.split('\n'):
                 stripped_line = option_line.lstrip()
-                if not stripped_line.startswith('\\item'):
+                if not stripped_line:
                     continue
-                if '\\all' in stripped_line:
-                    self.all_of_above = True
-                    if self.correct_string in stripped_line:
-                        self.all_of_above_correct = True
-                    options = options.replace(option_line, '')
-                elif '\\none' in stripped_line:
-                    self.none_of_above = True
-                    if self.correct_string in stripped_line:
-                        self.none_of_above_correct = True
-                    options = options.replace(option_line, '')
+                if stripped_line.startswith('\\item'):
+                    # \item line: only treat embedded \all/\none as special tokens.
+                    if '\\all' in stripped_line:
+                        self.all_of_above = True
+                        if self.correct_string in stripped_line:
+                            self.all_of_above_correct = True
+                        options = options.replace(option_line, '')
+                    elif '\\none' in stripped_line:
+                        self.none_of_above = True
+                        if self.correct_string in stripped_line:
+                            self.none_of_above_correct = True
+                        options = options.replace(option_line, '')
+                else:
+                    # Bare line (no \item prefix): \none and \all are their own
+                    # item syntax and must be detected and removed here.
+                    if '\\all' in stripped_line:
+                        self.all_of_above = True
+                        if self.correct_string in stripped_line:
+                            self.all_of_above_correct = True
+                        options = options.replace(option_line, '')
+                    elif '\\none' in stripped_line:
+                        self.none_of_above = True
+                        if self.correct_string in stripped_line:
+                            self.none_of_above_correct = True
+                        options = options.replace(option_line, '')
 
             options = options.lstrip().rstrip()
             options = options.split('\\item')[1:]
