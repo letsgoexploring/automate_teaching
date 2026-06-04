@@ -1660,19 +1660,40 @@ class Exam:
                 print("Detected inline FR questions in main file")
                 self.fr = FRExam(self.filename)
 
-    def shuffle_options(self, seed=None, filename=None):
+    def shuffle_options(self, seed=None, filename=None, fr_file=None):
         """Return a new Exam with shuffled MC options, preserving FR questions.
 
         Args:
             seed (int, optional): Random seed for reproducibility.
             filename (str, optional): If provided, sets the base path for
                 subsequent export_exam and export_key calls.
+            fr_file (str, optional): Path to an alternative FR questions file.
+                When provided, the returned exam uses that file's FR content
+                instead of the original. Useful for producing exam versions
+                with different free-response questions. Defaults to None
+                (preserve the original FR questions).
 
         Returns:
             Exam: A deep copy of this Exam with MC options shuffled.
         """
         new_exam = deepcopy(self)
         new_exam.mc = new_exam.mc.shuffle_options(seed=seed)
+
+        if fr_file is not None:
+            fr_path = Path(fr_file).expanduser().resolve()
+            if fr_path.exists():
+                text = fr_path.read_text(encoding="utf-8")
+                cleaned_text = "\n".join(_strip_commented_lines(text.splitlines()))
+                new_exam.fr = FRExam.from_string(
+                    cleaned_text,
+                    source_path=fr_path,
+                    filename_hint=fr_path.name,
+                )
+                # Update file_text so _assemble_exam routes FR content correctly.
+                new_exam.fr_text = cleaned_text
+                print("Using alternative FR file: " + fr_path.name)
+            else:
+                print("Warning: fr_file not found: " + str(fr_path))
 
         if filename:
             out_path = Path(filename).expanduser().resolve()
