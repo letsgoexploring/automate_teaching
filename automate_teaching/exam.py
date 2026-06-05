@@ -1584,116 +1584,193 @@ class Exam:
         self.fr = fr
 
         if self.mc is None:
-            mc_inputs = re.findall(
-                r'(?m)^\s*(?!%)\\input\{([^}]*mc[^}]*)\}',
-                self.file_text
-            )
-            if mc_inputs:
-                merged = ""
-                for fname in mc_inputs:
-                    mc_path = base_dir / (fname if fname.endswith(".tex") else f"{fname}.tex")
-                    if mc_path.exists():
-                        print("Including MC file: " + mc_path.name)
-                        text = mc_path.read_text(encoding="utf-8")
-
-                        # Strip commented-out shuffle/noshuffle blocks by tracking brace depth
-                        lines = text.splitlines()
-                        cleaned_lines = []
-                        skip_block = False
-                        brace_depth = 0
-
-                        for line in lines:
-                            stripped = line.lstrip()
-                            if (not skip_block) and (
-                                stripped.startswith('%\\shuffle')
-                                or stripped.startswith('%\\noshuffle')
-                            ):
-                                skip_block = True
-                                brace_depth = 0
-                                continue
-
-                            if skip_block:
-                                brace_depth += line.count('{')
-                                brace_depth -= line.count('}')
-                                if brace_depth <= 0 and '}' in line:
-                                    skip_block = False
-                                continue
-
-                            if not stripped.startswith('%'):
-                                cleaned_lines.append(line)
-
-                        merged += "\n".join(cleaned_lines) + "\n"
-                    else:
-                        print("Warning: MC file not found: " + str(mc_path))
-
-                merged_mc_tex = "\\begin{mcquestions}\n" + merged + "\\end{mcquestions}\n"
-                self.mc = MCExam.from_string(
-                    merged_mc_tex,
-                    correct_string=correct_string,
-                    seed=seed,
-                    source_path=self.filepath,
-                    filename_hint=self.filename,
+            mc_fname = self._read_file_command("mcfile")
+            if mc_fname:
+                self._load_mc([mc_fname], base_dir, correct_string, seed)
+            else:
+                # Fallback: heuristic \input{...mc...} detection for older exam files
+                mc_inputs = re.findall(
+                    r'(?m)^\s*(?!%)\\input\{([^}]*mc[^}]*)\}',
+                    self.file_text
                 )
-
-            elif "\\begin{mcquestions}" in self.file_text:
-                print("Detected inline MC questions in main file")
-                self.mc = MCExam(self.filename, correct_string=correct_string, seed=seed)
+                if mc_inputs:
+                    self._load_mc(mc_inputs, base_dir, correct_string, seed)
+                elif "\\begin{mcquestions}" in self.file_text:
+                    print("Detected inline MC questions in main file")
+                    self.mc = MCExam(self.filename, correct_string=correct_string, seed=seed)
 
         if self.fr is None:
-            fr_input = re.search(r'\\input\{([^}]*(?:fr[_]?questions)[^}]*)\}', self.file_text)
-            if fr_input:
-                fr_fname = fr_input.group(1)
-                fr_path = base_dir / (fr_fname if fr_fname.endswith(".tex") else f"{fr_fname}.tex")
-                if fr_path.exists():
-                    print("Auto-loading FR section from " + fr_path.name)
-                    text = fr_path.read_text(encoding="utf-8")
-                    cleaned_text = "\n".join(_strip_commented_lines(text.splitlines()))
-                    self.fr_text = cleaned_text
-                    self.fr = FRExam.from_string(
-                        cleaned_text,
-                        source_path=self.filepath,
-                        filename_hint=self.filename,
-                    )
-                else:
-                    print("Warning: FR file not found: " + str(fr_path))
-            elif "\\begin{frquestions}" in self.file_text:
-                print("Detected inline FR questions in main file")
-                self.fr = FRExam(self.filename)
+            fr_fname = self._read_file_command("frfile")
+            if fr_fname:
+                self._load_fr(fr_fname, base_dir)
+            else:
+                # Fallback: heuristic \input{...fr_questions...} detection for older exam files
+                fr_input = re.search(r'\\input\{([^}]*(?:fr[_]?questions)[^}]*)\}', self.file_text)
+                if fr_input:
+                    self._load_fr(fr_input.group(1), base_dir)
+                elif "\\begin{frquestions}" in self.file_text:
+                    print("Detected inline FR questions in main file")
+                    self.fr = FRExam(self.filename)
 
-    def shuffle_options(self, seed=None, filename=None, fr_file=None):
+    # ------------------------------------------------------------------
+    # Private helpers for loading MC/FR content
+    # ------------------------------------------------------------------
+
+    def _read_file_command(self, command_name):
+        """Read the value of a newcommand declaration from file_text.
+
+        Used to extract \\mcfile and \\frfile declarations from the exam's
+        LaTeX preamble.
+
+        Args:
+            command_name (str): The command name without backslash
+                (e.g. 'mcfile' or 'frfile').
+
+        Returns:
+            str or None: The declared file path, or None if not found.
+        """
+        m = re.search(
+            rf'\\newcommand\{{\\{command_name}\}}\{{([^}}]+)\}}',
+            self.file_text
+        )
+        return m.group(1).strip() if m else None
+
+    def _load_mc(self, fnames, base_dir, correct_string, seed):
+        """Load and parse one or more MC question files into self.mc.
+
+        Strips commented-out shuffle/noshuffle blocks before parsing.
+
+        Args:
+            fnames (list of str): Relative file paths to load and merge.
+            base_dir (Path): Directory used to resolve relative paths.
+            correct_string (str): Marker for correct answers.
+            seed (int or None): RNG seed.
+        """
+        merged = ""
+        for fname in fnames:
+            mc_path = base_dir / (fname if fname.endswith(".tex") else f"{fname}.tex")
+            if not mc_path.exists():
+                print("Warning: MC file not found: " + str(mc_path))
+                continue
+            print("Including MC file: " + mc_path.name)
+            text = mc_path.read_text(encoding="utf-8")
+
+            # Strip commented-out shuffle/noshuffle blocks by tracking brace depth
+            lines = text.splitlines()
+            cleaned_lines = []
+            skip_block = False
+            brace_depth = 0
+            for line in lines:
+                stripped = line.lstrip()
+                if (not skip_block) and (
+                    stripped.startswith('%\\shuffle')
+                    or stripped.startswith('%\\noshuffle')
+                ):
+                    skip_block = True
+                    brace_depth = 0
+                    continue
+                if skip_block:
+                    brace_depth += line.count('{')
+                    brace_depth -= line.count('}')
+                    if brace_depth <= 0 and '}' in line:
+                        skip_block = False
+                    continue
+                if not stripped.startswith('%'):
+                    cleaned_lines.append(line)
+            merged += "\n".join(cleaned_lines) + "\n"
+
+        merged_mc_tex = "\\begin{mcquestions}\n" + merged + "\\end{mcquestions}\n"
+        self.mc = MCExam.from_string(
+            merged_mc_tex,
+            correct_string=correct_string,
+            seed=seed,
+            source_path=self.filepath,
+            filename_hint=self.filename,
+        )
+
+    def _load_fr(self, fname, base_dir):
+        """Load and parse a single FR questions file into self.fr.
+
+        Args:
+            fname (str): Relative path to the FR questions file.
+            base_dir (Path): Directory used to resolve the path.
+        """
+        fr_path = base_dir / (fname if fname.endswith(".tex") else f"{fname}.tex")
+        if not fr_path.exists():
+            print("Warning: FR file not found: " + str(fr_path))
+            return
+        print("Auto-loading FR section from " + fr_path.name)
+        text = fr_path.read_text(encoding="utf-8")
+        cleaned_text = "\n".join(_strip_commented_lines(text.splitlines()))
+        self.fr_text = cleaned_text
+        self.fr = FRExam.from_string(
+            cleaned_text,
+            source_path=self.filepath,
+            filename_hint=self.filename,
+        )
+
+    def _update_file_command(self, command_name, new_path):
+        """Replace the value of a \\newcommand{\\<command_name>}{...} in file_text.
+
+        If the command is not present, does nothing and prints a warning.
+
+        Args:
+            command_name (str): The command name without backslash.
+            new_path (str): The new file path value to set.
+        """
+        pattern = rf'(\\newcommand\{{\\{command_name}\}}\{{)[^}}]+(\}})' 
+        replacement = rf'\g<1>{new_path}\g<2>'
+        new_text, n = re.subn(pattern, replacement, self.file_text)
+        if n == 0:
+            print(f"Warning: \\{command_name} not found in file_text; set_{command_name[:-4]} had no effect.")
+        else:
+            self.file_text = new_text
+
+    # ------------------------------------------------------------------
+    # Public API for swapping question files
+    # ------------------------------------------------------------------
+
+    def set_mc(self, path):
+        """Swap in a different MC questions file.
+
+        Updates both the parsed MC content and the \\mcfile declaration in
+        file_text so that the exported .tex files reference the new file.
+
+        Args:
+            path (str): Path to the replacement MC questions file.
+        """
+        base_dir = Path(path).resolve().parent
+        self._load_mc([path], base_dir, self.correct_string, self.seed)
+        self._update_file_command("mcfile", path)
+        print("MC file set to: " + path)
+
+    def set_fr(self, path):
+        """Swap in a different FR questions file.
+
+        Updates both the parsed FR content and the \\frfile declaration in
+        file_text so that the exported .tex files reference the new file.
+
+        Args:
+            path (str): Path to the replacement FR questions file.
+        """
+        base_dir = Path(path).resolve().parent
+        self._load_fr(path, base_dir)
+        self._update_file_command("frfile", path)
+        print("FR file set to: " + path)
+
+    def shuffle_options(self, seed=None, filename=None):
         """Return a new Exam with shuffled MC options, preserving FR questions.
 
         Args:
             seed (int, optional): Random seed for reproducibility.
             filename (str, optional): If provided, sets the base path for
                 subsequent export_exam and export_key calls.
-            fr_file (str, optional): Path to an alternative FR questions file.
-                When provided, the returned exam uses that file's FR content
-                instead of the original. Useful for producing exam versions
-                with different free-response questions. Defaults to None
-                (preserve the original FR questions).
 
         Returns:
             Exam: A deep copy of this Exam with MC options shuffled.
         """
         new_exam = deepcopy(self)
         new_exam.mc = new_exam.mc.shuffle_options(seed=seed)
-
-        if fr_file is not None:
-            fr_path = Path(fr_file).expanduser().resolve()
-            if fr_path.exists():
-                text = fr_path.read_text(encoding="utf-8")
-                cleaned_text = "\n".join(_strip_commented_lines(text.splitlines()))
-                new_exam.fr = FRExam.from_string(
-                    cleaned_text,
-                    source_path=fr_path,
-                    filename_hint=fr_path.name,
-                )
-                # Update file_text so _assemble_exam routes FR content correctly.
-                new_exam.fr_text = cleaned_text
-                print("Using alternative FR file: " + fr_path.name)
-            else:
-                print("Warning: fr_file not found: " + str(fr_path))
 
         if filename:
             out_path = Path(filename).expanduser().resolve()

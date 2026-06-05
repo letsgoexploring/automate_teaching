@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>latex module &#8212; automate_teaching 1.0.3 documentation</title>
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="_static/doctools.js"></script>
+    <title>latex module &#8212; automate_teaching 1.0.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css?v=4468db6d" />
+    <script src="_static/documentation_options.js?v=71272d9f"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -74,7 +72,18 @@
   <ul class="dropdown-menu localtoc"
       role="menu"
       aria-labelledby="dLabelLocalToc"><ul>
-<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">latex</span></code> module</a></li>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">latex</span></code> module</a><ul>
+<li><a class="reference internal" href="#compile_latex"><code class="docutils literal notranslate"><span class="pre">compile_latex()</span></code></a></li>
+<li><a class="reference internal" href="#pdf_latex"><code class="docutils literal notranslate"><span class="pre">pdf_latex()</span></code></a></li>
+<li><a class="reference internal" href="#clean_aux_files"><code class="docutils literal notranslate"><span class="pre">clean_aux_files()</span></code></a></li>
+<li><a class="reference internal" href="#make_figure"><code class="docutils literal notranslate"><span class="pre">make_figure()</span></code></a></li>
+<li><a class="reference internal" href="#make_handout"><code class="docutils literal notranslate"><span class="pre">make_handout()</span></code></a></li>
+<li><a class="reference internal" href="#make_tabular"><code class="docutils literal notranslate"><span class="pre">make_tabular()</span></code></a></li>
+<li><a class="reference internal" href="#make_table"><code class="docutils literal notranslate"><span class="pre">make_table()</span></code></a></li>
+<li><a class="reference internal" href="#DataFrame_to_array"><code class="docutils literal notranslate"><span class="pre">DataFrame_to_array()</span></code></a></li>
+<li><a class="reference internal" href="#python_script"><code class="docutils literal notranslate"><span class="pre">python_script()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </ul>
 </li>
@@ -120,14 +129,51 @@
 
 <div class="container">
   <div class="row">
-    <div class="body col-md-12 content" role="main">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">latex</span></code> module</a><ul>
+<li><a class="reference internal" href="#compile_latex"><code class="docutils literal notranslate"><span class="pre">compile_latex()</span></code></a></li>
+<li><a class="reference internal" href="#pdf_latex"><code class="docutils literal notranslate"><span class="pre">pdf_latex()</span></code></a></li>
+<li><a class="reference internal" href="#clean_aux_files"><code class="docutils literal notranslate"><span class="pre">clean_aux_files()</span></code></a></li>
+<li><a class="reference internal" href="#make_figure"><code class="docutils literal notranslate"><span class="pre">make_figure()</span></code></a></li>
+<li><a class="reference internal" href="#make_handout"><code class="docutils literal notranslate"><span class="pre">make_handout()</span></code></a></li>
+<li><a class="reference internal" href="#make_tabular"><code class="docutils literal notranslate"><span class="pre">make_tabular()</span></code></a></li>
+<li><a class="reference internal" href="#make_table"><code class="docutils literal notranslate"><span class="pre">make_table()</span></code></a></li>
+<li><a class="reference internal" href="#DataFrame_to_array"><code class="docutils literal notranslate"><span class="pre">DataFrame_to_array()</span></code></a></li>
+<li><a class="reference internal" href="#python_script"><code class="docutils literal notranslate"><span class="pre">python_script()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  <li>
+    <a href="google.html" title="Previous Chapter: google_api module"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; google_api module</span>
+    </a>
+  </li>
+  <li>
+    <a href="homework.html" title="Next Chapter: Homework class"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Homework class &raquo;</span>
+    </a>
+  </li>
+<div id="sourcelink">
+  <a href="_sources/latex.rst.txt"
+     rel="nofollow">Source</a>
+</div>
+<form action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
       
   <section id="latex-module">
-<h1><code class="docutils literal notranslate"><span class="pre">latex</span></code> module<a class="headerlink" href="#latex-module" title="Permalink to this heading">¶</a></h1>
+<h1><code class="docutils literal notranslate"><span class="pre">latex</span></code> module<a class="headerlink" href="#latex-module" title="Link to this heading">¶</a></h1>
 <p>This module provides utilities for managing LaTeX files, including compilation, creating figures and tables, and handling Beamer slides.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compile_latex">
-<span class="sig-name descname"><span class="pre">compile_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdflatex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_aux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compile_latex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">compile_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdflatex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_aux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#compile_latex" title="Link to this definition">¶</a></dt>
 <dd><p>Compiles one or more LaTeX files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -161,7 +207,7 @@ a <code class="docutils literal notranslate"><span class="pre">.tex</span></code
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pdf_latex">
-<span class="sig-name descname"><span class="pre">pdf_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdflatex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_aux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdf_latex" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">pdf_latex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pdflatex'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_aux</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pdf_latex" title="Link to this definition">¶</a></dt>
 <dd><p>Compiles a LaTeX file with BibTeX support using a four-pass compilation
 sequence: compiler twice, then BibTeX, then compiler twice more, to resolve
 all cross-references and bibliography entries.</p>
@@ -183,7 +229,7 @@ or if any compilation step fails.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="clean_aux_files">
-<span class="sig-name descname"><span class="pre">clean_aux_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#clean_aux_files" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">clean_aux_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#clean_aux_files" title="Link to this definition">¶</a></dt>
 <dd><p>Deletes LaTeX auxiliary files in the same directory as the given file.
 Removes files with the following extensions: <code class="docutils literal notranslate"><span class="pre">.aux</span></code>, <code class="docutils literal notranslate"><span class="pre">.log</span></code>, <code class="docutils literal notranslate"><span class="pre">.out</span></code>,
 <code class="docutils literal notranslate"><span class="pre">.gz</span></code>, <code class="docutils literal notranslate"><span class="pre">.snm</span></code>, <code class="docutils literal notranslate"><span class="pre">.nav</span></code>, <code class="docutils literal notranslate"><span class="pre">.toc</span></code>, <code class="docutils literal notranslate"><span class="pre">.blg</span></code>, <code class="docutils literal notranslate"><span class="pre">.bbl</span></code>, <code class="docutils literal notranslate"><span class="pre">.vrb</span></code>.</p>
@@ -197,7 +243,7 @@ containing this file is cleaned; the file itself is not deleted.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="make_figure">
-<span class="sig-name descname"><span class="pre">make_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'h'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0cm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6.5cm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_figure" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">make_figure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'h'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'0cm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'6.5cm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_figure" title="Link to this definition">¶</a></dt>
 <dd><p>Builds a LaTeX figure environment string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -232,7 +278,7 @@ Defaults to None.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="make_handout">
-<span class="sig-name descname"><span class="pre">make_handout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slides_file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handout_file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_handout" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">make_handout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slides_file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handout_file_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_handout" title="Link to this definition">¶</a></dt>
 <dd><p>Generates a Beamer handout file from a slides file. Inserts <code class="docutils literal notranslate"><span class="pre">'handout,'</span></code>
 into the <code class="docutils literal notranslate"><span class="pre">\documentclass</span></code> options on the first line of the slides file so
 that overlay animations are collapsed.</p>
@@ -257,7 +303,7 @@ a <code class="docutils literal notranslate"><span class="pre">\documentclass[..
 
 <dl class="py function">
 <dt class="sig sig-object py" id="make_tabular">
-<span class="sig-name descname"><span class="pre">make_tabular</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_tabular" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">make_tabular</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'c'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_tabular" title="Link to this definition">¶</a></dt>
 <dd><p>Builds a LaTeX tabular environment string.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -292,7 +338,7 @@ Defaults to None.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="make_table">
-<span class="sig-name descname"><span class="pre">make_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'h'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_table" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">make_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">table_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hlines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'h'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caption_top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center_table</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#make_table" title="Link to this definition">¶</a></dt>
 <dd><p>Builds a LaTeX table environment containing a tabular environment.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -329,7 +375,7 @@ Defaults to None.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="DataFrame_to_array">
-<span class="sig-name descname"><span class="pre">DataFrame_to_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_column_headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_index_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DataFrame_to_array" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DataFrame_to_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_column_headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_index_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#DataFrame_to_array" title="Link to this definition">¶</a></dt>
 <dd><p>Converts a pandas DataFrame to a NumPy array with optional headers and
 index column, suitable for passing directly to <code class="docutils literal notranslate"><span class="pre">make_tabular</span></code> or
 <code class="docutils literal notranslate"><span class="pre">make_table</span></code>.</p>
@@ -357,12 +403,12 @@ prepended according to the selected options.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="python_script">
-<span class="sig-name descname"><span class="pre">python_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">script</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#python_script" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">python_script</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">script</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#python_script" title="Link to this definition">¶</a></dt>
 <dd><p>Executes one or more Python scripts as subprocesses. Appends <code class="docutils literal notranslate"><span class="pre">.py</span></code> to
 any filename that does not already have that extension.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>script</strong> (<em>str</em><em> or </em><em>list of str</em>) – Filename or list of filenames of Python scripts to run.</p>
+<dd class="field-odd"><p><strong>script</strong> (<em>str</em><em> or </em><em>list</em><em> of </em><em>str</em>) – Filename or list of filenames of Python scripts to run.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -382,7 +428,7 @@ any filename that does not already have that extension.</p>
     </p>
     <p>
         &copy; Copyright 2025, Brian C. Jenkins.<br/>
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.0.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 8.2.3.<br/>
     </p>
   </div>
 </footer>
