@@ -733,9 +733,9 @@ class calendar:
         print(f"Event exported to {ics_path} successfully.")
 
         
-    def find_future_events(self,title_contains=None,description_contains=None,calendar_name=None,calendar_id=None,maxResults=1000):
+    def find_events(self,title_contains=None,description_contains=None,calendar_name=None,calendar_id=None,maxResults=1000,direction='future'):
 
-        """Finds future events matching specified criteria.
+        """Finds events matching specified criteria.
 
         Args:
             title_contains (str, optional): Search keyword for the event title. Default is None.
@@ -743,9 +743,21 @@ class calendar:
             calendar_name (str, optional): Name of the calendar to search. Default is None.
             calendar_id (str, optional): ID of the calendar to search. Default is None.
             maxResults (int): Maximum number of results to return. Default is 1000.
+            direction (str): Which events (relative to now) to search:
+
+                - 'future' — only events starting now or later.
+                - 'past' — only events starting before now.
+                - 'all' — every event on the calendar, regardless of start time.
+
+                Default is 'future'.
 
         Returns:
             list: List of matching event dictionaries.
+
+        Raises:
+            ValueError: If `calendar_id` and `calendar_name` do not reference
+                the same calendar, or if `direction` is not one of
+                'future', 'past', or 'all'.
         """
 
         if calendar_id is not None and calendar_name is not None:
@@ -757,16 +769,30 @@ class calendar:
         # Set calendar_id to primary if calendar_id or calendar_name are supplied
         if calendar_id == None:
             calendar_id = self.primary_calendar_id
-        
+
+        if direction not in ('future', 'past', 'all'):
+            raise ValueError("direction must be one of 'future', 'past', or 'all'.")
+
         now = datetime.datetime.utcnow().isoformat() + 'Z'
+
+        list_kwargs = dict(
+            calendarId=calendar_id,
+            maxResults=maxResults,
+            singleEvents=True,
+            orderBy='startTime',
+        )
+
+        if direction == 'future':
+            list_kwargs['timeMin'] = now
+        elif direction == 'past':
+            list_kwargs['timeMax'] = now
+        # direction == 'all': no timeMin/timeMax restriction, so every
+        # event on the calendar is fetched.
+
         events_result = (
             self.service
                 .events()
-                .list(calendarId=calendar_id,
-                      timeMin=now,
-                      maxResults=maxResults,
-                      singleEvents=True,
-                      orderBy='startTime')
+                .list(**list_kwargs)
                 .execute()
         )
         all_events = events_result.get('items', [])

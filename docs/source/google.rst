@@ -357,9 +357,9 @@ Classes
          is specified.
       :return: None
 
-   .. py:method:: find_future_events(title_contains=None, description_contains=None, calendar_name=None, calendar_id=None, maxResults=1000)
+   .. py:method:: find_events(title_contains=None, description_contains=None, calendar_name=None, calendar_id=None, maxResults=1000, direction='future')
 
-      Finds future events matching a title or description keyword.
+      Finds events matching a title or description keyword.
 
       :param title_contains: Return only events whose title contains this
          string. Defaults to None.
@@ -376,11 +376,21 @@ Classes
       :param maxResults: Maximum number of results to fetch from the API
          before filtering. Defaults to 1000.
       :type maxResults: int, optional
-      :return: Matching future event dicts. Returns all future events if no
-         filter is specified.
+      :param direction: Which events (relative to now) to search.
+
+         - ``'future'`` — only events starting now or later.
+         - ``'past'`` — only events starting before now.
+         - ``'all'`` — every event on the calendar, regardless of start
+           time.
+
+         Defaults to ``'future'``.
+      :type direction: str, optional
+      :return: Matching event dicts. Returns all events in the searched
+         range if no title/description filter is specified.
       :rtype: list of dict
       :raises ValueError: If ``calendar_name`` and ``calendar_id`` refer to
-         different calendars.
+         different calendars, or if ``direction`` is not one of
+         ``'future'``, ``'past'``, or ``'all'``.
 
    .. py:method:: import_from_ics(ics_path=None, calendar_name=None, calendar_id=None, delete_ics=False)
 

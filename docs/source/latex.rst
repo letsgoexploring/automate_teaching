@@ -198,6 +198,27 @@ This module provides utilities for managing LaTeX files, including compilation, 
       prepended according to the selected options.
    :rtype: numpy.ndarray
 
+.. py:function:: make_listing(snippet_filename, caption=None, label='', filename=None)
+
+   Builds a LaTeX code listing macro call string.
+
+   :param snippet_filename: Path to the exported ``.py`` snippet file, as it
+      will appear in the LaTeX source (e.g. ``'snippets/ar1_sim.py'``).
+   :type snippet_filename: str
+   :param caption: Caption text. If None, produces a plain
+      ``\codelisting{}`` call with no caption or numbering. Defaults to
+      None.
+   :type caption: str, optional
+   :param label: Label for cross-referencing. Only used if ``caption`` is
+      also given — an uncaptioned listing isn't numbered, so a label on one
+      wouldn't resolve to anything. Defaults to ``''``.
+   :type label: str, optional
+   :param filename: If provided, write the LaTeX string to this file.
+      Defaults to None.
+   :type filename: str, optional
+   :return: LaTeX source calling ``\codelisting`` or ``\codelistingcaptioned``.
+   :rtype: str
+
 .. py:function:: python_script(script)
 
    Executes one or more Python scripts as subprocesses. Appends ``.py`` to

@@ -306,6 +306,39 @@ def DataFrame_to_array(df, include_index=True, include_column_headers=True, keep
 
     return retval
 
+def make_listing(snippet_filename, caption=None, label='', filename=None):
+    """Build a LaTeX code listing macro call string.
+
+    Args:
+        snippet_filename (str): Path to the exported .py snippet file,
+            as it will appear in the LaTeX source (e.g.
+            'snippets/ar1_sim.py').
+        caption (str, optional): Caption text. If None, produces a
+            plain \\codelisting{} call with no caption or numbering.
+            Defaults to None.
+        label (str, optional): Label for cross-referencing. Only used
+            if caption is also given — an uncaptioned listing isn't
+            numbered, so a label on one wouldn't resolve to anything.
+            Defaults to ''.
+        filename (str, optional): If provided, write the LaTeX string
+            to this file. Defaults to None.
+
+    Returns:
+        str: LaTeX source calling \\codelisting or \\codelistingcaptioned.
+    """
+    if caption is None:
+        latex = f"\\codelisting{{{snippet_filename}}}"
+    elif label:
+        latex = f"\\codelistingcaptioned[{label}]{{{snippet_filename}}}{{{caption}}}"
+    else:
+        latex = f"\\codelistingcaptioned{{{snippet_filename}}}{{{caption}}}"
+
+    if filename is not None:
+        with open(filename, 'w') as f:
+            f.write(latex)
+
+    return latex
+
 
 # ---------------------------------------------------------------------------
 # LaTeX compilation

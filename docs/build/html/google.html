@@ -102,7 +102,7 @@
 <li><a class="reference internal" href="#google_api.GoogleCalendar.add_event"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.add_event()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.delete_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.delete_events()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.export_to_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.export_to_ics()</span></code></a></li>
-<li><a class="reference internal" href="#google_api.GoogleCalendar.find_future_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.find_future_events()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.find_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.find_events()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.import_from_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.import_from_ics()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.make_multiple_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.make_multiple_events()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.parse_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.parse_ics()</span></code></a></li>
@@ -189,7 +189,7 @@
 <li><a class="reference internal" href="#google_api.GoogleCalendar.add_event"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.add_event()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.delete_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.delete_events()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.export_to_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.export_to_ics()</span></code></a></li>
-<li><a class="reference internal" href="#google_api.GoogleCalendar.find_future_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.find_future_events()</span></code></a></li>
+<li><a class="reference internal" href="#google_api.GoogleCalendar.find_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.find_events()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.import_from_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.import_from_ics()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.make_multiple_events"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.make_multiple_events()</span></code></a></li>
 <li><a class="reference internal" href="#google_api.GoogleCalendar.parse_ics"><code class="docutils literal notranslate"><span class="pre">GoogleCalendar.parse_ics()</span></code></a></li>
@@ -708,9 +708,9 @@ is specified.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="google_api.GoogleCalendar.find_future_events">
-<span class="sig-name descname"><span class="pre">find_future_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title_contains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description_contains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxResults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar.find_future_events" title="Link to this definition">¶</a></dt>
-<dd><p>Finds future events matching a title or description keyword.</p>
+<dt class="sig sig-object py" id="google_api.GoogleCalendar.find_events">
+<span class="sig-name descname"><span class="pre">find_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title_contains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description_contains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calendar_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxResults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'future'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#google_api.GoogleCalendar.find_events" title="Link to this definition">¶</a></dt>
+<dd><p>Finds events matching a title or description keyword.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -724,18 +724,28 @@ primary calendar).</p></li>
 primary calendar).</p></li>
 <li><p><strong>maxResults</strong> (<em>int</em><em>, </em><em>optional</em>) – Maximum number of results to fetch from the API
 before filtering. Defaults to 1000.</p></li>
+<li><p><strong>direction</strong> (<em>str</em><em>, </em><em>optional</em>) – <p>Which events (relative to now) to search.</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'future'</span></code> — only events starting now or later.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'past'</span></code> — only events starting before now.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'all'</span></code> — every event on the calendar, regardless of start
+time.</p></li>
+</ul>
+<p>Defaults to <code class="docutils literal notranslate"><span class="pre">'future'</span></code>.</p>
+</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Matching future event dicts. Returns all future events if no
-filter is specified.</p>
+<dd class="field-even"><p>Matching event dicts. Returns all events in the searched
+range if no title/description filter is specified.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of dict</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ValueError</strong> – If <code class="docutils literal notranslate"><span class="pre">calendar_name</span></code> and <code class="docutils literal notranslate"><span class="pre">calendar_id</span></code> refer to
-different calendars.</p>
+different calendars, or if <code class="docutils literal notranslate"><span class="pre">direction</span></code> is not one of
+<code class="docutils literal notranslate"><span class="pre">'future'</span></code>, <code class="docutils literal notranslate"><span class="pre">'past'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'all'</span></code>.</p>
 </dd>
 </dl>
 </dd></dl>
